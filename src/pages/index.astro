@@ -61,37 +61,239 @@ import Layout from '../layouts/Layout.astro';
 					</h1>
 				</div>
 
-				<!-- Toggle Chip -->
+				<!-- Direction Toggle Chip -->
 				<div class="inline-flex items-center p-1 bg-surface border border-hairline rounded-full text-xs font-medium self-start sm:self-auto">
-					<button type="button" class="px-3.5 py-1.5 bg-primary text-on-primary rounded-full transition-all cursor-pointer font-medium">
+					<button 
+						id="toggle-g-to-mol"
+						type="button" 
+						class="px-3.5 py-1.5 bg-primary text-on-primary rounded-full transition-all cursor-pointer font-medium"
+					>
 						g &rarr; mol
 					</button>
-					<button type="button" class="px-3.5 py-1.5 text-steel hover:text-ink rounded-full transition-all cursor-pointer font-medium">
+					<button 
+						id="toggle-mol-to-g"
+						type="button" 
+						class="px-3.5 py-1.5 text-steel hover:text-ink rounded-full transition-all cursor-pointer font-medium"
+					>
 						mol &rarr; g
 					</button>
 				</div>
 			</header>
 
-			<!-- Body Area: Side by Side on Desktop, single column below 520px -->
-			<div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-6">
-				<!-- Placeholder Box 1 -->
-				<div class="bg-surface-soft border border-dashed border-hairline rounded-[8px] p-6 min-h-[160px] flex flex-col justify-center items-center text-center">
-					<span class="text-[11px] font-semibold uppercase tracking-wider text-stone mb-1">
-						Field Container 1
-					</span>
-					<span class="text-sm font-medium text-steel">
-						Placeholder Box (Input)
-					</span>
+			<!-- Calculator Inputs & Fields Grid -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<!-- Field 1: Molar Mass -->
+				<div class="bg-canvas border border-hairline rounded-[12px] p-5 flex flex-col justify-between">
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label for="molar-mass" class="block text-xs font-semibold uppercase tracking-wider text-steel">
+								Molar Mass
+							</label>
+						</div>
+						<input 
+							type="number" 
+							id="molar-mass" 
+							step="any"
+							min="0"
+							placeholder="e.g. 18.02" 
+							class="w-full bg-canvas text-ink font-mono text-base rounded-[8px] px-3.5 py-2.5 border border-hairline focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+						/>
+					</div>
+					<!-- Molar Mass Unit Pills -->
+					<div class="mt-4 pt-3 border-t border-hairline-soft">
+						<div class="flex flex-wrap gap-2 items-center" id="molar-mass-units">
+							<button 
+								type="button" 
+								data-unit="g/mol"
+								class="unit-pill-mm min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-primary text-on-primary border border-primary cursor-pointer transition-all flex items-center justify-center"
+							>
+								g/mol
+							</button>
+							<button 
+								type="button" 
+								data-unit="kg/kmol"
+								class="unit-pill-mm min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								kg/kmol
+							</button>
+						</div>
+					</div>
 				</div>
 
-				<!-- Placeholder Box 2 -->
-				<div class="bg-surface-soft border border-dashed border-hairline rounded-[8px] p-6 min-h-[160px] flex flex-col justify-center items-center text-center">
-					<span class="text-[11px] font-semibold uppercase tracking-wider text-stone mb-1">
-						Field Container 2
-					</span>
-					<span class="text-sm font-medium text-steel">
-						Placeholder Box (Output)
-					</span>
+				<!-- Field 2: Mass Container -->
+				<div id="mass-container" class="bg-canvas border border-hairline rounded-[12px] p-5 flex flex-col justify-between transition-colors">
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label for="mass-input" class="block text-xs font-semibold uppercase tracking-wider text-steel">
+								Mass
+							</label>
+							<!-- Calculated Badge (Shown when readonly) -->
+							<span id="mass-calculated-badge" class="hidden items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-steel bg-surface px-2 py-0.5 rounded border border-hairline">
+								<svg class="w-3 h-3 text-steel shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+								</svg>
+								Calculated
+							</span>
+						</div>
+						<div class="relative flex items-center">
+							<input 
+								type="number" 
+								id="mass-input" 
+								step="any"
+								min="0"
+								placeholder="e.g. 18.02" 
+								class="w-full bg-canvas text-ink font-mono text-base rounded-[8px] px-3.5 py-2.5 border border-hairline focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+							/>
+							<div id="mass-lock-icon" class="hidden absolute right-3 pointer-events-none">
+								<svg class="w-4 h-4 text-steel" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+								</svg>
+							</div>
+						</div>
+					</div>
+					<!-- Mass Unit Pills -->
+					<div class="mt-4 pt-3 border-t border-hairline-soft">
+						<div class="flex flex-wrap gap-2 items-center" id="mass-units-primary">
+							<button 
+								type="button" 
+								data-unit="mg"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								mg
+							</button>
+							<button 
+								type="button" 
+								data-unit="g"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-primary text-on-primary border border-primary cursor-pointer transition-all flex items-center justify-center"
+							>
+								g
+							</button>
+							<button 
+								type="button" 
+								data-unit="kg"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								kg
+							</button>
+							<button 
+								type="button" 
+								id="toggle-mass-more"
+								aria-label="More units"
+								class="min-h-[44px] h-[44px] px-3 rounded-full text-xs font-bold bg-surface border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								&middot;&middot;&middot;
+							</button>
+						</div>
+						<!-- Mass Secondary Units Row -->
+						<div id="mass-units-secondary" class="hidden flex-wrap gap-2 items-center mt-2">
+							<button 
+								type="button" 
+								data-unit="ng"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								ng
+							</button>
+							<button 
+								type="button" 
+								data-unit="ug"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								&micro;g
+							</button>
+							<button 
+								type="button" 
+								data-unit="dag"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								dag
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Field 3: Moles Container -->
+				<div id="moles-container" class="md:col-span-2 bg-surface-soft border border-hairline rounded-[12px] p-5 flex flex-col justify-between transition-colors">
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label for="moles-input" class="block text-xs font-semibold uppercase tracking-wider text-steel">
+								Moles
+							</label>
+							<!-- Calculated Badge (Shown when readonly) -->
+							<span id="moles-calculated-badge" class="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-steel bg-canvas px-2 py-0.5 rounded border border-hairline">
+								<svg class="w-3 h-3 text-steel shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+								</svg>
+								Calculated
+							</span>
+						</div>
+						<div class="relative flex items-center">
+							<input 
+								type="number" 
+								id="moles-input" 
+								step="any"
+								min="0"
+								readonly
+								placeholder="0.000000" 
+								class="w-full bg-surface border border-hairline text-ink font-mono text-base font-semibold rounded-[8px] px-3.5 py-2.5 cursor-not-allowed select-none focus:outline-none transition-all"
+							/>
+							<div id="moles-lock-icon" class="absolute right-3 pointer-events-none">
+								<svg class="w-4 h-4 text-steel" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+								</svg>
+							</div>
+						</div>
+					</div>
+					<!-- Moles Unit Pills -->
+					<div class="mt-4 pt-3 border-t border-hairline-soft">
+						<div class="flex flex-wrap gap-2 items-center" id="moles-units-primary">
+							<button 
+								type="button" 
+								data-unit="mol"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-primary text-on-primary border border-primary cursor-pointer transition-all flex items-center justify-center"
+							>
+								mol
+							</button>
+							<button 
+								type="button" 
+								data-unit="mmol"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								mmol
+							</button>
+							<button 
+								type="button" 
+								id="toggle-moles-more"
+								aria-label="More units"
+								class="min-h-[44px] h-[44px] px-3 rounded-full text-xs font-bold bg-surface border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								&middot;&middot;&middot;
+							</button>
+						</div>
+						<!-- Moles Secondary Units Row -->
+						<div id="moles-units-secondary" class="hidden flex-wrap gap-2 items-center mt-2">
+							<button 
+								type="button" 
+								data-unit="umol"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								&micro;mol
+							</button>
+							<button 
+								type="button" 
+								data-unit="nmol"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								nmol
+							</button>
+							<button 
+								type="button" 
+								data-unit="pmol"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+							>
+								pmol
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -106,5 +308,224 @@ import Layout from '../layouts/Layout.astro';
 		</div>
 	</footer>
 </Layout>
+
+<script>
+	import { 
+		calculateMolesWithUnits, 
+		calculateMassWithUnits, 
+		format6Decimals,
+		type MolarMassUnit,
+		type MassUnit,
+		type MolesUnit
+	} from '../utils/units';
+
+	let currentMode: 'g_to_mol' | 'mol_to_g' = 'g_to_mol';
+
+	let molarMassUnit: MolarMassUnit = 'g/mol';
+	let massUnit: MassUnit = 'g';
+	let molesUnit: MolesUnit = 'mol';
+
+	const toggleGtoMolBtn = document.getElementById('toggle-g-to-mol');
+	const toggleMolToGBtn = document.getElementById('toggle-mol-to-g');
+
+	const molarMassInput = document.getElementById('molar-mass') as HTMLInputElement | null;
+	
+	const massContainer = document.getElementById('mass-container');
+	const massInput = document.getElementById('mass-input') as HTMLInputElement | null;
+	const massCalculatedBadge = document.getElementById('mass-calculated-badge');
+	const massLockIcon = document.getElementById('mass-lock-icon');
+
+	const molesContainer = document.getElementById('moles-container');
+	const molesInput = document.getElementById('moles-input') as HTMLInputElement | null;
+	const molesCalculatedBadge = document.getElementById('moles-calculated-badge');
+	const molesLockIcon = document.getElementById('moles-lock-icon');
+
+	const toggleMassMoreBtn = document.getElementById('toggle-mass-more');
+	const massSecondaryRow = document.getElementById('mass-units-secondary');
+
+	const toggleMolesMoreBtn = document.getElementById('toggle-moles-more');
+	const molesSecondaryRow = document.getElementById('moles-units-secondary');
+
+	function updateModeUI() {
+		if (currentMode === 'g_to_mol') {
+			// g -> mol: Moles field is READONLY calculated output, Mass field is EDITABLE input
+			toggleGtoMolBtn?.classList.add('bg-primary', 'text-on-primary');
+			toggleGtoMolBtn?.classList.remove('text-steel');
+			toggleMolToGBtn?.classList.remove('bg-primary', 'text-on-primary');
+			toggleMolToGBtn?.classList.add('text-steel');
+
+			// Editable Mass Field Styling
+			if (massInput) {
+				massInput.readOnly = false;
+				massInput.className = "w-full bg-canvas text-ink font-mono text-base rounded-[8px] px-3.5 py-2.5 border border-hairline focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all";
+			}
+			massContainer?.classList.remove('bg-surface-soft');
+			massContainer?.classList.add('bg-canvas');
+			massCalculatedBadge?.classList.add('hidden');
+			massCalculatedBadge?.classList.remove('flex');
+			massLockIcon?.classList.add('hidden');
+
+			// Readonly Moles Field Styling
+			if (molesInput) {
+				molesInput.readOnly = true;
+				molesInput.className = "w-full bg-surface border border-hairline text-ink font-mono text-base font-semibold rounded-[8px] px-3.5 py-2.5 cursor-not-allowed select-none focus:outline-none transition-all";
+			}
+			molesContainer?.classList.remove('bg-canvas');
+			molesContainer?.classList.add('bg-surface-soft');
+			molesCalculatedBadge?.classList.remove('hidden');
+			molesCalculatedBadge?.classList.add('flex');
+			molesLockIcon?.classList.remove('hidden');
+		} else {
+			// mol -> g: Mass field is READONLY calculated output, Moles field is EDITABLE input
+			toggleMolToGBtn?.classList.add('bg-primary', 'text-on-primary');
+			toggleMolToGBtn?.classList.remove('text-steel');
+			toggleGtoMolBtn?.classList.remove('bg-primary', 'text-on-primary');
+			toggleGtoMolBtn?.classList.add('text-steel');
+
+			// Editable Moles Field Styling
+			if (molesInput) {
+				molesInput.readOnly = false;
+				molesInput.className = "w-full bg-canvas text-ink font-mono text-base rounded-[8px] px-3.5 py-2.5 border border-hairline focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all";
+			}
+			molesContainer?.classList.remove('bg-surface-soft');
+			molesContainer?.classList.add('bg-canvas');
+			molesCalculatedBadge?.classList.add('hidden');
+			molesCalculatedBadge?.classList.remove('flex');
+			molesLockIcon?.classList.add('hidden');
+
+			// Readonly Mass Field Styling
+			if (massInput) {
+				massInput.readOnly = true;
+				massInput.className = "w-full bg-surface border border-hairline text-ink font-mono text-base font-semibold rounded-[8px] px-3.5 py-2.5 cursor-not-allowed select-none focus:outline-none transition-all";
+			}
+			massContainer?.classList.remove('bg-canvas');
+			massContainer?.classList.add('bg-surface-soft');
+			massCalculatedBadge?.classList.remove('hidden');
+			massCalculatedBadge?.classList.add('flex');
+			massLockIcon?.classList.remove('hidden');
+		}
+		recalculate();
+	}
+
+	function recalculate() {
+		const molarMassVal = parseFloat(molarMassInput?.value || '');
+
+		if (currentMode === 'g_to_mol') {
+			const massVal = parseFloat(massInput?.value || '');
+			if (isNaN(molarMassVal) || isNaN(massVal) || molarMassVal <= 0) {
+				if (molesInput) molesInput.value = '0.000000';
+				return;
+			}
+			const molesResult = calculateMolesWithUnits(
+				massVal, 
+				massUnit, 
+				molarMassVal, 
+				molarMassUnit, 
+				molesUnit
+			);
+			if (molesInput) molesInput.value = format6Decimals(molesResult);
+		} else {
+			const molesVal = parseFloat(molesInput?.value || '');
+			if (isNaN(molarMassVal) || isNaN(molesVal) || molarMassVal <= 0) {
+				if (massInput) massInput.value = '0.000000';
+				return;
+			}
+			const massResult = calculateMassWithUnits(
+				molesVal, 
+				molesUnit, 
+				molarMassVal, 
+				molarMassUnit, 
+				massUnit
+			);
+			if (massInput) massInput.value = format6Decimals(massResult);
+		}
+	}
+
+	function updatePillStyles(buttons: NodeListOf<HTMLButtonElement>, selectedUnit: string) {
+		buttons.forEach(btn => {
+			const unit = btn.getAttribute('data-unit');
+			if (unit === selectedUnit) {
+				btn.className = "min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-primary text-on-primary border border-primary cursor-pointer transition-all flex items-center justify-center shadow-xs";
+			} else {
+				btn.className = "min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center";
+			}
+		});
+	}
+
+	// Molar mass unit selection
+	const mmButtons = document.querySelectorAll<HTMLButtonElement>('.unit-pill-mm');
+	mmButtons.forEach(btn => {
+		btn.addEventListener('click', () => {
+			const unit = btn.getAttribute('data-unit') as MolarMassUnit;
+			if (unit) {
+				molarMassUnit = unit;
+				updatePillStyles(mmButtons, molarMassUnit);
+				recalculate();
+			}
+		});
+	});
+
+	// Mass unit selection
+	const massButtons = document.querySelectorAll<HTMLButtonElement>('.unit-pill-mass');
+	massButtons.forEach(btn => {
+		btn.addEventListener('click', () => {
+			const unit = btn.getAttribute('data-unit') as MassUnit;
+			if (unit) {
+				massUnit = unit;
+				updatePillStyles(massButtons, massUnit);
+				recalculate();
+			}
+		});
+	});
+
+	// Moles unit selection
+	const molesButtons = document.querySelectorAll<HTMLButtonElement>('.unit-pill-moles');
+	molesButtons.forEach(btn => {
+		btn.addEventListener('click', () => {
+			const unit = btn.getAttribute('data-unit') as MolesUnit;
+			if (unit) {
+				molesUnit = unit;
+				updatePillStyles(molesButtons, molesUnit);
+				recalculate();
+			}
+		});
+	});
+
+	// Secondary rows toggle
+	toggleMassMoreBtn?.addEventListener('click', () => {
+		massSecondaryRow?.classList.toggle('hidden');
+		massSecondaryRow?.classList.toggle('flex');
+	});
+
+	toggleMolesMoreBtn?.addEventListener('click', () => {
+		molesSecondaryRow?.classList.toggle('hidden');
+		molesSecondaryRow?.classList.toggle('flex');
+	});
+
+	// Mode toggle listeners
+	toggleGtoMolBtn?.addEventListener('click', () => {
+		if (currentMode !== 'g_to_mol') {
+			currentMode = 'g_to_mol';
+			updateModeUI();
+		}
+	});
+
+	toggleMolToGBtn?.addEventListener('click', () => {
+		if (currentMode !== 'mol_to_g') {
+			currentMode = 'mol_to_g';
+			updateModeUI();
+		}
+	});
+
+	// Input listeners
+	molarMassInput?.addEventListener('input', recalculate);
+	massInput?.addEventListener('input', recalculate);
+	molesInput?.addEventListener('input', recalculate);
+
+	// Initial render setup
+	updateModeUI();
+</script>
+
+
 
 
