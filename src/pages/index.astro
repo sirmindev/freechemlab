@@ -3,7 +3,33 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Mole & Grams-to-Moles Calculator | FreeChemLab">
-	<main class="w-full max-w-4xl mx-auto px-4 py-6 md:py-10">
+	<!-- Top Navigation Bar -->
+	<header class="w-full bg-canvas border-b border-hairline-soft">
+		<div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+			<!-- Logo / Wordmark -->
+			<a href="/" class="text-base font-semibold text-ink tracking-tight flex items-center gap-1.5">
+				<span class="text-brand-green font-bold text-lg leading-none">&bull;</span>
+				<span>FreeChemLab</span>
+			</a>
+
+			<!-- Navigation Item (Active) -->
+			<nav aria-label="Main Navigation">
+				<ul class="flex items-center space-x-1">
+					<li>
+						<a 
+							href="/calculators" 
+							class="px-3 py-1.5 text-sm font-medium text-ink bg-surface rounded-full border border-hairline transition-colors" 
+							aria-current="page"
+						>
+							Calculator
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	<main class="w-full max-w-4xl mx-auto px-4 py-4 md:py-6">
 		<!-- Breadcrumb Navigation -->
 		<nav aria-label="Breadcrumb" class="mb-4">
 			<ol class="flex items-center space-x-2 text-sm text-steel">
@@ -70,5 +96,15 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 		</section>
 	</main>
+
+	<!-- Footer -->
+	<footer class="w-full border-t border-hairline-soft py-4 mt-auto">
+		<div class="max-w-4xl mx-auto px-4 text-center">
+			<p class="text-xs text-steel font-normal">
+				&copy; 2026 FreeChemLab
+			</p>
+		</div>
+	</footer>
 </Layout>
+
 
