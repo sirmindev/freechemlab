@@ -106,3 +106,26 @@ export function format6Decimals(value: number): string {
   if (isNaN(value) || value <= 0) return '0.000000';
   return value.toFixed(6);
 }
+
+export const AVOGADRO_CONSTANT = 6.02214076e23;
+
+/**
+ * Calculates particle count given moles (in base unit 'mol').
+ * Formula: particles = moles * N_A
+ */
+export function calculateParticles(molesInMol: number): number {
+  if (isNaN(molesInMol) || molesInMol <= 0) return 0;
+  return molesInMol * AVOGADRO_CONSTANT;
+}
+
+/**
+ * Formats particle count into scientific notation, e.g. "6.02214 × 10^23 particles".
+ */
+export function formatParticleCount(particles: number): string {
+  if (isNaN(particles) || particles <= 0) return '—';
+  const expString = particles.toExponential(5);
+  const [mantissa, exponent] = expString.split('e');
+  const expNum = parseInt(exponent, 10);
+  return `${mantissa} \u00D7 10^${expNum} particles`;
+}
+
