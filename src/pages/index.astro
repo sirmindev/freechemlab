@@ -1,11 +1,74 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Mole & Grams-to-Moles Calculator | FreeChemLab">
+	<main class="w-full max-w-4xl mx-auto px-4 py-6 md:py-10">
+		<!-- Breadcrumb Navigation -->
+		<nav aria-label="Breadcrumb" class="mb-4">
+			<ol class="flex items-center space-x-2 text-sm text-steel">
+				<li>
+					<a href="/" class="hover:text-ink transition-colors">Home</a>
+				</li>
+				<li>
+					<span class="text-stone" aria-hidden="true">/</span>
+				</li>
+				<li>
+					<a href="/calculators" class="hover:text-ink transition-colors">Calculators</a>
+				</li>
+				<li>
+					<span class="text-stone" aria-hidden="true">/</span>
+				</li>
+				<li class="font-medium text-ink" aria-current="page">
+					Mole &amp; Grams-to-Moles
+				</li>
+			</ol>
+		</nav>
+
+		<!-- Calculator Card Shell -->
+		<section class="bg-canvas border border-hairline rounded-[12px] p-6 shadow-xs">
+			<!-- Header Row -->
+			<header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-hairline-soft">
+				<div>
+					<h1 class="text-xl md:text-2xl font-semibold text-ink tracking-tight">
+						Mole &amp; Grams-to-Moles Calculator
+					</h1>
+				</div>
+
+				<!-- Toggle Chip -->
+				<div class="inline-flex items-center p-1 bg-surface border border-hairline rounded-full text-xs font-medium self-start sm:self-auto">
+					<button type="button" class="px-3.5 py-1.5 bg-primary text-on-primary rounded-full transition-all cursor-pointer font-medium">
+						g &rarr; mol
+					</button>
+					<button type="button" class="px-3.5 py-1.5 text-steel hover:text-ink rounded-full transition-all cursor-pointer font-medium">
+						mol &rarr; g
+					</button>
+				</div>
+			</header>
+
+			<!-- Body Area: Side by Side on Desktop, single column below 520px -->
+			<div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-6">
+				<!-- Placeholder Box 1 -->
+				<div class="bg-surface-soft border border-dashed border-hairline rounded-[8px] p-6 min-h-[160px] flex flex-col justify-center items-center text-center">
+					<span class="text-[11px] font-semibold uppercase tracking-wider text-stone mb-1">
+						Field Container 1
+					</span>
+					<span class="text-sm font-medium text-steel">
+						Placeholder Box (Input)
+					</span>
+				</div>
+
+				<!-- Placeholder Box 2 -->
+				<div class="bg-surface-soft border border-dashed border-hairline rounded-[8px] p-6 min-h-[160px] flex flex-col justify-center items-center text-center">
+					<span class="text-[11px] font-semibold uppercase tracking-wider text-stone mb-1">
+						Field Container 2
+					</span>
+					<span class="text-sm font-medium text-steel">
+						Placeholder Box (Output)
+					</span>
+				</div>
+			</div>
+		</section>
+	</main>
 </Layout>
+
