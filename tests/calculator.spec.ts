@@ -134,7 +134,7 @@ test.describe('Validation', () => {
     await goto(page);
     await setMolarMass(page, '0');
     await setMass(page, '10');
-    await expect(page.locator('#molar-mass-error')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#molar-mass-error')).toBeVisible();
     // Result field should not show a numeric value
     const result = await page.locator('#moles-input').inputValue();
     expect(isNaN(parseFloat(result)) || result === '—' || result === '').toBeTruthy();
@@ -144,14 +144,14 @@ test.describe('Validation', () => {
     await goto(page);
     await setMolarMass(page, '-5');
     await setMass(page, '10');
-    await expect(page.locator('#molar-mass-error')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#molar-mass-error')).toBeVisible();
   });
 
   test('negative mass shows inline error', async ({ page }) => {
     await goto(page);
     await setMolarMass(page, '18.015');
     await setMass(page, '-1');
-    await expect(page.locator('#mass-error')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#mass-error')).toBeVisible();
   });
 
   test('correcting molar mass to valid value clears error and resumes calculation', async ({ page }) => {
@@ -159,11 +159,11 @@ test.describe('Validation', () => {
     await setMolarMass(page, '0');
     await setMass(page, '18.015');
     // Error visible
-    await expect(page.locator('#molar-mass-error')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#molar-mass-error')).toBeVisible();
     // Fix it
     await setMolarMass(page, '18.015');
     // Error gone
-    await expect(page.locator('#molar-mass-error')).toHaveClass(/hidden/);
+    await expect(page.locator('#molar-mass-error')).toBeHidden();
     // Calculation resumes
     const result = await page.locator('#moles-input').inputValue();
     expect(parseFloat(result)).toBeCloseTo(1.0, 4);
@@ -173,9 +173,9 @@ test.describe('Validation', () => {
     await goto(page);
     await setMolarMass(page, '18.015');
     await setMass(page, '-1');
-    await expect(page.locator('#mass-error')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#mass-error')).toBeVisible();
     await setMass(page, '18.015');
-    await expect(page.locator('#mass-error')).toHaveClass(/hidden/);
+    await expect(page.locator('#mass-error')).toBeHidden();
   });
 });
 
@@ -208,13 +208,13 @@ test.describe('Particle count', () => {
 test.describe('Browse panel – Presets', () => {
   test('panel is hidden on load', async ({ page }) => {
     await goto(page);
-    await expect(page.locator('#browse-panel')).toHaveClass(/hidden/);
+    await expect(page.locator('#browse-panel')).toBeHidden();
   });
 
   test('clicking trigger opens panel', async ({ page }) => {
     await goto(page);
     await page.click('#browse-trigger');
-    await expect(page.locator('#browse-panel')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#browse-panel')).toBeVisible();
   });
 
   test('selecting Water and clicking "Use this molar mass" fills Molar Mass with 18.015 and collapses panel', async ({ page }) => {
@@ -226,7 +226,7 @@ test.describe('Browse panel – Presets', () => {
     const mmVal = await page.locator('#molar-mass').inputValue();
     expect(parseFloat(mmVal)).toBeCloseTo(18.015, 3);
     // Panel should be collapsed
-    await expect(page.locator('#browse-panel')).toHaveClass(/hidden/);
+    await expect(page.locator('#browse-panel')).toBeHidden();
   });
 
   test('selecting Carbon Dioxide fills Molar Mass with 44.01', async ({ page }) => {
@@ -241,9 +241,9 @@ test.describe('Browse panel – Presets', () => {
   test('"Use this molar mass" button is hidden until a compound is selected', async ({ page }) => {
     await goto(page);
     await page.click('#browse-trigger');
-    await expect(page.locator('#use-preset')).toHaveClass(/hidden/);
+    await expect(page.locator('#use-preset')).toBeHidden();
     await page.selectOption('#preset-select', '18.015');
-    await expect(page.locator('#use-preset')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#use-preset')).toBeVisible();
   });
 });
 
@@ -260,10 +260,10 @@ test.describe('Browse panel – Build custom', () => {
   test('switching to Build custom tab shows element grid', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
-    await expect(page.locator('#element-grid')).not.toHaveClass(/hidden/);
-    // Should have 62 element cards (full IUPAC/CIAAW 2024 dataset, Tc omitted)
+    await expect(page.locator('#element-grid')).toBeVisible();
+    // Should have 63 element cards (full IUPAC/CIAAW 2024 dataset, Tc omitted)
     const cards = page.locator('#element-grid > div');
-    await expect(cards).toHaveCount(62);
+    await expect(cards).toHaveCount(63);
   });
 
   test('H2O formula: 2x Hydrogen + 1x Oxygen = 18.015 g/mol', async ({ page }) => {
@@ -305,7 +305,7 @@ test.describe('Browse panel – Build custom', () => {
     const mmVal = await page.locator('#molar-mass').inputValue();
     expect(parseFloat(mmVal)).toBeCloseTo(12.011, 2);
     // Panel collapsed
-    await expect(page.locator('#browse-panel')).toHaveClass(/hidden/);
+    await expect(page.locator('#browse-panel')).toBeHidden();
   });
 });
 
@@ -337,20 +337,20 @@ test.describe('Element search filter', () => {
     await expect(cards.first()).toContainText('Fe');
   });
 
-  test('clearing search restores all 62 elements', async ({ page }) => {
+  test('clearing search restores all 63 elements', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
     await page.fill('#element-search', 'sod');
     await page.fill('#element-search', '');
     const cards = page.locator('#element-grid > div');
-    await expect(cards).toHaveCount(62);
+    await expect(cards).toHaveCount(63);
   });
 
   test('no-match query shows empty state message', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
     await page.fill('#element-search', 'zzz');
-    await expect(page.locator('#element-grid-empty')).not.toHaveClass(/hidden/);
+    await expect(page.locator('#element-grid-empty')).toBeVisible();
   });
 });
 
