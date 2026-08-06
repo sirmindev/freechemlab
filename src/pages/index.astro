@@ -217,6 +217,103 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 				</div>
 
+				<!-- Browse Elements Trigger + Panel (col-span-2, between inputs and result) -->
+				<div class="md:col-span-2">
+					<!-- Trigger -->
+					<button
+						id="browse-trigger"
+						type="button"
+						class="flex items-center gap-1.5 text-xs font-medium text-steel hover:text-ink transition-colors cursor-pointer"
+					>
+						<svg id="browse-chevron" class="w-3.5 h-3.5 text-stone transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+						</svg>
+						Not sure of the molar mass? Browse elements
+					</button>
+
+					<!-- Collapsible Panel -->
+					<div id="browse-panel" class="hidden mt-3 bg-canvas border border-hairline rounded-[12px] overflow-hidden">
+						<!-- Tabs -->
+						<div class="flex border-b border-hairline">
+							<button
+								id="tab-presets"
+								type="button"
+								class="px-5 py-3 text-xs font-semibold text-ink border-b-2 border-ink -mb-px transition-colors cursor-pointer"
+							>
+								Presets
+							</button>
+							<button
+								id="tab-custom"
+								type="button"
+								class="px-5 py-3 text-xs font-medium text-steel border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer"
+							>
+								Build custom
+							</button>
+						</div>
+
+						<!-- Presets Tab Content -->
+						<div id="panel-presets" class="p-5">
+							<label for="preset-select" class="block text-xs font-semibold uppercase tracking-wider text-steel mb-2">
+								Common Compounds
+							</label>
+							<select
+								id="preset-select"
+								class="w-full bg-surface-soft border border-hairline text-ink text-sm font-sans rounded-[8px] px-3.5 py-2.5 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+							>
+								<option value="">Select a compound…</option>
+								<option value="18.015">Water (H₂O) — 18.015 g/mol</option>
+								<option value="58.44">Table Salt (NaCl) — 58.44 g/mol</option>
+								<option value="44.01">Carbon Dioxide (CO₂) — 44.01 g/mol</option>
+								<option value="180.16">Glucose (C₆H₁₂O₆) — 180.16 g/mol</option>
+								<option value="46.07">Ethanol (C₂H₅OH) — 46.07 g/mol</option>
+							</select>
+							<button
+								id="use-preset"
+								type="button"
+								class="hidden mt-3 px-4 py-2 bg-primary text-on-primary text-xs font-semibold rounded-full cursor-pointer transition-colors hover:bg-charcoal"
+							>
+								Use this molar mass
+							</button>
+						</div>
+
+						<!-- Build Custom Tab Content -->
+						<div id="panel-custom" class="hidden p-5">
+							<!-- Search -->
+							<input
+								type="search"
+								id="element-search"
+								placeholder="Search by name or symbol…"
+								class="w-full bg-surface-soft border border-hairline text-ink text-sm font-sans rounded-[8px] px-3.5 py-2.5 mb-4 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+							/>
+
+							<!-- Element Grid -->
+							<div id="element-grid" class="grid grid-cols-4 sm:grid-cols-5 gap-2 mb-4">
+								<!-- Rendered by JS -->
+							</div>
+							<p id="element-grid-empty" class="hidden text-xs text-stone text-center py-4">No elements match your search.</p>
+
+							<!-- Formula Bar -->
+							<div class="mt-4 pt-4 border-t border-hairline-soft flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+								<div>
+									<span class="block text-[11px] font-semibold uppercase tracking-wider text-stone mb-0.5">Formula</span>
+									<span id="custom-formula" class="text-base font-semibold font-mono text-ink">—</span>
+								</div>
+								<div class="text-right sm:text-right">
+									<span class="block text-[11px] font-semibold uppercase tracking-wider text-stone mb-0.5">Molar Mass</span>
+									<span id="custom-molar-mass-val" class="text-base font-semibold font-mono text-ink">—</span>
+								</div>
+								<button
+									id="use-custom"
+									type="button"
+									class="hidden self-end sm:self-auto px-4 py-2 bg-primary text-on-primary text-xs font-semibold rounded-full cursor-pointer transition-colors hover:bg-charcoal whitespace-nowrap"
+								>
+									Use this molar mass
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<!-- Field 3: Moles Container -->
 				<div id="moles-container" class="md:col-span-2 bg-surface-soft border border-hairline rounded-[12px] p-5 flex flex-col justify-between transition-colors">
 					<div>
@@ -313,6 +410,7 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 				</div>
 			</div>
+
 		</section>
 	</main>
 
@@ -622,6 +720,201 @@ import Layout from '../layouts/Layout.astro';
 	// Initial render setup
 	updateModeUI();
 </script>
+
+<script>
+	import { SEED_ELEMENTS, buildFormula, computeCustomMolarMass } from '../utils/browseElements';
+
+	// --- DOM refs ---
+	const molarMassInput = document.getElementById('molar-mass') as HTMLInputElement | null;
+	const browseTrigger = document.getElementById('browse-trigger');
+	const browseChevron = document.getElementById('browse-chevron');
+	const browsePanel = document.getElementById('browse-panel');
+
+	const tabPresets = document.getElementById('tab-presets');
+	const tabCustom = document.getElementById('tab-custom');
+	const panelPresets = document.getElementById('panel-presets');
+	const panelCustom = document.getElementById('panel-custom');
+
+	const presetSelect = document.getElementById('preset-select') as HTMLSelectElement | null;
+	const usePresetBtn = document.getElementById('use-preset');
+
+	const elementSearch = document.getElementById('element-search') as HTMLInputElement | null;
+	const elementGrid = document.getElementById('element-grid');
+	const elementGridEmpty = document.getElementById('element-grid-empty');
+	const customFormula = document.getElementById('custom-formula');
+	const customMolarMassVal = document.getElementById('custom-molar-mass-val');
+	const useCustomBtn = document.getElementById('use-custom');
+
+	// --- State ---
+	const quantities = new Map<string, number>();
+	let panelOpen = false;
+	let activeTab: 'presets' | 'custom' = 'presets';
+
+	// --- Panel toggle ---
+	browseTrigger?.addEventListener('click', () => {
+		panelOpen = !panelOpen;
+		browsePanel?.classList.toggle('hidden', !panelOpen);
+		browseChevron?.classList.toggle('rotate-90', panelOpen);
+		if (panelOpen && activeTab === 'custom') renderGrid();
+	});
+
+	function collapsePanel() {
+		panelOpen = false;
+		browsePanel?.classList.add('hidden');
+		browseChevron?.classList.remove('rotate-90');
+	}
+
+	// --- Tab switching ---
+	function setTab(tab: 'presets' | 'custom') {
+		activeTab = tab;
+		const presetActive = tab === 'presets';
+		panelPresets?.classList.toggle('hidden', !presetActive);
+		panelCustom?.classList.toggle('hidden', presetActive);
+
+		const activeClass = 'px-5 py-3 text-xs font-semibold text-ink border-b-2 border-ink -mb-px transition-colors cursor-pointer';
+		const inactiveClass = 'px-5 py-3 text-xs font-medium text-steel border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer';
+		if (tabPresets) tabPresets.className = presetActive ? activeClass : inactiveClass;
+		if (tabCustom) tabCustom.className = presetActive ? inactiveClass : activeClass;
+
+		if (tab === 'custom') renderGrid();
+	}
+
+	tabPresets?.addEventListener('click', () => setTab('presets'));
+	tabCustom?.addEventListener('click', () => setTab('custom'));
+
+	// --- Presets ---
+	presetSelect?.addEventListener('change', () => {
+		if (usePresetBtn) {
+			usePresetBtn.classList.toggle('hidden', !presetSelect.value);
+		}
+	});
+
+	usePresetBtn?.addEventListener('click', () => {
+		const val = presetSelect?.value;
+		if (!val || !molarMassInput) return;
+		molarMassInput.value = val;
+		molarMassInput.dispatchEvent(new Event('input'));
+		collapsePanel();
+		if (presetSelect) presetSelect.value = '';
+		usePresetBtn.classList.add('hidden');
+	});
+
+	// --- Element Grid ---
+	function renderGrid(filter = '') {
+		if (!elementGrid) return;
+		elementGrid.innerHTML = '';
+		const lc = filter.toLowerCase().trim();
+		const visible = lc
+			? SEED_ELEMENTS.filter(el => el.name.toLowerCase().includes(lc) || el.symbol.toLowerCase().includes(lc))
+			: SEED_ELEMENTS;
+
+		const isEmpty = visible.length === 0;
+		elementGrid.classList.toggle('hidden', isEmpty);
+		elementGridEmpty?.classList.toggle('hidden', !isEmpty);
+
+		visible.forEach(el => {
+			const qty = quantities.get(el.symbol) ?? 0;
+			const card = document.createElement('div');
+			card.className = [
+				'flex flex-col items-center justify-between rounded-[10px] border transition-all overflow-hidden',
+				qty > 0 ? 'border-brand-green bg-canvas' : 'border-hairline bg-surface-soft'
+			].join(' ');
+
+			const infoArea = document.createElement('button');
+			infoArea.type = 'button';
+			infoArea.className = 'w-full flex flex-col items-center pt-3 pb-2 cursor-pointer select-none focus:outline-none';
+			infoArea.innerHTML = `
+				<span class="text-lg font-bold font-mono text-ink leading-tight">${el.symbol}</span>
+				<span class="text-[10px] font-medium text-stone leading-none mt-0.5 truncate w-full text-center px-1">${el.name}</span>
+				<span class="text-[10px] font-mono text-muted mt-0.5">${el.atomicWeight}</span>
+			`;
+			infoArea.addEventListener('click', () => {
+				if (!quantities.has(el.symbol) || quantities.get(el.symbol) === 0) {
+					quantities.set(el.symbol, 1);
+					renderGrid(filter);
+					updateFormulaBar();
+				}
+			});
+
+			card.appendChild(infoArea);
+
+			// Stepper (visible only when qty > 0)
+			if (qty > 0) {
+				const stepper = document.createElement('div');
+				stepper.className = 'w-full flex items-center justify-between border-t border-hairline';
+
+				const minusBtn = document.createElement('button');
+				minusBtn.type = 'button';
+				minusBtn.className = 'flex-1 flex items-center justify-center min-h-[44px] text-base font-semibold text-steel hover:text-ink hover:bg-surface-soft transition-colors cursor-pointer focus:outline-none';
+				minusBtn.textContent = '−';
+				minusBtn.addEventListener('click', () => {
+					const current = quantities.get(el.symbol) ?? 0;
+					if (current <= 1) {
+						quantities.delete(el.symbol);
+					} else {
+						quantities.set(el.symbol, current - 1);
+					}
+					renderGrid(filter);
+					updateFormulaBar();
+				});
+
+				const qtyDisplay = document.createElement('span');
+				qtyDisplay.className = 'px-1 text-sm font-semibold font-mono text-ink select-none min-w-[20px] text-center';
+				qtyDisplay.textContent = String(qty);
+
+				const plusBtn = document.createElement('button');
+				plusBtn.type = 'button';
+				plusBtn.className = 'flex-1 flex items-center justify-center min-h-[44px] text-base font-semibold text-steel hover:text-ink hover:bg-surface-soft transition-colors cursor-pointer focus:outline-none';
+				plusBtn.textContent = '+';
+				plusBtn.addEventListener('click', () => {
+					quantities.set(el.symbol, (quantities.get(el.symbol) ?? 0) + 1);
+					renderGrid(filter);
+					updateFormulaBar();
+				});
+
+				stepper.appendChild(minusBtn);
+				stepper.appendChild(qtyDisplay);
+				stepper.appendChild(plusBtn);
+				card.appendChild(stepper);
+			}
+
+			elementGrid.appendChild(card);
+		});
+	}
+
+	// --- Formula bar ---
+	function updateFormulaBar() {
+		const hasSelection = quantities.size > 0;
+		const formula = hasSelection ? buildFormula(quantities) : '—';
+		const mass = hasSelection ? computeCustomMolarMass(quantities) : 0;
+
+		if (customFormula) customFormula.textContent = formula || '—';
+		if (customMolarMassVal) {
+			customMolarMassVal.textContent = hasSelection ? `${mass.toFixed(3)} g/mol` : '—';
+		}
+		useCustomBtn?.classList.toggle('hidden', !hasSelection);
+	}
+
+	useCustomBtn?.addEventListener('click', () => {
+		if (!molarMassInput) return;
+		const mass = computeCustomMolarMass(quantities);
+		molarMassInput.value = String(mass.toFixed(3));
+		molarMassInput.dispatchEvent(new Event('input'));
+		collapsePanel();
+		quantities.clear();
+		if (elementSearch) elementSearch.value = '';
+		updateFormulaBar();
+	});
+
+	// --- Search ---
+	elementSearch?.addEventListener('input', () => {
+		renderGrid(elementSearch.value);
+	});
+
+	// Initial render
+	renderGrid();
+</script>
+
 
 
 
