@@ -66,7 +66,7 @@ import Layout from '../layouts/Layout.astro';
 					<button 
 						id="toggle-g-to-mol"
 						type="button" 
-						class="px-3.5 py-1.5 bg-primary text-on-primary rounded-full transition-all cursor-pointer font-medium"
+						class="px-3.5 py-1.5 bg-brand-green text-on-primary hover:bg-brand-green-deep rounded-full transition-all cursor-pointer font-medium"
 					>
 						g &rarr; mol
 					</button>
@@ -108,7 +108,7 @@ import Layout from '../layouts/Layout.astro';
 							<button 
 								type="button" 
 								data-unit="g/mol"
-								class="unit-pill-mm min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-primary text-on-primary border border-primary cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mm min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-brand-green text-on-primary hover:bg-brand-green-deep border border-brand-green cursor-pointer transition-all flex items-center justify-center"
 							>
 								g/mol
 							</button>
@@ -170,7 +170,7 @@ import Layout from '../layouts/Layout.astro';
 							<button 
 								type="button" 
 								data-unit="g"
-								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-primary text-on-primary border border-primary cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-brand-green text-on-primary hover:bg-brand-green-deep border border-brand-green cursor-pointer transition-all flex items-center justify-center"
 							>
 								g
 							</button>
@@ -291,7 +291,7 @@ import Layout from '../layouts/Layout.astro';
 							<button
 								id="use-preset"
 								type="button"
-								class="hidden mt-3 px-4 py-2 bg-primary text-on-primary text-xs font-semibold rounded-full cursor-pointer transition-colors hover:bg-charcoal"
+								class="hidden mt-3 px-4 py-2 bg-brand-green text-on-primary text-xs font-semibold rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep"
 							>
 								Use this molar mass
 							</button>
@@ -328,7 +328,7 @@ import Layout from '../layouts/Layout.astro';
 								<button
 									id="use-custom"
 									type="button"
-									class="hidden self-end sm:self-auto px-4 py-2 bg-primary text-on-primary text-xs font-semibold rounded-full cursor-pointer transition-colors hover:bg-charcoal whitespace-nowrap"
+									class="hidden self-end sm:self-auto px-4 py-2 bg-brand-green text-on-primary text-xs font-semibold rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep whitespace-nowrap"
 								>
 									Use this molar mass
 								</button>
@@ -386,7 +386,7 @@ import Layout from '../layouts/Layout.astro';
 							<button 
 								type="button" 
 								data-unit="mol"
-								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-primary text-on-primary border border-primary cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-brand-green text-on-primary hover:bg-brand-green-deep border border-brand-green cursor-pointer transition-all flex items-center justify-center"
 							>
 								mol
 							</button>
@@ -497,9 +497,9 @@ import Layout from '../layouts/Layout.astro';
 		clearAllErrors();
 		if (currentMode === 'g_to_mol') {
 			// g -> mol: Moles field is READONLY calculated output, Mass field is EDITABLE input
-			toggleGtoMolBtn?.classList.add('bg-primary', 'text-on-primary');
+			toggleGtoMolBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
 			toggleGtoMolBtn?.classList.remove('text-steel');
-			toggleMolToGBtn?.classList.remove('bg-primary', 'text-on-primary');
+			toggleMolToGBtn?.classList.remove('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
 			toggleMolToGBtn?.classList.add('text-steel');
 
 			// Editable Mass Field Styling
@@ -528,9 +528,9 @@ import Layout from '../layouts/Layout.astro';
 			particleCountRow?.classList.add('flex');
 		} else {
 			// mol -> g: Mass field is READONLY calculated output, Moles field is EDITABLE input
-			toggleMolToGBtn?.classList.add('bg-primary', 'text-on-primary');
+			toggleMolToGBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
 			toggleMolToGBtn?.classList.remove('text-steel');
-			toggleGtoMolBtn?.classList.remove('bg-primary', 'text-on-primary');
+			toggleGtoMolBtn?.classList.remove('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
 			toggleGtoMolBtn?.classList.add('text-steel');
 
 			// Editable Moles Field Styling
@@ -663,7 +663,7 @@ import Layout from '../layouts/Layout.astro';
 		buttons.forEach(btn => {
 			const unit = btn.getAttribute('data-unit');
 			if (unit === selectedUnit) {
-				btn.className = "min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-primary text-on-primary border border-primary cursor-pointer transition-all flex items-center justify-center shadow-xs";
+				btn.className = "min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-brand-green text-on-primary hover:bg-brand-green-deep border border-brand-green cursor-pointer transition-all flex items-center justify-center shadow-xs";
 			} else {
 				btn.className = "min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center";
 			}

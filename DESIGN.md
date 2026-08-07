@@ -6,28 +6,16 @@ description: Mintlify presents documentation infrastructure with a dual-mode aes
 colors:
   primary: "#0a0a0a"
   on-primary: "#ffffff"
-  brand-green: "#00d4a4"
-  brand-green-deep: "#00b48a"
-  brand-green-soft: "#7cebcb"
-  brand-tag: "#3772cf"
-  brand-warn: "#c37d0d"
-  brand-annotate: "#1ba673"
+  brand-green: "#02613E"
+  brand-green-deep: "#04442C"
+  brand-green-soft: "#E5F5EF"
   brand-error: "#d45656"
   brand-cursor: "#888888"
-  hero-sky-from: "#87a8c8"
-  hero-sky-to: "#f5e9d8"
-  hero-dark-from: "#1a3d4a"
-  hero-dark-to: "#2d5a4f"
-  testimonial-orange: "#f55a3c"
-  testimonial-orange-deep: "#cc3a1f"
-  canvas: "#ffffff"
-  canvas-dark: "#0a0a0a"
-  surface: "#f7f7f7"
+  canvas: "#FAF9F5"
+  surface: "#FAF9F5"
   surface-soft: "#fafafa"
-  surface-code: "#1c1c1e"
   hairline: "#e5e5e5"
   hairline-soft: "#ededed"
-  hairline-dark: "#1f1f1f"
   ink: "#0a0a0a"
   charcoal: "#1c1c1e"
   slate: "#3a3a3c"
@@ -35,7 +23,6 @@ colors:
   stone: "#888888"
   muted: "#a8a8aa"
   on-dark: "#ffffff"
-  on-dark-muted: "#b3b3b3"
 
 typography:
   hero-display:
@@ -182,7 +169,7 @@ components:
     textColor: "{colors.muted}"
   button-accent-green:
     backgroundColor: "{colors.brand-green}"
-    textColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
     typography: "{typography.button-md}"
     rounded: "{rounded.full}"
     padding: "10px 20px"
@@ -235,28 +222,6 @@ components:
     rounded: "{rounded.lg}"
     padding: "{spacing.xl}"
     border: "1px solid {colors.hairline}"
-  pricing-card:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xxl}"
-    border: "1px solid {colors.hairline}"
-  pricing-card-featured:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xxl}"
-    border: "2px solid {colors.brand-green}"
-    shadow: "rgba(0, 212, 164, 0.08) 0px 8px 24px"
-  testimonial-card-feature:
-    backgroundColor: "{colors.testimonial-orange}"
-    textColor: "{colors.on-dark}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.section}"
-  testimonial-card-quote:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xxl}"
-    border: "1px solid {colors.hairline}"
   text-input:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
@@ -296,18 +261,23 @@ components:
     padding: "8px 16px"
     border: "1px solid {colors.hairline}"
   pill-tab-active:
-    backgroundColor: "{colors.primary}"
+    backgroundColor: "{colors.brand-green}"
     textColor: "{colors.on-primary}"
     rounded: "{rounded.full}"
-    border: "1px solid {colors.primary}"
-  toggle-monthly-yearly:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.full}"
-    padding: "4px"
+    border: "1px solid {colors.brand-green}"
+  pill-tab-active-pressed:
+    backgroundColor: "{colors.brand-green-deep}"
+    textColor: "{colors.on-primary}"
+    border: "1px solid {colors.brand-green-deep}"
+  card-highlight-soft:
+    backgroundColor: "{colors.brand-green-soft}"
+    textColor: "{colors.brand-green}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.xl}"
+    border: "1px solid {colors.brand-green-deep}"
   badge-discount:
     backgroundColor: "{colors.brand-green}"
-    textColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
     typography: "{typography.caption-bold}"
     rounded: "{rounded.full}"
     padding: "2px 8px"
@@ -317,137 +287,7 @@ components:
     typography: "{typography.micro-uppercase}"
     rounded: "{rounded.sm}"
     padding: "2px 6px"
-  badge-type:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.steel}"
-    typography: "{typography.code-sm}"
-    rounded: "{rounded.sm}"
-    padding: "2px 6px"
-  badge-tag:
-    backgroundColor: "rgba(55, 114, 207, 0.15)"
-    textColor: "{colors.brand-tag}"
-    typography: "{typography.caption-bold}"
-    rounded: "{rounded.sm}"
-    padding: "2px 8px"
-  promo-banner:
-    backgroundColor: "{colors.canvas-dark}"
-    textColor: "{colors.on-dark}"
-    typography: "{typography.body-sm-medium}"
-    padding: "{spacing.sm} {spacing.md}"
-  code-block:
-    backgroundColor: "{colors.surface-code}"
-    textColor: "{colors.on-dark}"
-    typography: "{typography.code-md}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.md}"
-  code-block-header:
-    backgroundColor: "{colors.surface-code}"
-    textColor: "{colors.on-dark-muted}"
-    typography: "{typography.caption}"
-    padding: "{spacing.xs} {spacing.md}"
-    border: "0 0 1px {colors.hairline-dark} solid"
-  code-inline:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.charcoal}"
-    typography: "{typography.code-inline}"
-    rounded: "{rounded.xs}"
-    padding: "2px 6px"
-    border: "1px solid {colors.hairline}"
-  property-row:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-sm}"
-    padding: "{spacing.md} 0"
-    border: "0 0 1px {colors.hairline-soft} solid"
-  feature-comparison-table:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-sm}"
-    rounded: "{rounded.md}"
-    border: "1px solid {colors.hairline}"
-  feature-comparison-row:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    padding: "{spacing.md} {spacing.lg}"
-    border: "0 0 1px {colors.hairline-soft} solid"
-  sidebar-nav-item:
-    backgroundColor: "transparent"
-    textColor: "{colors.steel}"
-    typography: "{typography.body-sm}"
-    rounded: "{rounded.sm}"
-    padding: "{spacing.xs} {spacing.md}"
-  sidebar-nav-item-active:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-sm-medium}"
-  sidebar-section-header:
-    backgroundColor: "transparent"
-    textColor: "{colors.steel}"
-    typography: "{typography.micro-uppercase}"
-    padding: "{spacing.md} {spacing.md} {spacing.xs}"
-  doc-toc-item:
-    backgroundColor: "transparent"
-    textColor: "{colors.steel}"
-    typography: "{typography.body-sm}"
-    padding: "{spacing.xxs} 0"
-  doc-toc-item-active:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-sm-medium}"
-  copy-code-button:
-    backgroundColor: "transparent"
-    textColor: "{colors.on-dark-muted}"
-    typography: "{typography.caption}"
-    rounded: "{rounded.sm}"
-    padding: "{spacing.xxs} {spacing.xs}"
-    border: "1px solid {colors.hairline-dark}"
-  hero-band-sky:
-    backgroundColor: "{colors.hero-sky-from}"
-    textColor: "{colors.on-dark}"
-    rounded: "0"
-    padding: "{spacing.hero}"
-  hero-band-dark:
-    backgroundColor: "{colors.hero-dark-from}"
-    textColor: "{colors.on-dark}"
-    rounded: "0"
-    padding: "{spacing.hero}"
-  hero-product-mockup:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.lg}"
-    padding: "0"
-    border: "1px solid {colors.hairline-soft}"
-    shadow: "rgba(0, 0, 0, 0.12) 0px 24px 48px -8px"
-  logo-wall-item:
-    backgroundColor: "transparent"
-    textColor: "{colors.steel}"
-    typography: "{typography.body-md-medium}"
-    padding: "{spacing.lg}"
-  faq-accordion-item:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.xl}"
-    border: "1px solid {colors.hairline-soft}"
-  footer-region:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.steel}"
-    typography: "{typography.body-sm}"
-    padding: "{spacing.section} {spacing.xxl}"
-    border: "1px solid {colors.hairline}"
-  footer-link:
-    backgroundColor: "transparent"
-    textColor: "{colors.steel}"
-    typography: "{typography.body-sm}"
-    padding: "{spacing.xxs} 0"
-  startup-program-card:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xxl}"
-    border: "1px solid {colors.hairline}"
-  founder-quote-card:
-    backgroundColor: "{colors.testimonial-orange}"
-    textColor: "{colors.on-dark}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xxl}"
+
 ---
 
 ## Overview
@@ -470,14 +310,10 @@ The brand's signature mint green ({colors.brand-green}) appears sparingly but de
 > Source pages: mintlify.com/ (homepage), /startups (program page), /pricing (comparison), /docs/components/tabs (live documentation). Token coverage was identical across all four pages.
 
 ### Brand & Accent
-- **Mintlify Mint** ({colors.brand-green}): Signature accent — used on hero "Get started" pill button, green checkmarks in feature lists, featured pricing tier border accent, sidebar active indicator dots.
-- **Deep Mint** ({colors.brand-green-deep}): Pressed/active variant of the mint accent.
-- **Soft Mint** ({colors.brand-green-soft}): Subtle background tint for success states and confirmation surfaces.
-- **Brand Tag** ({colors.brand-tag}): Documentation tag and reference color (used in `<Tabs>` JSX-style annotations and code-tag chips).
-- **Brand Annotate** ({colors.brand-annotate}): Inline code annotation green (used in twoslash code annotation system).
-- **Brand Warn** ({colors.brand-warn}): Code warning highlight (deprecated, caution).
-- **Brand Error** ({colors.brand-error}): Red used for required-field labels and error highlight.
-- **Testimonial Orange** ({colors.testimonial-orange}): Warm coral-orange used on the "Cursor" testimonial card and warm callout surfaces.
+- **Brand Green** ({colors.brand-green} `#02613E`): Primary active fill — used on solid active controls (direction toggle, active unit pills, accent CTAs). Text on top must be light/white (`#ffffff`).
+- **Deep Green** ({colors.brand-green-deep} `#04442C`): Hover or pressed state variant of the solid green fill.
+- **Soft Green** ({colors.brand-green-soft} `#E5F5EF`): Light tinted background for secondary/informational cards (Particles card, selected element cards). Text on top must use `{colors.brand-green}` (`#02613E`) or `{colors.brand-green-deep}` (`#04442C`) for high contrast.
+- **Brand Error** ({colors.brand-error} `#d45656`): Red reserved exclusively for required-field labels and validation error messaging.
 
 ### Surface
 - **Canvas White** ({colors.canvas}): Primary page and card background.
@@ -614,8 +450,8 @@ The radius scale is tightly disciplined — the brand never uses a corner soften
 - Pressed state `button-primary-pressed` lifts to `{colors.charcoal}`.
 - Disabled state `button-primary-disabled` uses `{colors.hairline}` background and `{colors.muted}` text.
 
-**`button-accent-green`** — Mint green pill for brand-emphasis CTAs (hero "Get started", featured pricing CTA).
-- Background `{colors.brand-green}`, text `{colors.primary}`, typography `{typography.button-md}`, padding `10px 20px`, rounded `{rounded.full}`.
+**`button-accent-green`** — Dark green pill for brand-emphasis CTAs.
+- Background `{colors.brand-green}`, text `{colors.on-primary}`, typography `{typography.button-md}`, padding `10px 20px`, rounded `{rounded.full}`.
 
 **`button-on-dark`** — White pill for use on dark hero bands (startups page "Get started").
 - Background `{colors.on-dark}`, text `{colors.primary}`, typography `{typography.button-md}`, padding `10px 20px`, rounded `{rounded.full}`.
@@ -646,25 +482,6 @@ The radius scale is tightly disciplined — the brand never uses a corner soften
 **`card-startup-perk`** — Startup-program perk grid item ("Discounts and credits", "Priority support", "Startup pack", "Founder community").
 - Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xl}`, border `1px solid {colors.hairline}`. Carries an icon at top, heading `{typography.heading-5}`, description `{typography.body-sm}` `{colors.steel}`.
 
-**`pricing-card`** — Standard pricing tier card.
-- Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xxl}`, border `1px solid {colors.hairline}`.
-- Title `{typography.heading-3}`, price `{typography.display-lg}`, feature list `{typography.body-sm}` with green checkmark icons.
-
-**`pricing-card-featured`** — Highlighted pricing tier (Lift Off / featured plan).
-- Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xxl}`, border `2px solid {colors.brand-green}`, soft brand-tinted shadow `rgba(0, 212, 164, 0.08) 0px 8px 24px`.
-
-**`testimonial-card-feature`** — Bright orange large testimonial card with photo + quote ("Cursor — Every YC batch we consistently see the top performing startups use Mintlify to build their docs.").
-- Background `{colors.testimonial-orange}`, text `{colors.on-dark}`, rounded `{rounded.lg}`, padding `{spacing.section}`. Photo on right, large quote in `{typography.heading-3}` left, attribution below in `{typography.body-sm-medium}`.
-
-**`testimonial-card-quote`** — Smaller white testimonial card on the startups page.
-- Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xxl}`, border `1px solid {colors.hairline}`.
-
-**`founder-quote-card`** — Cursor founder testimonial card variant on the orange surface.
-- Background `{colors.testimonial-orange}`, text `{colors.on-dark}`, rounded `{rounded.lg}`, padding `{spacing.xxl}`. Carries the specific founder portrait + quote treatment.
-
-**`startup-program-card`** — Larger application/program card containing perks grid + apply CTA.
-- Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xxl}`, border `1px solid {colors.hairline}`.
-
 ### Inputs & Forms
 
 **`text-input`** — Standard text field.
@@ -681,66 +498,18 @@ The radius scale is tightly disciplined — the brand never uses a corner soften
 **`segmented-tab`** + **`segmented-tab-active`** — Underline-style tab navigation (used inside docs Tabs component for "First tab / Second tab / Third tab").
 - Inactive: text `{colors.steel}`, transparent background, padding `{spacing.sm} {spacing.md}`. Active: text `{colors.ink}`, 2px bottom border in `{colors.ink}`.
 
-**`pill-tab`** + **`pill-tab-active`** — Pill-style tab nav (top of pricing page: "Pricing / Roadmap").
+**`pill-tab`** + **`pill-tab-active`** — Pill-style tab nav.
 - Inactive: background `{colors.canvas}`, text `{colors.steel}`, border `1px solid {colors.hairline}`, padding `8px 16px`, rounded `{rounded.full}`.
-- Active: background `{colors.primary}`, text `{colors.on-primary}`, no border.
+- Active: background `{colors.brand-green}`, text `{colors.on-primary}`, border `1px solid {colors.brand-green}`.
 
-**`toggle-monthly-yearly`** — Two-state pill toggle (Monthly / Annual on pricing page).
-- Background `{colors.surface}`, rounded `{rounded.full}`, padding `4px`. Active state moves a white pill thumb to the selected position.
 
 ### Badges & Status
 
 **`badge-discount`** — Small green "Save 20%" badge attached to annual toggle.
-- Background `{colors.brand-green}`, text `{colors.primary}`, typography `{typography.caption-bold}`, rounded `{rounded.full}`, padding `2px 8px`.
+- Background `{colors.brand-green}`, text `{colors.on-primary}`, typography `{typography.caption-bold}`, rounded `{rounded.full}`, padding `2px 8px`.
 
 **`badge-required`** — Red "REQUIRED" label on documentation property rows.
 - Background `{colors.brand-error}`, text `{colors.on-dark}`, typography `{typography.micro-uppercase}`, rounded `{rounded.sm}`, padding `2px 6px`.
-
-**`badge-type`** — Type signature chip in documentation (e.g. `string`, `number`, `boolean`).
-- Background `{colors.surface}`, text `{colors.steel}`, typography `{typography.code-sm}`, rounded `{rounded.sm}`, padding `2px 6px`.
-
-**`badge-tag`** — Documentation tag chip (e.g. `<Tabs>` reference highlighted in body text).
-- Background `rgba(55, 114, 207, 0.15)`, text `{colors.brand-tag}`, typography `{typography.caption-bold}`, rounded `{rounded.sm}`, padding `2px 8px`.
-
-**`promo-banner`** — Sticky black promo strip ABOVE the top nav (when present).
-- Background `{colors.canvas-dark}`, text `{colors.on-dark}`, typography `{typography.body-sm-medium}`, padding `{spacing.sm} {spacing.md}`.
-
-### Code
-
-**`code-block`** — Syntax-highlighted code container.
-- Background `{colors.surface-code}`, text `{colors.on-dark}`, typography `{typography.code-md}`, rounded `{rounded.md}`, padding `{spacing.md}`.
-
-**`code-block-header`** — Header bar above the code with language label + copy button.
-- Background `{colors.surface-code}`, text `{colors.on-dark-muted}`, typography `{typography.caption}`, padding `{spacing.xs} {spacing.md}`, bottom border `1px solid {colors.hairline-dark}`.
-
-**`code-inline`** — Inline `<Tabs>` reference in body prose.
-- Background `{colors.surface}`, text `{colors.charcoal}`, typography `{typography.code-inline}`, rounded `{rounded.xs}`, padding `2px 6px`, border `1px solid {colors.hairline}`.
-
-**`copy-code-button`** — "Copy code" button in code-block header.
-- Background transparent, text `{colors.on-dark-muted}`, typography `{typography.caption}`, rounded `{rounded.sm}`, padding `{spacing.xxs} {spacing.xs}`, border `1px solid {colors.hairline-dark}`.
-
-### Documentation Components
-
-**`property-row`** — API property documentation row (e.g. `defaultIndex` on the Tabs page).
-- Background transparent, text `{colors.ink}`, typography `{typography.body-sm}`, padding `{spacing.md} 0`, bottom border `1px solid {colors.hairline-soft}`.
-- Layout: property name in `{typography.code-inline}` + type badge + optional REQUIRED badge + description below in `{typography.body-sm}` `{colors.steel}`.
-
-**`feature-comparison-table`** — Detailed pricing-page feature comparison table.
-- Background `{colors.canvas}`, text `{colors.ink}`, typography `{typography.body-sm}`, rounded `{rounded.md}`, border `1px solid {colors.hairline}`.
-
-**`feature-comparison-row`** — Individual row inside the comparison table.
-- Background `{colors.canvas}`, text `{colors.ink}`, padding `{spacing.md} {spacing.lg}`, bottom border `1px solid {colors.hairline-soft}`. Section dividers in `{typography.micro-uppercase}` `{colors.steel}`.
-
-**`sidebar-nav-item`** + **`sidebar-nav-item-active`** — Documentation left rail link entries.
-- Inactive: background transparent, text `{colors.steel}`, typography `{typography.body-sm}`, rounded `{rounded.sm}`, padding `{spacing.xs} {spacing.md}`.
-- Active: background `{colors.surface}`, text `{colors.ink}`, typography `{typography.body-sm-medium}`.
-
-**`sidebar-section-header`** — Uppercase section header inside sidebar (e.g. "COMPONENTS", "PRIMITIVES").
-- Background transparent, text `{colors.steel}`, typography `{typography.micro-uppercase}`, padding `{spacing.md} {spacing.md} {spacing.xs}`.
-
-**`doc-toc-item`** + **`doc-toc-item-active`** — Right-rail table-of-contents links.
-- Inactive: background transparent, text `{colors.steel}`, typography `{typography.body-sm}`, padding `{spacing.xxs} 0`.
-- Active: text `{colors.ink}`, typography `{typography.body-sm-medium}`, optional left-border accent in `{colors.brand-green}`.
 
 ### Navigation
 
@@ -752,35 +521,6 @@ The radius scale is tightly disciplined — the brand never uses a corner soften
 **Top Navigation (Documentation)** — Compressed nav with center search-pill and right-side account/upgrade CTAs.
 - Background `{colors.canvas}`, height ~56px. Search-pill at center, "Documentation / Guides / API Reference / Changelog" links + "Talk to us" + green "Get started" right.
 
-### Signature Components
-
-**`hero-band-sky`** — Homepage hero with atmospheric sky-blue to cream gradient and cloud illustrations.
-- Background gradient `linear-gradient(180deg, {colors.hero-sky-from} 0%, {colors.hero-sky-to} 100%)`, text `{colors.on-dark}` (early portion of gradient) shifting to `{colors.ink}` further down, padding `{spacing.hero}`.
-- Layout: centered hero headline in `{typography.hero-display}`, centered subtitle in `{typography.subtitle}`, centered button row (`button-accent-green` "Get started" + `button-secondary` "Talk to us"), product mockup below the buttons.
-
-**`hero-band-dark`** — Startups hero with dark teal-to-mint gradient and rocket launch illustration.
-- Background gradient `linear-gradient(135deg, {colors.hero-dark-from} 0%, {colors.hero-dark-to} 100%)`, text `{colors.on-dark}`, padding `{spacing.hero}`.
-- Layout: hero headline left in `{typography.hero-display}` `{colors.on-dark}`, illustration right (rocket cutting across the gradient), button row uses `button-on-dark` (white pill) + ghost link.
-
-**`hero-product-mockup`** — Code-editor mockup framed inside the homepage hero.
-- Background `{colors.canvas}`, rounded `{rounded.lg}`, border `1px solid {colors.hairline-soft}`, deep shadow `rgba(0, 0, 0, 0.12) 0px 24px 48px -8px`.
-- Carries a documentation page preview inside (sidebar on left, prose body, mock UI controls).
-
-**`logo-wall-item`** — Customer logo cell in 6-up trust-row grids ("Anthropic / Cognition / Mintlify / Vercel / react / Lovable", "Stripe / Block / PayPal / Compound / Auth").
-- Background transparent, text `{colors.steel}`, typography `{typography.body-md-medium}`, padding `{spacing.lg}`.
-- Logos rendered as wordmarks with consistent vertical centering.
-
-**`faq-accordion-item`** — Frequently-asked-questions panel item (visible on pricing page).
-- Background `{colors.canvas}`, rounded `{rounded.md}`, padding `{spacing.xl}`, border `1px solid {colors.hairline-soft}`.
-- Question in `{typography.heading-5}`, expanded answer in `{typography.body-md}` `{colors.steel}`, chevron icon in `{colors.steel}` 16px.
-
-**`footer-region`** — Multi-column site footer.
-- Background `{colors.canvas}`, top border `1px solid {colors.hairline}`, padding `{spacing.section} {spacing.xxl}`.
-- 5 column groups (Explore / Resources / Company / Legal + brand mark column).
-- Section headers in `{typography.body-sm-medium}` `{colors.ink}`, link items in `{typography.body-sm}` `{colors.steel}`.
-
-**`footer-link`** — Individual link entry in the footer.
-- Background transparent, text `{colors.steel}`, typography `{typography.body-sm}`, padding `{spacing.xxs} 0`.
 
 ## Do's and Don'ts
 

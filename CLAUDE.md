@@ -1,5 +1,5 @@
 Always use:
--astro, seo-schema, tailwind-4-docs, typescript-expert, web-design-guidelines these 5 skills for this project
+-astro, tailwind-4-docs, web-design-guidelines these 3 skills for this project
 -DESIGN.md for this project design
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
