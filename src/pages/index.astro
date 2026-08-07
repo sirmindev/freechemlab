@@ -16,9 +16,9 @@ import Layout from '../layouts/Layout.astro';
 			<nav aria-label="Main Navigation">
 				<ul class="flex items-center space-x-1">
 					<li>
-						<a 
-							href="/calculators" 
-							class="px-3 py-1.5 text-sm font-medium text-ink bg-surface rounded-full border border-hairline transition-colors" 
+						<a
+							href="/calculators"
+							class="px-3 py-1.5 text-sm font-medium text-ink bg-surface rounded-full border border-hairline transition-colors"
 							aria-current="page"
 						>
 							Calculator
@@ -52,7 +52,7 @@ import Layout from '../layouts/Layout.astro';
 		</nav>
 
 		<!-- Calculator Card Shell -->
-		<section class="bg-canvas border border-hairline rounded-[12px] p-6 shadow-xs">
+		<section class="bg-surface border border-hairline rounded-[12px] p-6">
 			<!-- Header Row -->
 			<header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-hairline-soft">
 				<div>
@@ -63,17 +63,17 @@ import Layout from '../layouts/Layout.astro';
 
 				<!-- Direction Toggle Chip -->
 				<div class="inline-flex items-center p-1 bg-surface border border-hairline rounded-full text-xs font-medium self-start sm:self-auto">
-					<button 
+					<button
 						id="toggle-g-to-mol"
-						type="button" 
-						class="px-3.5 py-1.5 bg-brand-green text-on-primary hover:bg-brand-green-deep rounded-full transition-all cursor-pointer font-medium"
+						type="button"
+						class="min-h-[44px] px-4 py-2 text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep rounded-full transition-all cursor-pointer flex items-center"
 					>
 						g &rarr; mol
 					</button>
-					<button 
+					<button
 						id="toggle-mol-to-g"
-						type="button" 
-						class="px-3.5 py-1.5 text-steel hover:text-ink rounded-full transition-all cursor-pointer font-medium"
+						type="button"
+						class="min-h-[44px] px-4 py-2 text-sm font-medium text-stone hover:bg-surface-soft hover:text-ink rounded-full transition-all cursor-pointer flex items-center"
 					>
 						mol &rarr; g
 					</button>
@@ -81,41 +81,44 @@ import Layout from '../layouts/Layout.astro';
 			</header>
 
 			<!-- Calculator Inputs & Fields Grid -->
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div class="fields-grid grid grid-cols-1 gap-6">
 				<!-- Field 1: Molar Mass -->
-				<div class="bg-canvas border border-hairline rounded-[12px] p-5 flex flex-col justify-between">
+				<div class="bg-surface-soft border border-hairline rounded-[12px] p-5 flex flex-col justify-between">
 					<div>
 						<div class="flex items-center justify-between mb-2">
-							<label for="molar-mass" class="block text-xs font-semibold uppercase tracking-wider text-steel">
+							<label for="molar-mass" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle">
 								Molar Mass
 							</label>
 						</div>
-						<input 
-							type="number" 
-							id="molar-mass" 
+						<input
+							type="number"
+							id="molar-mass"
 							step="any"
-							placeholder="e.g. 18.02" 
-							class="w-full bg-canvas text-ink font-mono text-base rounded-[8px] px-3.5 py-2.5 border border-hairline focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+							placeholder="e.g. 18.02"
+							class="w-full bg-surface text-ink font-mono text-base rounded-[8px] px-3 py-2 border-[0.5px] border-hairline focus:outline-none focus:border-[2px] focus:border-brand-green focus:ring-0 transition-all"
 						/>
 						<!-- Inline Error Message -->
-						<p id="molar-mass-error" class="hidden text-xs text-brand-error font-medium mt-1.5 font-sans">
-							Molar mass must be greater than 0
-						</p>
+						<div id="molar-mass-error" class="hidden flex items-center gap-2 mt-1 text-sm text-brand-error">
+							<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+							</svg>
+							<span>Molar mass must be greater than 0</span>
+						</div>
 					</div>
 					<!-- Molar Mass Unit Pills -->
 					<div class="mt-4 pt-3 border-t border-hairline-soft">
 						<div class="flex flex-wrap gap-2 items-center" id="molar-mass-units">
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="g/mol"
-								class="unit-pill-mm min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-brand-green text-on-primary hover:bg-brand-green-deep border border-brand-green cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mm min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
 							>
 								g/mol
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="kg/kmol"
-								class="unit-pill-mm min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mm min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								kg/kmol
 							</button>
@@ -124,92 +127,95 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 
 				<!-- Field 2: Mass Container -->
-				<div id="mass-container" class="bg-canvas border border-hairline rounded-[12px] p-5 flex flex-col justify-between transition-colors">
+				<div id="mass-container" class="bg-surface-soft border border-hairline rounded-[12px] p-5 flex flex-col justify-between transition-colors">
 					<div>
 						<div class="flex items-center justify-between mb-2">
-							<label for="mass-input" class="block text-xs font-semibold uppercase tracking-wider text-steel">
+							<label for="mass-input" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle">
 								Mass
 							</label>
 							<!-- Calculated Badge (Shown when readonly) -->
-							<span id="mass-calculated-badge" class="hidden items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-steel bg-surface px-2 py-0.5 rounded border border-hairline">
-								<svg class="w-3 h-3 text-steel shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<span id="mass-calculated-badge" class="hidden flex items-center gap-1 text-sm text-primary-pressed bg-primary-soft px-2 py-1 rounded-full">
+								<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 								</svg>
-								Calculated
+								<span class="text-xs font-medium">Calculated</span>
 							</span>
 						</div>
 						<div class="relative flex items-center">
-							<input 
-								type="number" 
-								id="mass-input" 
+							<input
+								type="number"
+								id="mass-input"
 								step="any"
-								placeholder="e.g. 18.02" 
-								class="w-full bg-canvas text-ink font-mono text-base rounded-[8px] px-3.5 py-2.5 border border-hairline focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+								placeholder="e.g. 18.02"
+								class="w-full bg-surface text-ink font-mono text-base rounded-[8px] px-3 py-2 border-[0.5px] border-hairline focus:outline-none focus:border-[2px] focus:border-brand-green focus:ring-0 transition-all"
 							/>
 							<div id="mass-lock-icon" class="hidden absolute right-3 pointer-events-none">
-								<svg class="w-4 h-4 text-steel" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<svg class="w-4 h-4 text-ink-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 								</svg>
 							</div>
 						</div>
 						<!-- Inline Error Message -->
-						<p id="mass-error" class="hidden text-xs text-brand-error font-medium mt-1.5 font-sans">
-							Mass cannot be negative
-						</p>
+						<div id="mass-error" class="hidden flex items-center gap-2 mt-1 text-sm text-brand-error">
+							<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+							</svg>
+							<span>Mass cannot be negative</span>
+						</div>
 					</div>
 					<!-- Mass Unit Pills -->
 					<div class="mt-4 pt-3 border-t border-hairline-soft">
 						<div class="flex flex-wrap gap-2 items-center" id="mass-units-primary">
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="mg"
-								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								mg
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="g"
-								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-brand-green text-on-primary hover:bg-brand-green-deep border border-brand-green cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
 							>
 								g
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="kg"
-								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								kg
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								id="toggle-mass-more"
 								aria-label="More units"
-								class="min-h-[44px] h-[44px] px-3 rounded-full text-xs font-bold bg-surface border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="min-h-[44px] h-[44px] px-3 py-2 rounded-full text-sm font-bold bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								&middot;&middot;&middot;
 							</button>
 						</div>
 						<!-- Mass Secondary Units Row -->
-						<div id="mass-units-secondary" class="hidden flex-wrap gap-2 items-center mt-2">
-							<button 
-								type="button" 
+						<div id="mass-units-secondary" class="hidden flex-wrap gap-2 items-center mt-2 bg-surface-3 rounded-[8px] p-3">
+							<button
+								type="button"
 								data-unit="ng"
-								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								ng
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="ug"
-								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								&micro;g
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="dag"
-								class="unit-pill-mass min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-mass min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								dag
 							</button>
@@ -232,20 +238,20 @@ import Layout from '../layouts/Layout.astro';
 					</button>
 
 					<!-- Collapsible Panel -->
-					<div id="browse-panel" class="hidden mt-3 bg-canvas border border-hairline rounded-[12px] overflow-hidden">
+					<div id="browse-panel" class="hidden mt-3 bg-surface-soft border border-hairline rounded-[12px] overflow-hidden">
 						<!-- Tabs -->
 						<div class="flex border-b border-hairline">
 							<button
 								id="tab-presets"
 								type="button"
-								class="px-5 py-3 text-xs font-semibold text-ink border-b-2 border-ink -mb-px transition-colors cursor-pointer"
+								class="py-2 px-4 text-sm font-medium text-brand-green border-b-2 border-brand-green -mb-px transition-colors cursor-pointer"
 							>
 								Presets
 							</button>
 							<button
 								id="tab-custom"
 								type="button"
-								class="px-5 py-3 text-xs font-medium text-steel border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer"
+								class="py-2 px-4 text-sm font-medium text-stone border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer"
 							>
 								Build custom
 							</button>
@@ -253,7 +259,7 @@ import Layout from '../layouts/Layout.astro';
 
 						<!-- Presets Tab Content -->
 						<div id="panel-presets" class="p-5">
-							<label for="preset-select" class="block text-xs font-semibold uppercase tracking-wider text-steel mb-2">
+							<label for="preset-select" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">
 								Common Compounds
 							</label>
 							<select
@@ -291,7 +297,7 @@ import Layout from '../layouts/Layout.astro';
 							<button
 								id="use-preset"
 								type="button"
-								class="hidden mt-3 px-4 py-2 bg-brand-green text-on-primary text-xs font-semibold rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep"
+								class="hidden mt-3 min-h-[44px] px-5 py-2.5 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep flex items-center justify-center"
 							>
 								Use this molar mass
 							</button>
@@ -318,17 +324,17 @@ import Layout from '../layouts/Layout.astro';
 							<!-- Formula Bar -->
 							<div class="mt-4 pt-4 border-t border-hairline-soft flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 								<div>
-									<span class="block text-[11px] font-semibold uppercase tracking-wider text-stone mb-0.5">Formula</span>
-									<span id="custom-formula" class="text-base font-semibold font-mono text-ink">—</span>
+									<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-0.5">Formula</span>
+									<span id="custom-formula" class="text-base font-medium font-mono text-ink">—</span>
 								</div>
 								<div class="text-right sm:text-right">
-									<span class="block text-[11px] font-semibold uppercase tracking-wider text-stone mb-0.5">Molar Mass</span>
-									<span id="custom-molar-mass-val" class="text-base font-semibold font-mono text-ink">—</span>
+									<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-0.5">Molar Mass</span>
+									<span id="custom-molar-mass-val" class="text-base font-medium font-mono text-ink">—</span>
 								</div>
 								<button
 									id="use-custom"
 									type="button"
-									class="hidden self-end sm:self-auto px-4 py-2 bg-brand-green text-on-primary text-xs font-semibold rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep whitespace-nowrap"
+									class="hidden self-end sm:self-auto min-h-[44px] px-5 py-2.5 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep whitespace-nowrap flex items-center justify-center"
 								>
 									Use this molar mass
 								</button>
@@ -338,44 +344,48 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 
 				<!-- Field 3: Moles Container -->
-				<div id="moles-container" class="md:col-span-2 bg-surface-soft border border-hairline rounded-[12px] p-5 flex flex-col justify-between transition-colors">
+				<div id="moles-container" class="md:col-span-2 bg-primary-soft border border-hairline rounded-[12px] p-5 flex flex-col justify-between transition-colors">
 					<div>
 						<div class="flex items-center justify-between mb-2">
-							<label for="moles-input" class="block text-xs font-semibold uppercase tracking-wider text-steel">
+							<label for="moles-input" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle">
 								Moles
 							</label>
 							<!-- Calculated Badge (Shown when readonly) -->
-							<span id="moles-calculated-badge" class="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-steel bg-canvas px-2 py-0.5 rounded border border-hairline">
-								<svg class="w-3 h-3 text-steel shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+							<span id="moles-calculated-badge" class="flex items-center gap-1 text-sm text-primary-pressed bg-primary-soft px-2 py-1 rounded-full">
+								<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 								</svg>
-								Calculated
+								<span class="text-xs font-medium">Calculated</span>
 							</span>
 						</div>
 						<div class="relative flex items-center">
-							<input 
-								type="number" 
-								id="moles-input" 
+							<input
+								type="number"
+								id="moles-input"
 								step="any"
 								readonly
-								placeholder="0.000000" 
-								class="w-full bg-surface border border-hairline text-ink font-mono text-base font-semibold rounded-[8px] px-3.5 py-2.5 cursor-not-allowed select-none focus:outline-none transition-all"
+								placeholder="0.000000"
+								class="w-full bg-primary-soft text-primary-pressed font-mono text-2xl font-medium rounded-[8px] px-3 py-2 border-[0.5px] border-hairline cursor-not-allowed select-none focus:outline-none transition-all"
+								style="line-height: 1.2;"
 							/>
 							<div id="moles-lock-icon" class="absolute right-3 pointer-events-none">
-								<svg class="w-4 h-4 text-steel" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<svg class="w-4 h-4 text-ink-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 								</svg>
 							</div>
 						</div>
 						<!-- Inline Error Message -->
-						<p id="moles-error" class="hidden text-xs text-brand-error font-medium mt-1.5 font-sans">
-							Moles cannot be negative
-						</p>
+						<div id="moles-error" class="hidden flex items-center gap-2 mt-1 text-sm text-brand-error">
+							<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+							</svg>
+							<span>Moles cannot be negative</span>
+						</div>
 
 						<!-- Secondary Line: Particle Count (Only visible when Moles is the calculated result) -->
-						<div id="particle-count-row" class="mt-3 pt-2.5 border-t border-hairline-soft flex flex-wrap items-center justify-between gap-1 text-xs">
-							<span class="font-medium text-steel">Particle Count</span>
-							<span id="particle-count-val" class="font-mono font-medium text-ink">
+						<div id="particle-count-row" class="mt-3 pt-2.5 border-t border-hairline-soft flex flex-wrap items-center justify-between gap-1 text-sm">
+							<span class="font-medium text-ink-subtle">Particle Count</span>
+							<span id="particle-count-val" class="font-medium font-mono text-ink">
 								&mdash;
 							</span>
 						</div>
@@ -383,49 +393,49 @@ import Layout from '../layouts/Layout.astro';
 					<!-- Moles Unit Pills -->
 					<div class="mt-4 pt-3 border-t border-hairline-soft">
 						<div class="flex flex-wrap gap-2 items-center" id="moles-units-primary">
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="mol"
-								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-brand-green text-on-primary hover:bg-brand-green-deep border border-brand-green cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
 							>
 								mol
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="mmol"
-								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								mmol
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								id="toggle-moles-more"
 								aria-label="More units"
-								class="min-h-[44px] h-[44px] px-3 rounded-full text-xs font-bold bg-surface border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="min-h-[44px] h-[44px] px-3 py-2 rounded-full text-sm font-bold bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								&middot;&middot;&middot;
 							</button>
 						</div>
 						<!-- Moles Secondary Units Row -->
-						<div id="moles-units-secondary" class="hidden flex-wrap gap-2 items-center mt-2">
-							<button 
-								type="button" 
+						<div id="moles-units-secondary" class="hidden flex-wrap gap-2 items-center mt-2 bg-surface-3 rounded-[8px] p-3">
+							<button
+								type="button"
 								data-unit="umol"
-								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								&micro;mol
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="nmol"
-								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								nmol
 							</button>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								data-unit="pmol"
-								class="unit-pill-moles min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center"
+								class="unit-pill-moles min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 							>
 								pmol
 							</button>
@@ -447,10 +457,19 @@ import Layout from '../layouts/Layout.astro';
 	</footer>
 </Layout>
 
+<style>
+	/* Responsive breakpoint: 520px per DESIGN.md */
+	@media (min-width: 520px) {
+		.fields-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+</style>
+
 <script>
-	import { 
-		calculateMolesWithUnits, 
-		calculateMassWithUnits, 
+	import {
+		calculateMolesWithUnits,
+		calculateMassWithUnits,
 		toBaseMoles,
 		calculateParticles,
 		formatParticleCount,
@@ -471,7 +490,7 @@ import Layout from '../layouts/Layout.astro';
 
 	const molarMassInput = document.getElementById('molar-mass') as HTMLInputElement | null;
 	const molarMassError = document.getElementById('molar-mass-error');
-	
+
 	const massContainer = document.getElementById('mass-container');
 	const massInput = document.getElementById('mass-input') as HTMLInputElement | null;
 	const massError = document.getElementById('mass-error');
@@ -498,17 +517,17 @@ import Layout from '../layouts/Layout.astro';
 		if (currentMode === 'g_to_mol') {
 			// g -> mol: Moles field is READONLY calculated output, Mass field is EDITABLE input
 			toggleGtoMolBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
-			toggleGtoMolBtn?.classList.remove('text-steel');
+			toggleGtoMolBtn?.classList.remove('text-stone');
 			toggleMolToGBtn?.classList.remove('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
-			toggleMolToGBtn?.classList.add('text-steel');
+			toggleMolToGBtn?.classList.add('text-stone');
 
 			// Editable Mass Field Styling
 			if (massInput) {
 				massInput.readOnly = false;
-				massInput.className = "w-full bg-canvas text-ink font-mono text-base rounded-[8px] px-3.5 py-2.5 border border-hairline focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all";
+				massInput.className = "w-full bg-surface text-ink font-mono text-base rounded-[8px] px-3 py-2 border-[0.5px] border-hairline focus:outline-none focus:border-[2px] focus:border-brand-green focus:ring-0 transition-all";
 			}
-			massContainer?.classList.remove('bg-surface-soft');
-			massContainer?.classList.add('bg-canvas');
+			massContainer?.classList.remove('bg-primary-soft');
+			massContainer?.classList.add('bg-surface-soft');
 			massCalculatedBadge?.classList.add('hidden');
 			massCalculatedBadge?.classList.remove('flex');
 			massLockIcon?.classList.add('hidden');
@@ -516,10 +535,11 @@ import Layout from '../layouts/Layout.astro';
 			// Readonly Moles Field Styling
 			if (molesInput) {
 				molesInput.readOnly = true;
-				molesInput.className = "w-full bg-surface border border-hairline text-ink font-mono text-base font-semibold rounded-[8px] px-3.5 py-2.5 cursor-not-allowed select-none focus:outline-none transition-all";
+				molesInput.className = "w-full bg-primary-soft text-primary-pressed font-mono text-2xl font-medium rounded-[8px] px-3 py-2 border-[0.5px] border-hairline cursor-not-allowed select-none focus:outline-none transition-all";
+				molesInput.style.lineHeight = "1.2";
 			}
-			molesContainer?.classList.remove('bg-canvas');
-			molesContainer?.classList.add('bg-surface-soft');
+			molesContainer?.classList.remove('bg-surface-soft');
+			molesContainer?.classList.add('bg-primary-soft');
 			molesCalculatedBadge?.classList.remove('hidden');
 			molesCalculatedBadge?.classList.add('flex');
 			molesLockIcon?.classList.remove('hidden');
@@ -529,17 +549,17 @@ import Layout from '../layouts/Layout.astro';
 		} else {
 			// mol -> g: Mass field is READONLY calculated output, Moles field is EDITABLE input
 			toggleMolToGBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
-			toggleMolToGBtn?.classList.remove('text-steel');
+			toggleMolToGBtn?.classList.remove('text-stone');
 			toggleGtoMolBtn?.classList.remove('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
-			toggleGtoMolBtn?.classList.add('text-steel');
+			toggleGtoMolBtn?.classList.add('text-stone');
 
 			// Editable Moles Field Styling
 			if (molesInput) {
 				molesInput.readOnly = false;
-				molesInput.className = "w-full bg-canvas text-ink font-mono text-base rounded-[8px] px-3.5 py-2.5 border border-hairline focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all";
+				molesInput.className = "w-full bg-surface text-ink font-mono text-base rounded-[8px] px-3 py-2 border-[0.5px] border-hairline focus:outline-none focus:border-[2px] focus:border-brand-green focus:ring-0 transition-all";
 			}
-			molesContainer?.classList.remove('bg-surface-soft');
-			molesContainer?.classList.add('bg-canvas');
+			molesContainer?.classList.remove('bg-primary-soft');
+			molesContainer?.classList.add('bg-surface-soft');
 			molesCalculatedBadge?.classList.add('hidden');
 			molesCalculatedBadge?.classList.remove('flex');
 			molesLockIcon?.classList.add('hidden');
@@ -547,10 +567,11 @@ import Layout from '../layouts/Layout.astro';
 			// Readonly Mass Field Styling
 			if (massInput) {
 				massInput.readOnly = true;
-				massInput.className = "w-full bg-surface border border-hairline text-ink font-mono text-base font-semibold rounded-[8px] px-3.5 py-2.5 cursor-not-allowed select-none focus:outline-none transition-all";
+				massInput.className = "w-full bg-primary-soft text-primary-pressed font-mono text-2xl font-medium rounded-[8px] px-3 py-2 border-[0.5px] border-hairline cursor-not-allowed select-none focus:outline-none transition-all";
+				massInput.style.lineHeight = "1.2";
 			}
-			massContainer?.classList.remove('bg-canvas');
-			massContainer?.classList.add('bg-surface-soft');
+			massContainer?.classList.remove('bg-surface-soft');
+			massContainer?.classList.add('bg-primary-soft');
 			massCalculatedBadge?.classList.remove('hidden');
 			massCalculatedBadge?.classList.add('flex');
 			massLockIcon?.classList.remove('hidden');
@@ -564,14 +585,17 @@ import Layout from '../layouts/Layout.astro';
 	function clearAllErrors() {
 		molarMassError?.classList.add('hidden');
 		molarMassInput?.classList.remove('border-brand-error');
+		molarMassInput?.classList.add('border-[0.5px]');
 		molarMassInput?.classList.add('border-hairline');
 
 		massError?.classList.add('hidden');
 		massInput?.classList.remove('border-brand-error');
+		massInput?.classList.add('border-[0.5px]');
 		massInput?.classList.add('border-hairline');
 
 		molesError?.classList.add('hidden');
 		molesInput?.classList.remove('border-brand-error');
+		molesInput?.classList.add('border-[0.5px]');
 		molesInput?.classList.add('border-hairline');
 	}
 
@@ -585,10 +609,11 @@ import Layout from '../layouts/Layout.astro';
 		// Molar mass validation: must be greater than 0
 		if (rawMolarMass.trim() !== '' && (isNaN(molarMassVal) || molarMassVal <= 0)) {
 			if (molarMassError) {
-				molarMassError.textContent = 'Molar mass must be greater than 0';
 				molarMassError.classList.remove('hidden');
 			}
+			molarMassInput?.classList.add('border-[2px]');
 			molarMassInput?.classList.add('border-brand-error');
+			molarMassInput?.classList.remove('border-[0.5px]');
 			molarMassInput?.classList.remove('border-hairline');
 			hasError = true;
 		}
@@ -600,10 +625,11 @@ import Layout from '../layouts/Layout.astro';
 			// Mass validation: must be non-negative
 			if (rawMass.trim() !== '' && (isNaN(massVal) || massVal < 0)) {
 				if (massError) {
-					massError.textContent = 'Mass cannot be negative';
 					massError.classList.remove('hidden');
 				}
+				massInput?.classList.add('border-[2px]');
 				massInput?.classList.add('border-brand-error');
+				massInput?.classList.remove('border-[0.5px]');
 				massInput?.classList.remove('border-hairline');
 				hasError = true;
 			}
@@ -615,10 +641,10 @@ import Layout from '../layouts/Layout.astro';
 			}
 
 			const molesResult = calculateMolesWithUnits(
-				massVal, 
-				massUnit, 
-				molarMassVal, 
-				molarMassUnit, 
+				massVal,
+				massUnit,
+				molarMassVal,
+				molarMassUnit,
 				molesUnit
 			);
 			if (molesInput) molesInput.value = format6Decimals(molesResult);
@@ -634,10 +660,11 @@ import Layout from '../layouts/Layout.astro';
 			// Moles validation: must be non-negative
 			if (rawMoles.trim() !== '' && (isNaN(molesVal) || molesVal < 0)) {
 				if (molesError) {
-					molesError.textContent = 'Moles cannot be negative';
 					molesError.classList.remove('hidden');
 				}
+				molesInput?.classList.add('border-[2px]');
 				molesInput?.classList.add('border-brand-error');
+				molesInput?.classList.remove('border-[0.5px]');
 				molesInput?.classList.remove('border-hairline');
 				hasError = true;
 			}
@@ -649,10 +676,10 @@ import Layout from '../layouts/Layout.astro';
 			}
 
 			const massResult = calculateMassWithUnits(
-				molesVal, 
-				molesUnit, 
-				molarMassVal, 
-				molarMassUnit, 
+				molesVal,
+				molesUnit,
+				molarMassVal,
+				molarMassUnit,
 				massUnit
 			);
 			if (massInput) massInput.value = format6Decimals(massResult);
@@ -663,9 +690,9 @@ import Layout from '../layouts/Layout.astro';
 		buttons.forEach(btn => {
 			const unit = btn.getAttribute('data-unit');
 			if (unit === selectedUnit) {
-				btn.className = "min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-semibold bg-brand-green text-on-primary hover:bg-brand-green-deep border border-brand-green cursor-pointer transition-all flex items-center justify-center shadow-xs";
+				btn.className = "min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center";
 			} else {
-				btn.className = "min-h-[44px] h-[44px] px-3.5 rounded-full text-xs font-medium bg-canvas border border-hairline text-steel hover:text-ink hover:border-steel cursor-pointer transition-all flex items-center justify-center";
+				btn.className = "min-h-[44px] h-[44px] px-4 py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-stone hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center";
 			}
 		});
 	}
@@ -794,8 +821,8 @@ import Layout from '../layouts/Layout.astro';
 		panelPresets?.classList.toggle('hidden', !presetActive);
 		panelCustom?.classList.toggle('hidden', presetActive);
 
-		const activeClass = 'px-5 py-3 text-xs font-semibold text-ink border-b-2 border-ink -mb-px transition-colors cursor-pointer';
-		const inactiveClass = 'px-5 py-3 text-xs font-medium text-steel border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer';
+		const activeClass = 'py-2 px-4 text-sm font-medium text-brand-green border-b-2 border-brand-green -mb-px transition-colors cursor-pointer';
+		const inactiveClass = 'py-2 px-4 text-sm font-medium text-stone border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer';
 		if (tabPresets) tabPresets.className = presetActive ? activeClass : inactiveClass;
 		if (tabCustom) tabCustom.className = presetActive ? inactiveClass : activeClass;
 
@@ -840,7 +867,7 @@ import Layout from '../layouts/Layout.astro';
 			const card = document.createElement('div');
 			card.className = [
 				'flex flex-col items-center justify-between rounded-[10px] border transition-all overflow-hidden',
-				qty > 0 ? 'border-brand-green bg-canvas' : 'border-hairline bg-surface-soft'
+				qty > 0 ? 'border-brand-green bg-primary-soft' : 'border-hairline bg-surface'
 			].join(' ');
 
 			const infoArea = document.createElement('button');
@@ -849,7 +876,7 @@ import Layout from '../layouts/Layout.astro';
 			infoArea.innerHTML = `
 				<span class="text-lg font-bold font-mono text-ink leading-tight">${el.symbol}</span>
 				<span class="text-[10px] font-medium text-stone leading-none mt-0.5 truncate w-full text-center px-1">${el.name}</span>
-				<span class="text-[10px] font-mono text-muted mt-0.5">${el.atomicWeight}</span>
+				<span class="text-[10px] font-mono text-ink-tertiary mt-0.5">${el.atomicWeight}</span>
 			`;
 			infoArea.addEventListener('click', () => {
 				if (!quantities.has(el.symbol) || quantities.get(el.symbol) === 0) {
@@ -937,9 +964,3 @@ import Layout from '../layouts/Layout.astro';
 	// Initial render
 	renderGrid();
 </script>
-
-
-
-
-
-

@@ -1,135 +1,101 @@
 ---
 version: alpha
-name: Mintlify-design-analysis
-description: Mintlify presents documentation infrastructure with a dual-mode aesthetic — atmospheric sky-gradient marketing heroes (cloud illustration backdrops, soft cream-to-blue washes) paired with dense developer-grade documentation surfaces. The system uses Inter for UI prose, Geist Mono for code, and a signature Mintlify green ({colors.brand-green}) reserved for accent CTAs and active states. Black-pill primary buttons dominate marketing, white-on-dark inversions appear on dark hero bands, and a 3-column documentation layout (sidebar / prose / TOC) anchors the developer experience. Coverage spans homepage, startups program, pricing comparison, and the live tabs documentation page.
+name: FreeChemLab-design-system
+description: "A light, warm scientific-instrument system for a single-purpose chemistry calculator. Built on Linear's structural logic (four-step surface ladder, hairline borders, no drop shadows, disciplined radius scale) inverted for a warm off-white canvas (#FAF9F5). Deep forest green (#02613E) is the single chromatic accent, used only on active controls, focus states, and the calculated-result tint. Public Sans carries all text; DM Mono carries every number, chosen for its unambiguous 0/O and 1/l/I forms since misreading a digit is the primary failure mode of a calculator. Pill-shaped controls are used deliberately for the direction toggle and unit selectors; everything else holds Linear's 8px/12px corners."
 
 colors:
-  primary: "#0a0a0a"
+  primary: "#02613E"
+  primary-hover: "#0B7A4F"
+  primary-pressed: "#04442C"
+  primary-soft: "#DCEEE4"
   on-primary: "#ffffff"
-  brand-green: "#02613E"
-  brand-green-deep: "#04442C"
-  brand-green-soft: "#E5F5EF"
-  brand-error: "#d45656"
-  brand-cursor: "#888888"
+
   canvas: "#FAF9F5"
-  surface: "#FAF9F5"
-  surface-soft: "#fafafa"
-  hairline: "#e5e5e5"
-  hairline-soft: "#ededed"
-  ink: "#0a0a0a"
-  charcoal: "#1c1c1e"
-  slate: "#3a3a3c"
-  steel: "#5a5a5c"
-  stone: "#888888"
-  muted: "#a8a8aa"
-  on-dark: "#ffffff"
+  surface-1: "#ffffff"
+  surface-2: "#F5F3EE"
+  surface-3: "#EFEDE7"
+  surface-4: "#E8E6DF"
+
+  hairline: "#E5E2DA"
+  hairline-strong: "#D3CFC3"
+  hairline-tertiary: "#C4C0B2"
+
+  ink: "#14140F"
+  ink-muted: "#4A4842"
+  ink-subtle: "#7A776D"
+  ink-tertiary: "#A8A498"
+
+  error: "#C23B3B"
+  error-soft: "#FBEAEA"
 
 typography:
-  hero-display:
-    fontFamily: Inter
-    fontSize: 72px
-    fontWeight: 600
-    lineHeight: 1.05
-    letterSpacing: -2px
-  display-lg:
-    fontFamily: Inter
-    fontSize: 56px
-    fontWeight: 600
-    lineHeight: 1.10
-    letterSpacing: -1.5px
-  heading-1:
-    fontFamily: Inter
-    fontSize: 48px
-    fontWeight: 600
-    lineHeight: 1.10
-    letterSpacing: -1px
-  heading-2:
-    fontFamily: Inter
-    fontSize: 36px
-    fontWeight: 600
-    lineHeight: 1.20
-    letterSpacing: -0.5px
-  heading-3:
-    fontFamily: Inter
+  page-title:
+    fontFamily: Public Sans
     fontSize: 28px
     fontWeight: 600
+    lineHeight: 1.20
+    letterSpacing: 0
+  card-title:
+    fontFamily: Public Sans
+    fontSize: 20px
+    fontWeight: 500
     lineHeight: 1.25
-  heading-4:
-    fontFamily: Inter
-    fontSize: 22px
-    fontWeight: 600
-    lineHeight: 1.30
-  heading-5:
-    fontFamily: Inter
-    fontSize: 18px
-    fontWeight: 600
-    lineHeight: 1.40
-  subtitle:
-    fontFamily: Inter
-    fontSize: 18px
-    fontWeight: 400
-    lineHeight: 1.50
-  body-md:
-    fontFamily: Inter
-    fontSize: 16px
-    fontWeight: 400
-    lineHeight: 1.50
-  body-md-medium:
-    fontFamily: Inter
-    fontSize: 16px
-    fontWeight: 500
-    lineHeight: 1.50
-  body-sm:
-    fontFamily: Inter
-    fontSize: 14px
-    fontWeight: 400
-    lineHeight: 1.50
-  body-sm-medium:
-    fontFamily: Inter
-    fontSize: 14px
-    fontWeight: 500
-    lineHeight: 1.50
-  caption:
-    fontFamily: Inter
-    fontSize: 13px
-    fontWeight: 400
-    lineHeight: 1.40
-  caption-bold:
-    fontFamily: Inter
-    fontSize: 13px
-    fontWeight: 600
-    lineHeight: 1.40
-  micro:
-    fontFamily: Inter
+    letterSpacing: 0
+  label:
+    fontFamily: Public Sans
     fontSize: 12px
-    fontWeight: 500
-    lineHeight: 1.40
-  micro-uppercase:
-    fontFamily: Inter
-    fontSize: 11px
     fontWeight: 600
-    lineHeight: 1.40
-    letterSpacing: 0.5px
-  button-md:
-    fontFamily: Inter
-    fontSize: 14px
-    fontWeight: 500
     lineHeight: 1.30
-  code-md:
-    fontFamily: Geist Mono
+    letterSpacing: 0.4px
+    textTransform: uppercase
+  body:
+    fontFamily: Public Sans
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.50
+    letterSpacing: 0
+  body-sm:
+    fontFamily: Public Sans
     fontSize: 14px
     fontWeight: 400
     lineHeight: 1.50
-  code-sm:
-    fontFamily: Geist Mono
+    letterSpacing: 0
+  button:
+    fontFamily: Public Sans
+    fontSize: 14px
+    fontWeight: 500
+    lineHeight: 1.20
+    letterSpacing: 0
+  breadcrumb:
+    fontFamily: Public Sans
     fontSize: 13px
     fontWeight: 400
     lineHeight: 1.40
-  code-inline:
-    fontFamily: Geist Mono
-    fontSize: 13px
+    letterSpacing: 0
+  input-value:
+    fontFamily: DM Mono
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.40
+    letterSpacing: 0
+  result-value:
+    fontFamily: DM Mono
+    fontSize: 24px
     fontWeight: 500
-    lineHeight: 1.30
+    lineHeight: 1.20
+    letterSpacing: 0
+  particle-count:
+    fontFamily: DM Mono
+    fontSize: 13px
+    fontWeight: 400
+    lineHeight: 1.40
+    letterSpacing: 0
+  formula-mono:
+    fontFamily: DM Mono
+    fontSize: 15px
+    fontWeight: 500
+    lineHeight: 1.40
+    letterSpacing: 0
 
 rounded:
   xs: 4px
@@ -138,6 +104,7 @@ rounded:
   lg: 12px
   xl: 16px
   xxl: 24px
+  pill: 9999px
   full: 9999px
 
 spacing:
@@ -145,448 +112,450 @@ spacing:
   xs: 8px
   sm: 12px
   md: 16px
-  lg: 20px
-  xl: 24px
-  xxl: 32px
-  xxxl: 40px
-  section-sm: 48px
-  section: 64px
-  section-lg: 96px
-  hero: 120px
+  lg: 24px
+  xl: 32px
+  xxl: 48px
+  section: 96px
 
 components:
+  pill-active:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "8px 16px"
+  pill-active-pressed:
+    backgroundColor: "{colors.primary-pressed}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "8px 16px"
+  pill-inactive:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-subtle}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "8px 16px"
+    border: "0.5px solid {colors.hairline}"
+  pill-inactive-hover:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.ink}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "8px 16px"
+    border: "0.5px solid {colors.hairline}"
+
+  segmented-tab:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-subtle}"
+    typography: "{typography.body-sm}"
+    padding: "8px 4px"
+    border: "0 0 2px transparent solid"
+  segmented-tab-active:
+    backgroundColor: "transparent"
+    textColor: "{colors.primary}"
+    typography: "{typography.body-sm}"
+    padding: "8px 4px"
+    border: "0 0 2px {colors.primary} solid"
+
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
-    typography: "{typography.button-md}"
-    rounded: "{rounded.full}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
     padding: "10px 20px"
   button-primary-pressed:
-    backgroundColor: "{colors.charcoal}"
+    backgroundColor: "{colors.primary-pressed}"
     textColor: "{colors.on-primary}"
-  button-primary-disabled:
-    backgroundColor: "{colors.hairline}"
-    textColor: "{colors.muted}"
-  button-accent-green:
-    backgroundColor: "{colors.brand-green}"
-    textColor: "{colors.on-primary}"
-    typography: "{typography.button-md}"
-    rounded: "{rounded.full}"
-    padding: "10px 20px"
-  button-on-dark:
-    backgroundColor: "{colors.on-dark}"
-    textColor: "{colors.primary}"
-    typography: "{typography.button-md}"
-    rounded: "{rounded.full}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
     padding: "10px 20px"
   button-secondary:
     backgroundColor: "transparent"
     textColor: "{colors.ink}"
-    typography: "{typography.button-md}"
-    rounded: "{rounded.full}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
     padding: "10px 20px"
-    border: "1px solid {colors.hairline}"
-  button-ghost:
-    backgroundColor: "transparent"
+    border: "0.5px solid {colors.hairline}"
+  button-icon:
+    backgroundColor: "{colors.surface-2}"
+    textColor: "{colors.ink-subtle}"
+    rounded: "{rounded.full}"
+    size: "32px"
+    border: "0.5px solid {colors.hairline}"
+
+  card-calculator:
+    backgroundColor: "{colors.surface-1}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.lg}"
+    border: "0.5px solid {colors.hairline}"
+  card-field:
+    backgroundColor: "{colors.surface-2}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.md}"
+    border: "0.5px solid {colors.hairline}"
+  card-result:
+    backgroundColor: "{colors.primary-soft}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.md}"
+    border: "0.5px solid {colors.hairline}"
+
+  panel-browse-elements:
+    backgroundColor: "{colors.surface-2}"
+    rounded: "{rounded.lg}"
+    padding: "{spacing.md}"
+    border: "0.5px solid {colors.hairline}"
+  panel-overflow-reveal:
+    backgroundColor: "{colors.surface-3}"
+    rounded: "{rounded.md}"
+    padding: "{spacing.sm}"
+    border: "0.5px solid {colors.hairline}"
+
+  element-tile:
+    backgroundColor: "{colors.surface-1}"
+    rounded: "{rounded.md}"
+    padding: "{spacing.xs}"
+    border: "0.5px solid {colors.hairline}"
+  element-tile-selected:
+    backgroundColor: "{colors.primary-soft}"
+    rounded: "{rounded.md}"
+    padding: "{spacing.xs}"
+    border: "0.5px solid {colors.primary}"
+
+  text-input:
+    backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
-    typography: "{typography.button-md}"
+    typography: "{typography.input-value}"
     rounded: "{rounded.md}"
     padding: "8px 12px"
-  button-link:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-sm-medium}"
-    padding: "0"
-  button-icon-circular:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.full}"
-    size: 32px
-    border: "1px solid {colors.hairline}"
-  card-base:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xl}"
-    border: "1px solid {colors.hairline}"
-  card-feature:
-    backgroundColor: "{colors.surface}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xxl}"
-  card-help:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xl}"
-    border: "1px solid {colors.hairline}"
-  card-startup-perk:
-    backgroundColor: "{colors.canvas}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xl}"
-    border: "1px solid {colors.hairline}"
-  text-input:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-    typography: "{typography.body-md}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.sm} {spacing.md}"
-    border: "1px solid {colors.hairline}"
-    height: 40px
+    border: "0.5px solid {colors.hairline}"
   text-input-focused:
-    backgroundColor: "{colors.canvas}"
+    backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
-    border: "2px solid {colors.brand-green}"
-  search-pill:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.steel}"
-    typography: "{typography.body-sm}"
+    typography: "{typography.input-value}"
     rounded: "{rounded.md}"
-    padding: "{spacing.xs} {spacing.md}"
-    height: 36px
-    border: "1px solid {colors.hairline}"
-  segmented-tab:
-    backgroundColor: "transparent"
-    textColor: "{colors.steel}"
-    typography: "{typography.body-sm-medium}"
-    padding: "{spacing.sm} {spacing.md}"
-    border: "0 0 2px transparent solid"
-  segmented-tab-active:
-    backgroundColor: "transparent"
+    border: "2px solid {colors.primary}"
+  text-input-error:
+    backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
-    typography: "{typography.body-sm-medium}"
-    border: "0 0 2px {colors.ink} solid"
-  pill-tab:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.steel}"
-    typography: "{typography.body-sm-medium}"
-    rounded: "{rounded.full}"
-    padding: "8px 16px"
-    border: "1px solid {colors.hairline}"
-  pill-tab-active:
-    backgroundColor: "{colors.brand-green}"
-    textColor: "{colors.on-primary}"
-    rounded: "{rounded.full}"
-    border: "1px solid {colors.brand-green}"
-  pill-tab-active-pressed:
-    backgroundColor: "{colors.brand-green-deep}"
-    textColor: "{colors.on-primary}"
-    border: "1px solid {colors.brand-green-deep}"
-  card-highlight-soft:
-    backgroundColor: "{colors.brand-green-soft}"
-    textColor: "{colors.brand-green}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.xl}"
-    border: "1px solid {colors.brand-green-deep}"
-  badge-discount:
-    backgroundColor: "{colors.brand-green}"
-    textColor: "{colors.on-primary}"
-    typography: "{typography.caption-bold}"
-    rounded: "{rounded.full}"
-    padding: "2px 8px"
-  badge-required:
-    backgroundColor: "{colors.brand-error}"
-    textColor: "{colors.on-dark}"
-    typography: "{typography.micro-uppercase}"
-    rounded: "{rounded.sm}"
-    padding: "2px 6px"
+    typography: "{typography.input-value}"
+    rounded: "{rounded.md}"
+    border: "2px solid {colors.error}"
+  text-input-readonly:
+    backgroundColor: "{colors.primary-soft}"
+    textColor: "{colors.primary-pressed}"
+    typography: "{typography.result-value}"
+    rounded: "{rounded.md}"
+    padding: "8px 12px"
+    border: "0.5px solid {colors.hairline}"
 
+  badge-calculated:
+    backgroundColor: "{colors.primary-soft}"
+    textColor: "{colors.primary-pressed}"
+    typography: "{typography.body-sm}"
+    rounded: "{rounded.pill}"
+    padding: "2px 8px"
+
+  error-message:
+    textColor: "{colors.error}"
+    typography: "{typography.body-sm}"
+    padding: "4px 0"
+  error-message-icon:
+    textColor: "{colors.error}"
+    size: "14px"
+
+  top-nav:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    typography: "{typography.body-sm}"
+    height: "56px"
+  breadcrumb-bar:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-subtle}"
+    typography: "{typography.breadcrumb}"
+    padding: "0 0 {spacing.lg} 0"
+  footer:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink-subtle}"
+    typography: "{typography.body-sm}"
+    padding: "{spacing.xl} 0"
 ---
 
 ## Overview
 
-Mintlify positions itself at the intersection of polished marketing presentation and developer-grade documentation density. The home and startups pages open with cinematic atmospheric heroes — soft sky-gradient backdrops with cloud illustrations on the homepage, dark teal-to-mint gradients with a rocket launch on the startups page — that feel more like a SaaS landing aesthetic than a developer tool. Then the deeper surfaces (pricing comparison, live documentation pages) collapse into dense, high-information layouts where Inter body type carries 14–16px copy across long-form prose, syntax-highlighted code blocks, and 3-column documentation grids.
+FreeChemLab is a single-purpose chemistry calculator, not a SaaS product and not a marketing site. The design system reflects that: the calculator is the first thing on the page, there is no hero, and every visual decision serves reading a number correctly rather than persuading anyone of anything.
 
-The brand's signature mint green ({colors.brand-green}) appears sparingly but decisively — on the hero "Get started" pill button, the green checkmark icons inside feature lists, the "Featured" pricing tier border, and active state indicators inside docs UI. Black-pill primary buttons dominate the marketing flow; white-on-dark inversions appear on dark hero bands. The signature pairing of Inter (body, headings) with Geist Mono (code blocks, inline references, type signatures) reinforces the developer-tool DNA without requiring a third typeface.
+The structural logic is borrowed from Linear — a surface ladder carrying hierarchy instead of drop shadows, hairline borders, a disciplined radius scale, and a single chromatic accent used scarcely. That logic is inverted for light mode: where Linear's canvas is near-black and surfaces lift toward lighter grays, this system's canvas is a warm off-white (`{colors.canvas}` #FAF9F5) and surfaces lift toward clean white (`{colors.surface-1}` #ffffff).
+
+The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its association with organic chemistry and lab safety, and because green is nearly absent from the calculator-site landscape. It appears on active controls, focus states, and the calculated-result tint. Nowhere else.
 
 **Key Characteristics:**
-- Atmospheric gradient hero bands (sky-blue to cream on homepage; teal-to-mint on startups) provide cinematic marketing presentation
-- Signature Mintlify mint green ({colors.brand-green}) reserved for accent CTAs, active states, and feature confirmations
-- Black-pill primary buttons ({colors.primary} + `{rounded.full}`) for marketing CTAs
-- Inter for all UI prose; Geist Mono for code blocks, inline code, and type/property signatures
-- 3-column documentation layout (sidebar / prose / TOC) with dense 14px body type for long-form developer reading
-- Tightly-controlled radius scale: marketing uses `{rounded.lg}` (12px), pill buttons use `{rounded.full}` — no in-between corner softening
-- Vibrant testimonial card (`{colors.testimonial-orange}`) breaks color rhythm intentionally for emotional impact
+- Light warm canvas with a four-step surface ladder for hierarchy — no drop shadows anywhere
+- Single green accent (`{colors.primary}`) reserved for active states, focus, and calculated results
+- Two-family typography: Public Sans for all text, DM Mono for all numbers
+- Pill-shaped controls only where interaction demands it (direction toggle, unit selectors, buttons); cards hold 12px corners, inputs hold 8px
+- Red (`{colors.error}`) appears only on validation errors — never decoratively
+- Calculator visible immediately; no hero, no marketing band
 
 ## Colors
 
-> Source pages: mintlify.com/ (homepage), /startups (program page), /pricing (comparison), /docs/components/tabs (live documentation). Token coverage was identical across all four pages.
-
 ### Brand & Accent
-- **Brand Green** ({colors.brand-green} `#02613E`): Primary active fill — used on solid active controls (direction toggle, active unit pills, accent CTAs). Text on top must be light/white (`#ffffff`).
-- **Deep Green** ({colors.brand-green-deep} `#04442C`): Hover or pressed state variant of the solid green fill.
-- **Soft Green** ({colors.brand-green-soft} `#E5F5EF`): Light tinted background for secondary/informational cards (Particles card, selected element cards). Text on top must use `{colors.brand-green}` (`#02613E`) or `{colors.brand-green-deep}` (`#04442C`) for high contrast.
-- **Brand Error** ({colors.brand-error} `#d45656`): Red reserved exclusively for required-field labels and validation error messaging.
+- **Primary Green** (`{colors.primary}` #02613E): Active fills — direction toggle, active unit pills, primary buttons, focused input borders, active tab underline. White text on top (7.4:1 contrast, passes WCAG AAA).
+- **Primary Hover** (`{colors.primary-hover}` #0B7A4F): Lighter green for hover states on green fills.
+- **Primary Pressed** (`{colors.primary-pressed}` #04442C): Darker green for pressed/active states, and for text sitting on `{colors.primary-soft}`.
+- **Primary Soft** (`{colors.primary-soft}` #DCEEE4): Tint background for the calculated-result field, the Calculated badge, and selected element tiles. Text on top uses `{colors.primary-pressed}`, never white.
 
 ### Surface
-- **Canvas White** ({colors.canvas}): Primary page and card background.
-- **Canvas Dark** ({colors.canvas-dark}): Promo banner, dark inversion surfaces, code editor wrapper.
-- **Surface** ({colors.surface}): Subtle section backgrounds, search-pill rest, code-inline background, sidebar active state.
-- **Surface Soft** ({colors.surface-soft}): Quieter section backgrounds and FAQ accordion.
-- **Surface Code** ({colors.surface-code}): Dark code-block wrapper background.
-- **Hairline** ({colors.hairline}): 1px borders and primary dividers.
-- **Hairline Soft** ({colors.hairline-soft}): Quieter table-row dividers and secondary section breaks.
-
-### Hero Atmospheric
-- **Hero Sky From / To** ({colors.hero-sky-from}, {colors.hero-sky-to}): Atmospheric sky-blue to soft cream gradient on the homepage hero.
-- **Hero Dark From / To** ({colors.hero-dark-from}, {colors.hero-dark-to}): Dark teal to mint gradient on the startups hero.
+- **Canvas** (`{colors.canvas}` #FAF9F5): Page background. Warm off-white, not pure white — the warmth is deliberate and should read as "slightly less clinical," not visibly tinted.
+- **Surface 1** (`{colors.surface-1}` #ffffff): One step above canvas — the calculator card, element tiles, input field interiors.
+- **Surface 2** (`{colors.surface-2}` #F5F3EE): Two steps — the Molar Mass and Mass field containers, the Browse Elements panel.
+- **Surface 3** (`{colors.surface-3}` #EFEDE7): Three steps — the "···" overflow reveal panel, nested sub-panels.
+- **Surface 4** (`{colors.surface-4}` #E8E6DF): Four steps — deepest lift, currently unused. Reserved.
+- **Hairline** (`{colors.hairline}` #E5E2DA): Default 0.5px borders on cards, inputs, and dividers.
+- **Hairline Strong** (`{colors.hairline-strong}` #D3CFC3): Emphasized dividers.
+- **Hairline Tertiary** (`{colors.hairline-tertiary}` #C4C0B2): Nested/tertiary borders inside the element grid.
 
 ### Text
-- **Ink** ({colors.ink}): Primary headlines and CTA text.
-- **Charcoal** ({colors.charcoal}): Body text, code-inline foreground.
-- **Slate** ({colors.slate}): Secondary text and metadata.
-- **Steel** ({colors.steel}): Tertiary text, table headers, sidebar inactive items, footer links.
-- **Stone** ({colors.stone}): Captions, twoslash cursor color, muted labels.
-- **Muted** ({colors.muted}): De-emphasized labels and disabled text.
-- **On Dark** ({colors.on-dark}): White text on dark surfaces (hero bands, code blocks, promo banner).
-- **On Dark Muted** ({colors.on-dark-muted}): Reduced-opacity white for code-block headers and metadata on dark.
+- **Ink** (`{colors.ink}` #14140F): Headlines, input values, primary numbers. Near-black.
+- **Ink Muted** (`{colors.ink-muted}` #4A4842): Body copy, secondary values.
+- **Ink Subtle** (`{colors.ink-subtle}` #7A776D): Field labels, captions, breadcrumb, inactive pill text.
+- **Ink Tertiary** (`{colors.ink-tertiary}` #A8A498): Placeholder text, disabled state, atomic mass values inside element tiles.
 
 ### Semantic
-- Error tones derive from `{colors.brand-error}` for input borders, required-field labels, and validation messaging.
+- **Error** (`{colors.error}` #C23B3B): Validation error borders and inline error messages. 5.4:1 contrast on white, passes WCAG AA for normal text. Red appears nowhere else in the system.
+- **Error Soft** (`{colors.error-soft}` #FBEAEA): Tint background for error message blocks, if a filled treatment is ever needed.
 
 ## Typography
 
 ### Font Family
-**Inter** (primary): Variable typeface optimized for UI legibility. Used across every UI surface — body, headings, navigation, button labels, captions. Fallbacks: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif.
 
-**Geist Mono** (code): Monospace typeface used inside code blocks, inline code references, type signatures (e.g. `string`, `number`, `boolean`), and property names in API documentation. Fallbacks: 'SF Mono', Menlo, Consolas, 'Geist Mono Fallback', monospace.
+**Public Sans** — all text: headings, labels, buttons, body copy, breadcrumb. Chosen for legibility at small sizes and its tailed lowercase `l`, which disambiguates it from capital `I`. Fallbacks: `-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`.
 
-The brand uses no italic variants of either face — emphasis comes from weight (500/600), color shift, or background highlighting (in code references).
+**DM Mono** — all numbers: input values, calculated results, particle counts, chemical formulas. Fallbacks: `ui-monospace, 'SF Mono', Menlo, monospace`.
+
+### Why two families
+
+This is not a stylistic pairing. Misreading a digit is the primary failure mode of a calculator, and the confusable pairs are `0`/`O` and `1`/`l`/`I`. Public Sans handles `1`/`l`/`I` well but does not distinguish `0` from `O` (it has no slashed or dotted zero, and none is available as an OpenType feature). DM Mono resolves the numeric ambiguity and enforces fixed character width, so a result does not visually shift as it recalculates.
+
+The rule is simple: **if it is a number, it is DM Mono. If it is a word, it is Public Sans.** Unit labels ("g/mol", "mol") are words and stay in Public Sans, even when adjacent to numbers.
+
+Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were each evaluated and rejected during system design.
 
 ### Hierarchy
 
-| Token | Size | Weight | Line Height | Letter Spacing | Use |
+| Token | Family | Size | Weight | Line Height | Use |
 |---|---|---|---|---|---|
-| `{typography.hero-display}` | 72px | 600 | 1.05 | -2px | Marketing hero display ("The intelligent Knowledge Platform") |
-| `{typography.display-lg}` | 56px | 600 | 1.10 | -1.5px | Major section opener ("Built for the intelligence age") |
-| `{typography.heading-1}` | 48px | 600 | 1.10 | -1px | Page-level headlines ("Pricing on your terms") |
-| `{typography.heading-2}` | 36px | 600 | 1.20 | -0.5px | Section headlines ("Apply to the Mintlify startup program") |
-| `{typography.heading-3}` | 28px | 600 | 1.25 | 0 | Subsection headers, "Tabs" docs page title |
-| `{typography.heading-4}` | 22px | 600 | 1.30 | 0 | Card titles, larger feature headers |
-| `{typography.heading-5}` | 18px | 600 | 1.40 | 0 | Smaller feature headers, FAQ question titles |
-| `{typography.subtitle}` | 18px | 400 | 1.50 | 0 | Hero subtitle, lead body |
-| `{typography.body-md}` | 16px | 400 | 1.50 | 0 | Primary body text |
-| `{typography.body-md-medium}` | 16px | 500 | 1.50 | 0 | Body emphasis |
-| `{typography.body-sm}` | 14px | 400 | 1.50 | 0 | Secondary body, table cells, navigation |
-| `{typography.body-sm-medium}` | 14px | 500 | 1.50 | 0 | Active sidebar nav, button labels, tab labels |
-| `{typography.caption}` | 13px | 400 | 1.40 | 0 | Helper text, fine print, code-block headers |
-| `{typography.caption-bold}` | 13px | 600 | 1.40 | 0 | Badge labels |
-| `{typography.micro}` | 12px | 500 | 1.40 | 0 | Footer microcopy, label chips |
-| `{typography.micro-uppercase}` | 11px | 600 | 1.40 | 0.5px | Sidebar section headers, "REQUIRED" labels |
-| `{typography.button-md}` | 14px | 500 | 1.30 | 0 | Pill button labels |
-| `{typography.code-md}` | 14px | 400 | 1.50 | 0 | Code block content |
-| `{typography.code-sm}` | 13px | 400 | 1.40 | 0 | Smaller code, type signatures |
-| `{typography.code-inline}` | 13px | 500 | 1.30 | 0 | Inline `<Tabs>` references in body |
+| `{typography.page-title}` | Public Sans | 28px | 600 | 1.20 | Calculator card title |
+| `{typography.card-title}` | Public Sans | 20px | 500 | 1.25 | Section headers inside the card |
+| `{typography.label}` | Public Sans | 12px | 600 | 1.30 | Uppercase field labels (MOLAR MASS, MASS, MOLES), +0.4px tracking |
+| `{typography.body}` | Public Sans | 16px | 400 | 1.50 | Explainer prose |
+| `{typography.body-sm}` | Public Sans | 14px | 400 | 1.50 | Secondary copy, tab labels, error messages, footer |
+| `{typography.button}` | Public Sans | 14px | 500 | 1.20 | All button and pill labels |
+| `{typography.breadcrumb}` | Public Sans | 13px | 400 | 1.40 | Breadcrumb nav |
+| `{typography.input-value}` | DM Mono | 16px | 400 | 1.40 | Molar mass and mass input values |
+| `{typography.result-value}` | DM Mono | 24px | 500 | 1.20 | The calculated result — 6 decimal places |
+| `{typography.particle-count}` | DM Mono | 13px | 400 | 1.40 | Particle count secondary line |
+| `{typography.formula-mono}` | DM Mono | 15px | 500 | 1.40 | Built chemical formulas (e.g. He2LiBe2) |
 
 ### Principles
-- **Tight hero leading** (1.05) creates magazine-grade display headlines on the 72px hero
-- **Negative letter-spacing** progresses inversely with size — display sizes use -2px to -1.5px; smaller headings relax to 0
-- **Documentation-grade body** (1.50 line-height on 14–16px) ensures comfortable long-form reading in dense docs surfaces
-- **Inter / Geist Mono pairing** — Inter for everything else, Geist Mono surgically for code references; the contrast between the two is the brand's developer-respect signal
-- **Uppercase micro labels** with +0.5px letter-spacing carry sidebar section headers and "REQUIRED" annotation tags
+- **No negative letter-spacing anywhere.** Linear's aggressive tracking exists for 80px marketing headlines. The largest type here is 28px, and tightening hurts legibility on both small text and numbers.
+- **Labels are the only uppercase treatment**, at 12px/600 with +0.4px tracking. Nothing else is uppercased.
+- **Results are formatted to 6 decimal places**, matching the precision convention used across chemistry calculators.
 
 ## Layout
 
 ### Spacing System
-- **Base unit**: 4px (8px primary increment)
-- **Tokens**: `{spacing.xxs}` (4px) · `{spacing.xs}` (8px) · `{spacing.sm}` (12px) · `{spacing.md}` (16px) · `{spacing.lg}` (20px) · `{spacing.xl}` (24px) · `{spacing.xxl}` (32px) · `{spacing.xxxl}` (40px) · `{spacing.section-sm}` (48px) · `{spacing.section}` (64px) · `{spacing.section-lg}` (96px) · `{spacing.hero}` (120px)
-- **Section rhythm**: Marketing pages use `{spacing.section-lg}` (96px) between major bands; pricing comparison tightens to `{spacing.section}` (64px); documentation surfaces use `{spacing.xxl}` (32px) between subsections
-- **Card internal padding**: Standard `{spacing.xl}` (24px) for compact cards; `{spacing.xxl}` (32px) for pricing cards and feature panels; testimonial card pushes to `{spacing.section}` (64px) for hero-card presence
+- **Base unit**: 4px
+- **Tokens**: `{spacing.xxs}` 4px · `{spacing.xs}` 8px · `{spacing.sm}` 12px · `{spacing.md}` 16px · `{spacing.lg}` 24px · `{spacing.xl}` 32px · `{spacing.xxl}` 48px · `{spacing.section}` 96px
+- Calculator card padding: `{spacing.lg}` 24px
+- Field container padding: `{spacing.md}` 16px
+- Gap between the Molar Mass and Mass containers: `{spacing.md}` 16px
+- Pill padding: 8px vertical · 16px horizontal
+- Button padding: 10px vertical · 20px horizontal
+- Input padding: 8px vertical · 12px horizontal
 
 ### Grid & Container
-- Marketing pages use a 1280px max-width with 32px gutters
-- Hero and feature bands often use 2-column splits (text left, illustration/mockup right)
-- Pricing page renders 3 tier cards in a row at desktop (FREE / Lift Off / Custom), then a comprehensive feature comparison table below
-- Documentation pages use a strict 3-column grid: left sidebar nav (~240px), center prose (~720px max-width), right TOC (~200px)
-- Logo walls use 6-up rows of customer logos at 80–100px height each
+- Single-column page, max content width ~880px. This is a calculator, not a dashboard — it should not sprawl.
+- Molar Mass and Mass render side by side at desktop, each at `flex: 1`.
+- The element grid inside Browse Elements renders 5-up at desktop.
 
 ### Whitespace Philosophy
-Marketing surfaces give content generous breathing room — `{spacing.hero}` (120px) above-the-fold creates space for atmospheric gradient backdrops to read clearly. Documentation tightens dramatically: section gaps drop to `{spacing.xxl}` (32px), table rows pack to `{spacing.md}` (16px), sidebar nav compresses to `{spacing.xs}` (8px) vertical rhythm.
+The warm canvas is the whitespace. Sections separate by lifting onto a surface, not by large gaps. Vertical rhythm inside the card stays at `{spacing.md}` 16px between blocks; the page keeps `{spacing.lg}` 24px between the breadcrumb and the card.
 
 ## Elevation & Depth
 
-The system runs predominantly flat with strategic atmospheric depth.
-
 | Level | Treatment | Use |
 |---|---|---|
-| 0 (flat) | No shadow; `{colors.hairline}` border | Default cards, table rows, form inputs |
-| 1 (subtle) | `rgba(0, 0, 0, 0.04) 0px 1px 2px 0px` | Hover-elevated tiles, subtle highlights |
-| 2 (card) | `rgba(0, 0, 0, 0.08) 0px 4px 12px 0px` | Standard feature cards |
-| 3 (mockup) | `rgba(0, 0, 0, 0.12) 0px 24px 48px -8px` | Hero product mockup framing — the deep diffuse drop on the homepage hero docs preview |
-| 4 (brand-tinted) | `rgba(0, 212, 164, 0.08) 0px 8px 24px` | Featured pricing tier glow |
+| 0 (flat) | No border, no shadow | Page background, breadcrumb, footer |
+| 1 (card lift) | `{colors.surface-1}` on canvas, 0.5px `{colors.hairline}` | Calculator card, element tiles, input interiors |
+| 2 (nested lift) | `{colors.surface-2}`, 0.5px `{colors.hairline}` | Field containers, Browse Elements panel |
+| 3 (sub-panel lift) | `{colors.surface-3}`, 0.5px `{colors.hairline}` | Overflow reveal panel |
+| 4 (focus) | 2px `{colors.primary}` border | Focused input |
+| 4 (error) | 2px `{colors.error}` border | Errored input |
 
-### Decorative Depth
-- The homepage hero uses an atmospheric photographic backdrop (cloud illustration on sky-gradient) for depth — no shadow needed; the imagery does the work
-- The startups hero uses a similar treatment with a rocket-launch illustration cutting across the dark teal gradient
-- Code blocks carry their own internal depth via syntax-highlighting color hierarchy on the dark surface; no shadow used
+**There are no drop shadows in this system.** Depth is carried entirely by the surface ladder plus hairline borders. If something needs to feel raised, it moves up a surface step — it does not gain a shadow.
+
+Focus and error use a border-width change (0.5px to 2px) rather than a shadow ring, because a ring reads poorly against a flat bordered card system.
 
 ## Shapes
 
-### Border Radius Scale
-
 | Token | Value | Use |
 |---|---|---|
-| `{rounded.xs}` | 4px | Inline code chips, micro tags |
-| `{rounded.sm}` | 6px | Sidebar nav items, type badges |
-| `{rounded.md}` | 8px | Inputs, search pill, code blocks, secondary cards |
-| `{rounded.lg}` | 12px | Standard cards, pricing tiers, hero mockup, FAQ items |
-| `{rounded.xl}` | 16px | Larger feature panels |
-| `{rounded.xxl}` | 24px | Featured product showcase tiles |
-| `{rounded.full}` | 9999px | All buttons, pill tabs, badges |
+| `{rounded.xs}` | 4px | Micro chips |
+| `{rounded.sm}` | 6px | Inline tags |
+| `{rounded.md}` | 8px | Inputs, element tiles, overflow panel |
+| `{rounded.lg}` | 12px | Calculator card, field containers, Browse Elements panel |
+| `{rounded.xl}` | 16px | Reserved |
+| `{rounded.pill}` | 9999px | Direction toggle, unit pills, all buttons |
+| `{rounded.full}` | 9999px | Circular icon buttons, the Calculated badge |
 
-The radius scale is tightly disciplined — the brand never uses a corner softening between `{rounded.md}` (8px) and `{rounded.lg}` (12px) for the same component family. Pill buttons (`{rounded.full}`) are used universally; rectangular cards use `{rounded.lg}` (12px) consistently.
-
-### Photography Geometry
-- Hero illustrations (cloud, rocket) sit on full-bleed gradient backdrops with no internal framing
-- Customer logo walls use 1:1 ratio cells without rounding (logos are presented inline as wordmarks)
-- Testimonial photos use 1:1 aspect with `{rounded.md}` (8px) softening
-- Code editor mockup hero image uses `{rounded.lg}` (12px) corners on a hairline-bordered card with a deep diffuse drop shadow
+**Note on the pill divergence:** Linear's own system explicitly forbids pill-shaped CTAs. This system overrides that deliberately. The direction toggle and unit selectors are mutually-exclusive choice controls, and pill shape signals "pick one of these" more clearly than a rounded rectangle, which reads as a standalone button. Everything outside that pattern holds Linear's 8px/12px corners.
 
 ## Components
 
-> Per the no-hover policy, hover states are NOT documented. Default and pressed/active states only.
+> Hover states are documented only where they carry meaning. Default, active, pressed, focused, and error states are the priority.
 
-### Buttons
+### Pills & Toggles
 
-**`button-primary`** — Black pill primary CTA, the dominant action across all surfaces.
-- Background `{colors.primary}`, text `{colors.on-primary}`, typography `{typography.button-md}`, padding `10px 20px`, rounded `{rounded.full}`.
-- Pressed state `button-primary-pressed` lifts to `{colors.charcoal}`.
-- Disabled state `button-primary-disabled` uses `{colors.hairline}` background and `{colors.muted}` text.
+**`pill-active`** — Selected state for the direction toggle and unit selectors.
+- Background `{colors.primary}`, text `{colors.on-primary}`, type `{typography.button}`, padding 8px 16px, rounded `{rounded.pill}`.
+- Pressed state `pill-active-pressed` darkens to `{colors.primary-pressed}`.
 
-**`button-accent-green`** — Dark green pill for brand-emphasis CTAs.
-- Background `{colors.brand-green}`, text `{colors.on-primary}`, typography `{typography.button-md}`, padding `10px 20px`, rounded `{rounded.full}`.
-
-**`button-on-dark`** — White pill for use on dark hero bands (startups page "Get started").
-- Background `{colors.on-dark}`, text `{colors.primary}`, typography `{typography.button-md}`, padding `10px 20px`, rounded `{rounded.full}`.
-
-**`button-secondary`** — Outlined pill for secondary actions.
-- Background transparent, text `{colors.ink}`, border `1px solid {colors.hairline}`, typography `{typography.button-md}`, padding `10px 20px`, rounded `{rounded.full}`.
-
-**`button-ghost`** — Quieter rectangular ghost button (sidebar action, tertiary nav).
-- Background transparent, text `{colors.ink}`, typography `{typography.button-md}`, padding `8px 12px`, rounded `{rounded.md}`.
-
-**`button-link`** — Inline text link styled as a subtle button.
-- Background transparent, text `{colors.ink}`, typography `{typography.body-sm-medium}`, padding `0`. Underline appears on activation.
-
-**`button-icon-circular`** — 32×32px circular utility button (close, copy, arrow).
-- Background `{colors.canvas}`, text `{colors.ink}`, border `1px solid {colors.hairline}`, rounded `{rounded.full}`.
-
-### Cards & Containers
-
-**`card-base`** — Standard documentation/feature card.
-- Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xl}`, border `1px solid {colors.hairline}`.
-
-**`card-feature`** — Feature panel on light gray surface.
-- Background `{colors.surface}`, rounded `{rounded.lg}`, padding `{spacing.xxl}`.
-
-**`card-help`** — "Need help?" CTA cards below the pricing comparison ("Quickstart guide", "Guide to technical writing", "Founder", "Sales").
-- Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xl}`, border `1px solid {colors.hairline}`.
-
-**`card-startup-perk`** — Startup-program perk grid item ("Discounts and credits", "Priority support", "Startup pack", "Founder community").
-- Background `{colors.canvas}`, rounded `{rounded.lg}`, padding `{spacing.xl}`, border `1px solid {colors.hairline}`. Carries an icon at top, heading `{typography.heading-5}`, description `{typography.body-sm}` `{colors.steel}`.
-
-### Inputs & Forms
-
-**`text-input`** — Standard text field.
-- Background `{colors.canvas}`, text `{colors.ink}`, border `1px solid {colors.hairline}`, rounded `{rounded.md}`, padding `{spacing.sm} {spacing.md}`, height 40px.
-
-**`text-input-focused`** — Activated state.
-- Border switches to `2px solid {colors.brand-green}` — focus uses the brand mint as the activation signal.
-
-**`search-pill`** — Documentation top-bar search.
-- Background `{colors.surface}`, text `{colors.steel}`, typography `{typography.body-sm}`, rounded `{rounded.md}`, height 36px, border `1px solid {colors.hairline}`.
+**`pill-inactive`** — Unselected state.
+- Transparent background, text `{colors.ink-subtle}`, 0.5px `{colors.hairline}` border, same padding and radius.
+- Hover state `pill-inactive-hover` fills to `{colors.surface-2}` and text darkens to `{colors.ink}`.
 
 ### Tabs
 
-**`segmented-tab`** + **`segmented-tab-active`** — Underline-style tab navigation (used inside docs Tabs component for "First tab / Second tab / Third tab").
-- Inactive: text `{colors.steel}`, transparent background, padding `{spacing.sm} {spacing.md}`. Active: text `{colors.ink}`, 2px bottom border in `{colors.ink}`.
+**`segmented-tab`** + **`segmented-tab-active`** — Presets / Build custom inside the Browse Elements panel.
+- Inactive: text `{colors.ink-subtle}`, transparent background, 2px transparent bottom border, padding 8px 4px.
+- Active: text `{colors.primary}`, 2px `{colors.primary}` bottom border.
 
-**`pill-tab`** + **`pill-tab-active`** — Pill-style tab nav.
-- Inactive: background `{colors.canvas}`, text `{colors.steel}`, border `1px solid {colors.hairline}`, padding `8px 16px`, rounded `{rounded.full}`.
-- Active: background `{colors.brand-green}`, text `{colors.on-primary}`, border `1px solid {colors.brand-green}`.
+Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal "switch a view." The distinction matters because both appear in the same panel.
 
+### Buttons
 
-### Badges & Status
+**`button-primary`** — Green pill. Used for "Use this molar mass."
+- Background `{colors.primary}`, text `{colors.on-primary}`, padding 10px 20px, rounded `{rounded.pill}`.
+- Pressed state darkens to `{colors.primary-pressed}`.
 
-**`badge-discount`** — Small green "Save 20%" badge attached to annual toggle.
-- Background `{colors.brand-green}`, text `{colors.on-primary}`, typography `{typography.caption-bold}`, rounded `{rounded.full}`, padding `2px 8px`.
+**`button-secondary`** — Outlined pill for secondary actions (Clear, Reset).
+- Transparent background, text `{colors.ink}`, 0.5px `{colors.hairline}` border.
 
-**`badge-required`** — Red "REQUIRED" label on documentation property rows.
-- Background `{colors.brand-error}`, text `{colors.on-dark}`, typography `{typography.micro-uppercase}`, rounded `{rounded.sm}`, padding `2px 6px`.
+**`button-icon`** — 32×32px circular utility button (collapse, close).
+- Background `{colors.surface-2}`, icon `{colors.ink-subtle}`, 0.5px `{colors.hairline}` border, rounded `{rounded.full}`.
 
-### Navigation
+### Cards & Panels
 
-**Top Navigation (Marketing)** — Sticky white bar with logo, link list, and right-side CTAs.
-- Background `{colors.canvas}`, height ~64px, bottom border `1px solid {colors.hairline-soft}`.
-- Left: Mintlify wordmark + horizontal link list (Solutions, Pricing, Customers, Documentation, Changelog).
-- Right: secondary "Talk to sales" + black-pill "Get Started".
+**`card-calculator`** — The outer card. Everything lives inside it.
+- Background `{colors.surface-1}`, rounded `{rounded.lg}`, padding `{spacing.lg}`, 0.5px `{colors.hairline}` border.
 
-**Top Navigation (Documentation)** — Compressed nav with center search-pill and right-side account/upgrade CTAs.
-- Background `{colors.canvas}`, height ~56px. Search-pill at center, "Documentation / Guides / API Reference / Changelog" links + "Talk to us" + green "Get started" right.
+**`card-field`** — Molar Mass and Mass containers.
+- Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, 0.5px `{colors.hairline}` border.
 
+**`card-result`** — The calculated-output container.
+- Background `{colors.primary-soft}`, otherwise identical to `card-field`. The green tint is what communicates "this is a result, not an input." It is not decorative and must not be applied to editable fields.
+
+**`panel-browse-elements`** — The expandable element/preset picker.
+- Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, 0.5px `{colors.hairline}` border.
+
+**`panel-overflow-reveal`** — The "···" panel holding rare units.
+- Background `{colors.surface-3}`, rounded `{rounded.md}`, padding `{spacing.sm}`.
+
+**`element-tile`** / **`element-tile-selected`** — Individual elements in the Build custom grid.
+- Default: `{colors.surface-1}`, rounded `{rounded.md}`, 0.5px `{colors.hairline}`. Symbol in `{colors.ink}`, name and atomic mass in `{colors.ink-tertiary}`.
+- Selected: `{colors.primary-soft}` fill with a 0.5px `{colors.primary}` border. Symbol and mass shift to `{colors.primary-pressed}` and `{colors.primary-hover}`.
+
+The selected state must be visible from the fill and border alone. The quantity stepper appearing is additional feedback, not the primary signal.
+
+### Inputs & Validation
+
+**`text-input`** — Molar mass and mass fields.
+- Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, padding 8px 12px, 0.5px `{colors.hairline}` border.
+
+**`text-input-focused`** — Border widens to 2px `{colors.primary}`.
+
+**`text-input-error`** — Border widens to 2px `{colors.error}`. Paired with an `error-message` directly below the field.
+
+**`text-input-readonly`** — The calculated result field.
+- Background `{colors.primary-soft}`, text `{colors.primary-pressed}`, type `{typography.result-value}`. Not editable. Always accompanied by `badge-calculated`.
+
+**`badge-calculated`** — Small pill label with a lock icon, sitting top-right of the result field's label row.
+- Background `{colors.primary-soft}`, text `{colors.primary-pressed}`, type `{typography.body-sm}`, rounded `{rounded.pill}`, padding 2px 8px.
+
+**`error-message`** — Inline validation message below the errored field.
+- Text `{colors.error}`, type `{typography.body-sm}`, preceded by a 14px alert icon in the same color.
+
+Validation rules: molar mass must be greater than zero; mass and moles must be non-negative. A field must never render focused and errored simultaneously — the validation logic should resolve to one state.
+
+### Navigation & Chrome
+
+**`top-nav`** — Wordmark left, minimal. No CTA button.
+- Background `{colors.canvas}`, height 56px, type `{typography.body-sm}`.
+
+**`breadcrumb-bar`** — Sits above the calculator card.
+- Transparent, text `{colors.ink-subtle}`, current page in `{colors.ink}`, type `{typography.breadcrumb}`.
+
+**`footer`** — Single line, copyright only. No cross-links until the product has more than one module.
+- Background `{colors.canvas}`, text `{colors.ink-subtle}`, type `{typography.body-sm}`.
 
 ## Do's and Don'ts
 
 ### Do
-- Reserve `{colors.brand-green}` (Mintlify mint) for accent CTAs and active state indicators only — even one accent button per viewport carries weight
-- Use `{colors.primary}` (black) as the dominant CTA on light backgrounds; switch to `button-on-dark` (white pill) on dark hero bands
-- Apply `{rounded.full}` to every button and pill; never soften pill corners
-- Pair Inter (UI prose) with Geist Mono (code) — never introduce a third typeface
-- Use atmospheric gradient hero bands sparingly (only the homepage and startups page); keep deeper surfaces flat and dense
-- Apply `{rounded.lg}` (12px) consistently on cards; use `{rounded.md}` (8px) only on compact UI like search pills and code blocks
-- Keep documentation prose at `{typography.body-md}` (16px) with 1.50 line-height — never compress
+- Use the surface ladder for hierarchy. If two containers sit at the same level, one of them is probably wrong.
+- Reserve `{colors.primary}` for active states, focus, and calculated results.
+- Use `{colors.primary-soft}` as the signal for "calculated" and "selected" — the tint carries the meaning, not an adjacent badge alone.
+- Put every number in DM Mono and every word in Public Sans.
+- Apply `{rounded.pill}` only to the direction toggle, unit selectors, and buttons.
+- Keep the calculator above the fold. It is the product.
+- Format all calculated results to 6 decimal places.
 
 ### Don't
-- Don't use `{colors.brand-green}` on body text or large surfaces — it loses signal
-- Don't introduce additional accent colors beyond mint, tag-blue, error-red, and the testimonial orange
-- Don't apply heavy shadows on flat documentation cards; reserve elevation for the hero product mockup
-- Don't reduce documentation line-height below 1.50 — long-form readability suffers
-- Don't combine atmospheric gradients with multiple competing color accents in the same hero — the sky/dark gradient is the brand mood; let it breathe
-- Don't use Inter for code or Geist Mono for prose — the typeface assignment IS the brand voice
+- Don't add drop shadows. Depth comes from the surface ladder.
+- Don't use `{colors.error}` red for anything except validation errors.
+- Don't use `{colors.primary}` as a large surface fill or on body text.
+- Don't introduce a third font family.
+- Don't nest containers at the same surface level — step up or don't nest.
+- Don't add a marketing hero, a promotional CTA, or footer cross-links.
+- Don't apply `card-result`'s green tint to an editable field. It means "read-only output."
+- Don't pill-round the element tiles or the calculator card.
 
 ## Responsive Behavior
 
 ### Breakpoints
 | Name | Width | Key Changes |
 |---|---|---|
-| Mobile (small) | < 480px | Single column. Hero scales to 36px. Pill nav collapses to hamburger. Pricing tiers stack 1-up. Footer 1-column accordion. |
-| Mobile (large) | 480 – 767px | Same as small but feature tiles render 2-up. Hero scales to 44px. |
-| Tablet | 768 – 1023px | 2-column feature grids. Pill-tab nav returns. Documentation sidebar collapses to drawer. Hero scales to 56px. |
-| Desktop | 1024 – 1279px | Full 3-column docs grid (sidebar / body / TOC). 3-tier pricing card row. Hero at 72px. |
-| Wide Desktop | ≥ 1280px | Wider hero gutters, larger product mockup, fixed 240px sidebar. |
+| Desktop | ≥ 1024px | Molar Mass and Mass side by side; element grid 5-up |
+| Tablet | 768 – 1023px | Same two-column field layout; element grid 4-up |
+| Mobile-Lg | 520 – 767px | Fields still side by side; element grid 3-up |
+| Mobile | < 520px | Molar Mass and Mass stack to one column; element grid 2-up; page title scales 28px → 22px |
 
 ### Touch Targets
-- Pill buttons render at 36–40px effective height — bumps to 44px on mobile via padding override
-- Circular icon buttons: 32×32px desktop → 44×44px mobile
-- Form inputs render at 40px height; bumps to 44px mobile
-- Sidebar nav items render at ~32px tall — bump to 44px mobile drawers
+All interactive controls hold a minimum 44×44px tap target on touch viewports. This is a hard requirement, not a guideline — it was a defect in an earlier build.
+- Pills render at 36px effective height on desktop; padding increases to reach 44px on touch.
+- Inputs render at 40px on desktop; 44px on touch.
+- Element tiles hold ≥44px on all viewports.
+- Quantity steppers (− / +) hold ≥44×44px on touch.
 
 ### Collapsing Strategy
-- **Promo banner** stays full-width; truncates at < 480px
-- **Top nav** below 1024px collapses to hamburger; horizontal links move into drawer
-- **Hero band**: 2-column hero (text + mockup) collapses to stacked at < 1024px; mockup rendered below text on mobile
-- **Documentation grid**: 3-column desktop → sidebar-drawer at < 1024px → single-column at < 768px
-- **Pricing comparison**: 3-column tiers → 1-column stacked at < 768px; comparison table becomes horizontal-scroll
-- **Hero typography**: `{typography.hero-display}` (72px) → 56px tablet → 44px mobile-large → 36px mobile-small
-- **Customer logo wall**: 6-up → 3-up at tablet → 2-up at mobile
-- **Footer**: 5-column desktop → 2-column tablet → accordion at mobile
-
-### Image Behavior
-- Hero illustrations (cloud, rocket) lazy-load with the hero band; remain crisp at all breakpoints (SVG-based)
-- Product mockup retains its aspect ratio across breakpoints; scales proportionally
-- Customer logos use SVG wordmarks; remain crisp on retina displays
+- **Field row**: two columns → stacked single column below 520px
+- **Element grid**: 5-up → 4-up → 3-up → 2-up
+- **Unit pills**: common units stay visible at all widths; rare units remain behind the "···" reveal
+- **Direction toggle**: stays in the card header at all widths; may wrap below the title under 520px
 
 ## Iteration Guide
 
-1. Focus on ONE component at a time. The system has high internal consistency.
-2. Reference component names and tokens directly (`{colors.primary}`, `{component-name}-pressed`, `{rounded.full}`) — do not paraphrase.
-3. Run `npx @google/design.md lint DESIGN.md` after edits to catch broken refs and contrast issues.
-4. Add new variants as separate `components:` entries (`-pressed`, `-disabled`, `-focused`, `-active`).
-5. Default to `{typography.body-md}` for body and `{typography.subtitle}` for emphasis. Headlines step down `hero-display → display-lg → heading-1 → heading-2 → heading-3 → heading-4 → heading-5`.
-6. Keep `{colors.brand-green}` confined to accent moments. If it appears on a generic surface, ask whether it earned that role.
-7. Pill-shaped buttons (`{rounded.full}`) always; squared buttons signal "third-party widget" in this language.
-8. Documentation prose belongs in `{typography.body-md}` 16px with 1.50 line-height — anything denser breaks the reading experience.
+1. Work on one component at a time and reference it by its `components:` token name.
+2. When adding a container, decide its surface level first. That decision drives everything else.
+3. Default text to `{typography.body-sm}` and numbers to `{typography.input-value}`.
+4. Add new states as separate component entries (`-focused`, `-pressed`, `-error`, `-selected`).
+5. Treat green as scarce. If it appears on a surface that is not active, focused, or a result, it has not earned the role.
+6. Any new numeric display inherits DM Mono automatically — this is not optional styling.
 
 ## Known Gaps
 
-- Specific dark-mode token values for canvas, surface, ink, and hairline are not surfaced on these pages; the brand has not yet shipped a published dark-mode palette
-- Animation/transition timings are not extracted; recommend 150–200ms ease for hover/focus state transitions
-- Form validation success state is not explicitly captured beyond defaults — implement following standard green-border + success badge patterns
-- Code syntax highlighting palette inside docs is not formalized; documentation samples carry their own twoslash-style annotation system tokens (e.g. `{colors.brand-tag}`, `{colors.brand-annotate}`, `{colors.brand-warn}`) but the full highlight scheme is not enumerated
+- Dark mode is not defined. The product ships light-only for now.
+- Animation and transition timings are not specified; 150–200ms ease is a reasonable default for state changes.
+- Success and warning semantic states are not defined, since the calculator has no success confirmation or warning condition. Add them only if a real use case appears.
+- The explainer/theory section below the calculator has no component definitions yet — that section's design is deliberately deferred.
+- `{colors.surface-4}` and `{rounded.xl}` are defined but currently unused. They exist as headroom, not as a mandate to find a use for them.

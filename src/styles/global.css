@@ -1,31 +1,79 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #FAF9F5;
-  --color-surface: #FAF9F5;
-  --color-surface-soft: #fafafa;
-  --color-hairline: #e5e5e5;
-  --color-hairline-soft: #ededed;
-  --color-ink: #0a0a0a;
-  --color-steel: #5a5a5c;
-  --color-stone: #888888;
-  --color-muted: #a8a8aa;
-  --color-brand-green: #02613E;
+  /* ── Brand & Accent ───────────────────────────────────────────── */
+  --color-primary:         #02613E;
+  --color-primary-hover:   #0B7A4F;
+  --color-primary-pressed: #04442C;
+  --color-primary-soft:    #DCEEE4;
+  --color-on-primary:      #ffffff;
+
+  /* Aliases used by component classes */
+  --color-brand-green:      #02613E;
   --color-brand-green-deep: #04442C;
-  --color-brand-green-soft: #E5F5EF;
-  --color-brand-error: #d45656;
-  --color-primary: #0a0a0a;
-  --color-on-primary: #ffffff;
+  --color-brand-green-soft: #DCEEE4;
 
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'Geist Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* ── Surface ladder ───────────────────────────────────────────── */
+  --color-canvas:    #FAF9F5;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #F5F3EE;
+  --color-surface-3: #EFEDE7;
+  --color-surface-4: #E8E6DF;
 
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* Aliases used by component classes (surface ≡ surface-1, surface-soft ≡ surface-2) */
+  --color-surface:      #ffffff;
+  --color-surface-soft: #F5F3EE;
+
+  /* ── Hairlines ────────────────────────────────────────────────── */
+  --color-hairline:          #E5E2DA;
+  --color-hairline-strong:   #D3CFC3;
+  --color-hairline-tertiary: #C4C0B2;
+
+  /* Alias used by component classes (hairline-soft ≡ hairline) */
+  --color-hairline-soft: #E5E2DA;
+
+  /* ── Text ─────────────────────────────────────────────────────── */
+  --color-ink:          #14140F;
+  --color-ink-muted:    #4A4842;
+  --color-ink-subtle:   #7A776D;
+  --color-ink-tertiary: #A8A498;
+
+  /* Aliases used by component classes */
+  --color-steel: #4A4842;
+  --color-stone: #7A776D;
+  --color-muted: #A8A498;
+
+  /* ── Semantic ─────────────────────────────────────────────────── */
+  --color-error:      #C23B3B;
+  --color-error-soft: #FBEAEA;
+
+  /* Alias used by component classes */
+  --color-brand-error: #C23B3B;
+
+  /* ── Typography ───────────────────────────────────────────────── */
+  --font-sans: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ── Border radius ────────────────────────────────────────────── */
+  --radius-xs:  4px;
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
   --radius-xxl: 24px;
+
+  /* ── Spacing ──────────────────────────────────────────────────── */
+  --spacing-xxs:     4px;
+  --spacing-xs:      8px;
+  --spacing-sm:      12px;
+  --spacing-md:      16px;
+  --spacing-lg:      24px;
+  --spacing-xl:      32px;
+  --spacing-xxl:     48px;
+  --spacing-section: 96px;
+
+  /* ── Breakpoints ──────────────────────────────────────────────── */
+  --breakpoint-mobile: 520px;
 }
 
 body {
