@@ -1,0 +1,40 @@
+
+> freechemlab@0.0.1 test
+> playwright test
+
+
+Running 31 tests using 1 worker
+
+  ok  1 [chromium] › tests\calculator.spec.ts:33:3 › Direction toggle › default mode is g→mol: mass is editable, moles is readonly (3.2s)
+  ok  2 [chromium] › tests\calculator.spec.ts:39:3 › Direction toggle › switching to mol→g: moles becomes editable, mass becomes readonly (342ms)
+  ok  3 [chromium] › tests\calculator.spec.ts:46:3 › Direction toggle › switching back to g→mol restores mass editable, moles readonly (328ms)
+  ok  4 [chromium] › tests\calculator.spec.ts:58:3 › Core calculation › g→mol: 18.015 g/mol + 18.015 g = 1 mol (shown as 1.000000) (299ms)
+  ok  5 [chromium] › tests\calculator.spec.ts:66:3 › Core calculation › mol→g: 18.015 g/mol + 1 mol = 18.015 g (shown as 18.015000) (315ms)
+  ok  6 [chromium] › tests\calculator.spec.ts:75:3 › Core calculation › result is formatted to 6 decimal places (332ms)
+  ok  7 [chromium] › tests\calculator.spec.ts:88:3 › Unit pill conversions › mass unit: switching to mg recalculates correctly (18015 mg → 1 mol) (321ms)
+  ok  8 [chromium] › tests\calculator.spec.ts:99:3 › Unit pill conversions › mass unit: switching to kg recalculates correctly (0.018015 kg → 1 mol) (326ms)
+  ok  9 [chromium] › tests\calculator.spec.ts:109:3 › Unit pill conversions › molar mass unit: kg/kmol gives same result as g/mol (18.015 kg/kmol + 18.015 g → 1 mol) (335ms)
+  ok 10 [chromium] › tests\calculator.spec.ts:119:3 › Unit pill conversions › moles unit: switching to mmol recalculates correctly (1000 mmol → 18.015 g) (562ms)
+  ok 11 [chromium] › tests\calculator.spec.ts:133:3 › Validation › molar mass = 0 shows inline error and clears result (285ms)
+  ok 12 [chromium] › tests\calculator.spec.ts:143:3 › Validation › negative molar mass shows inline error (295ms)
+  ok 13 [chromium] › tests\calculator.spec.ts:150:3 › Validation › negative mass shows inline error (280ms)
+  ok 14 [chromium] › tests\calculator.spec.ts:157:3 › Validation › correcting molar mass to valid value clears error and resumes calculation (293ms)
+  ok 15 [chromium] › tests\calculator.spec.ts:172:3 › Validation › correcting negative mass clears error (300ms)
+  ok 16 [chromium] › tests\calculator.spec.ts:185:3 › Particle count › 1 mol shows ~6.02214 × 10^23 particles (294ms)
+  ok 17 [chromium] › tests\calculator.spec.ts:196:3 › Particle count › 2 mol shows ~1.204 × 10^24 particles (290ms)
+  ok 18 [chromium] › tests\calculator.spec.ts:209:3 › Browse panel – Presets › panel is hidden on load (270ms)
+  ok 19 [chromium] › tests\calculator.spec.ts:214:3 › Browse panel – Presets › clicking trigger opens panel (284ms)
+  ok 20 [chromium] › tests\calculator.spec.ts:220:3 › Browse panel – Presets › selecting Water and clicking "Use this molar mass" fills Molar Mass with 18.015 and collapses panel (343ms)
+  ok 21 [chromium] › tests\calculator.spec.ts:232:3 › Browse panel – Presets › selecting Carbon Dioxide fills Molar Mass with 44.01 (341ms)
+  ok 22 [chromium] › tests\calculator.spec.ts:241:3 › Browse panel – Presets › "Use this molar mass" button is hidden until a compound is selected (310ms)
+  ok 23 [chromium] › tests\calculator.spec.ts:260:3 › Browse panel – Build custom › switching to Build custom tab shows element grid (333ms)
+  ok 24 [chromium] › tests\calculator.spec.ts:269:3 › Browse panel – Build custom › H2O formula: 2x Hydrogen + 1x Oxygen = 18.015 g/mol (593ms)
+  ok 25 [chromium] › tests\calculator.spec.ts:293:3 › Browse panel – Build custom › "Use this molar mass" applies custom molar mass and collapses panel (422ms)
+  ok 26 [chromium] › tests\calculator.spec.ts:321:3 › Element search filter › "sod" filters to show only Sodium (368ms)
+  ok 27 [chromium] › tests\calculator.spec.ts:331:3 › Element search filter › "iron" filters to show only Iron (393ms)
+  ok 28 [chromium] › tests\calculator.spec.ts:340:3 › Element search filter › clearing search restores all 63 elements (355ms)
+  ok 29 [chromium] › tests\calculator.spec.ts:349:3 › Element search filter › no-match query shows empty state message (342ms)
+  ok 30 [chromium] › tests\calculator.spec.ts:364:3 › Touch targets – 44px minimum › all unit pills on mobile are at least 44px tall (351ms)
+  ok 31 [chromium] › tests\calculator.spec.ts:377:3 › Touch targets – 44px minimum › stepper +/- buttons in Browse custom tab are at least 44px tall (523ms)
+
+  31 passed (14.6s)
