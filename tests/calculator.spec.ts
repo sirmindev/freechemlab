@@ -204,6 +204,24 @@ test.describe('Particle count', () => {
     const text = await page.locator('#particle-count-val').textContent();
     expect(text?.trim()).toBe('1.20443 × 10^24 particles');
   });
+
+  test('a computed zero renders "0 particles", not a dash', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '18.015');
+    // Produce a real result first. Without this the final assertion could pass
+    // from the static markup, which already reads "0 particles" on load — the
+    // string has to be one formatParticleCount(0) actually wrote.
+    await setMass(page, '18.015');
+    expect((await page.locator('#particle-count-val').textContent())?.trim())
+      .toBe('6.02214 × 10^23 particles');
+
+    // 0 g is a valid calculation, not an empty field: 0 / 18.015 = 0 mol.
+    // This used to render the em-dash while the untouched empty state read
+    // "0 particles", so the same logical state had two different renderings.
+    await setMass(page, '0');
+    const text = await page.locator('#particle-count-val').textContent();
+    expect(text?.trim()).toBe('0 particles');
+  });
 });
 
 // ─── 6. Browse Panel – Presets ───────────────────────────────────────────────
