@@ -568,11 +568,20 @@ import Layout from '../layouts/Layout.astro';
 	const massFieldContent = document.getElementById('mass-field-content');
 	const molesFieldContent = document.getElementById('moles-field-content');
 
+	// The string a result field displays is a rendering, not a value: format6Decimals
+	// pads to 6 decimals ("1.000000") or drops to 4 significant figures ("1.000e-12").
+	// Keep the unrounded number alongside it so that when a field flips to the input
+	// role it can be restored from the number rather than inheriting read-only display
+	// formatting. null = no valid result is currently displayed for that field.
+	let lastMassResult: number | null = null;
+	let lastMolesResult: number | null = null;
+
 	interface FieldRefs {
 		input: HTMLInputElement | null;
 		chevron: HTMLElement | null;
 		copyBtn: HTMLButtonElement | null;
 		editablePlaceholder: string;
+		rawResult: number | null;
 	}
 
 	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-9 py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all";
@@ -595,6 +604,11 @@ import Layout from '../layouts/Layout.astro';
 				refs.input.readOnly = false;
 				refs.input.className = EDITABLE_INPUT_CLASS;
 				refs.input.placeholder = refs.editablePlaceholder;
+				// Shed the display formatting this field carried as a result. Restoring
+				// from the number (not re-parsing the rounded string) keeps a back-and-
+				// forth toggle lossless. null means the result was empty — leave the
+				// field empty rather than inventing a value.
+				if (refs.rawResult !== null) refs.input.value = String(refs.rawResult);
 			} else {
 				refs.input.readOnly = true;
 				refs.input.className = READONLY_RESULT_CLASS;
@@ -635,8 +649,8 @@ import Layout from '../layouts/Layout.astro';
 	function updateModeUI() {
 		clearAllErrors();
 
-		const massRefs: FieldRefs = { input: massInput, chevron: massInputChevron, copyBtn: massCopyBtn, editablePlaceholder: MASS_EDITABLE_PLACEHOLDER };
-		const molesRefs: FieldRefs = { input: molesInput, chevron: molesInputChevron, copyBtn: molesCopyBtn, editablePlaceholder: MOLES_EDITABLE_PLACEHOLDER };
+		const massRefs: FieldRefs = { input: massInput, chevron: massInputChevron, copyBtn: massCopyBtn, editablePlaceholder: MASS_EDITABLE_PLACEHOLDER, rawResult: lastMassResult };
+		const molesRefs: FieldRefs = { input: molesInput, chevron: molesInputChevron, copyBtn: molesCopyBtn, editablePlaceholder: MOLES_EDITABLE_PLACEHOLDER, rawResult: lastMolesResult };
 
 		if (currentMode === 'g_to_mol') {
 			// g -> mol: Mass is input (alongside Molar Mass), Moles is the readonly result
@@ -774,6 +788,7 @@ import Layout from '../layouts/Layout.astro';
 			}
 
 			if (hasError || rawMolarMass.trim() === '' || rawMass.trim() === '' || isNaN(molarMassVal) || molarMassVal <= 0 || isNaN(massVal) || massVal < 0) {
+				lastMolesResult = null;
 				if (molesInput) molesInput.value = '—';
 				if (particleCountVal) particleCountVal.textContent = '0 particles';
 				setCopyButtonState(molesCopyBtn, false);
@@ -789,6 +804,7 @@ import Layout from '../layouts/Layout.astro';
 				molarMassUnit,
 				molesUnit
 			);
+			lastMolesResult = molesResult;
 			if (molesInput) molesInput.value = format6Decimals(molesResult);
 			setCopyButtonState(molesCopyBtn, true);
 			setResultTextState(molesInput, true, 'text-primary');
@@ -813,6 +829,7 @@ import Layout from '../layouts/Layout.astro';
 			}
 
 			if (hasError || rawMolarMass.trim() === '' || rawMoles.trim() === '' || isNaN(molarMassVal) || molarMassVal <= 0 || isNaN(molesVal) || molesVal < 0) {
+				lastMassResult = null;
 				if (massInput) massInput.value = '—';
 				if (particleCountVal) particleCountVal.textContent = '0 particles';
 				setCopyButtonState(massCopyBtn, false);
@@ -827,6 +844,7 @@ import Layout from '../layouts/Layout.astro';
 				molarMassUnit,
 				massUnit
 			);
+			lastMassResult = massResult;
 			if (massInput) massInput.value = format6Decimals(massResult);
 			setCopyButtonState(massCopyBtn, true);
 			setResultTextState(massInput, true, 'text-primary');
