@@ -223,11 +223,6 @@ components:
     rounded: "{rounded.lg}"
     padding: "{spacing.md}"
     border: "0.5px solid {colors.hairline}"
-  panel-overflow-reveal:
-    backgroundColor: "{colors.surface-3}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.sm}"
-    border: "0.5px solid {colors.hairline}"
 
   element-tile:
     backgroundColor: "{colors.surface-1}"
@@ -246,7 +241,7 @@ components:
     typography: "{typography.input-value}"
     rounded: "{rounded.md}"
     padding: "8px 12px"
-    border: "0.5px solid {colors.hairline}"
+    border: "2px solid {colors.hairline}"
   text-input-focused:
     backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
@@ -317,7 +312,7 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 - **Canvas** (`{colors.canvas}` #FAF9F5): Page background. Warm off-white, not pure white — the warmth is deliberate and should read as "slightly less clinical," not visibly tinted.
 - **Surface 1** (`{colors.surface-1}` #ffffff): One step above canvas — the calculator card, element tiles, input field interiors.
 - **Surface 2** (`{colors.surface-2}` #F5F3EE): Two steps — the Molar Mass and Mass field containers, the Browse Elements panel.
-- **Surface 3** (`{colors.surface-3}` #EFEDE7): Three steps — the "···" overflow reveal panel, nested sub-panels.
+- **Surface 3** (`{colors.surface-3}` #EFEDE7): Three steps — currently unused since the "···" overflow reveal panel it backed was removed (all units now render inline). Reserved.
 - **Surface 4** (`{colors.surface-4}` #E8E6DF): Four steps — deepest lift, currently unused. Reserved.
 - **Hairline** (`{colors.hairline}` #E5E2DA): Default 0.5px borders on cards, inputs, and dividers.
 - **Hairline Strong** (`{colors.hairline-strong}` #D3CFC3): Emphasized dividers.
@@ -398,13 +393,13 @@ The warm canvas is the whitespace. Sections separate by lifting onto a surface, 
 | 0 (flat) | No border, no shadow | Page background, breadcrumb, footer |
 | 1 (card lift) | `{colors.surface-1}` on canvas, 0.5px `{colors.hairline}` | Calculator card, element tiles, input interiors |
 | 2 (nested lift) | `{colors.surface-2}`, 0.5px `{colors.hairline}` | Field containers, Browse Elements panel |
-| 3 (sub-panel lift) | `{colors.surface-3}`, 0.5px `{colors.hairline}` | Overflow reveal panel |
+| 3 (sub-panel lift) | `{colors.surface-3}`, 0.5px `{colors.hairline}` | Reserved — currently unused |
 | 4 (focus) | 2px `{colors.primary}` border | Focused input |
 | 4 (error) | 2px `{colors.error}` border | Errored input |
 
 **There are no drop shadows in this system.** Depth is carried entirely by the surface ladder plus hairline borders. If something needs to feel raised, it moves up a surface step — it does not gain a shadow.
 
-Focus and error use a border-width change (0.5px to 2px) rather than a shadow ring, because a ring reads poorly against a flat bordered card system.
+Focus and error use a border-color change rather than a shadow ring, because a ring reads poorly against a flat bordered card system. The border is 2px at rest and stays 2px through every state — only the color moves (hairline → primary → error). An earlier build changed the width instead (0.5px → 2px on focus), which shifted the input's content by a couple of pixels on every focus/blur; keeping the width constant was the fix.
 
 ## Shapes
 
@@ -460,7 +455,7 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 **`button-icon`** — 32×32px circular utility button (collapse, close).
 - Background `{colors.surface-2}`, icon `{colors.ink-subtle}`, 0.5px `{colors.hairline}` border, rounded `{rounded.full}`.
 
-**`button-copy`** — Bare icon button in the result field's label row, right-aligned opposite the label. No background, no border, no fill, and no badge or lock icon beside it — see the read-only signal Don't below.
+**`button-copy`** — Bare icon button aligned with the result *value* row, vertically centered on the big number — not the label row above it. Figma's exact node position confirms this (the icon sits centered on the value line's height, not the label's). No background, no border, no fill, and no badge or lock icon beside it — see the read-only signal Don't below.
 - Icon: copy/duplicate glyph, outline style, matching the app's existing stroke-based icon set (`stroke="currentColor"`).
 - Empty state: `{colors.ink-tertiary}` #A8A498.
 - Filled state: `{colors.ink-muted}` #4A4842.
@@ -484,9 +479,6 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 **`panel-browse-elements`** — The expandable element/preset picker.
 - Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, 0.5px `{colors.hairline}` border.
 
-**`panel-overflow-reveal`** — The "···" panel holding rare units.
-- Background `{colors.surface-3}`, rounded `{rounded.md}`, padding `{spacing.sm}`.
-
 **`element-tile`** / **`element-tile-selected`** — Individual elements in the Build custom grid.
 - Default: `{colors.surface-1}`, rounded `{rounded.md}`, 0.5px `{colors.hairline}`. Symbol in `{colors.ink}`, name and atomic mass in `{colors.ink-tertiary}`.
 - Selected: `{colors.primary-soft}` fill with a 0.5px `{colors.primary}` border. Symbol and mass shift to `{colors.primary-pressed}` and `{colors.primary-hover}`.
@@ -496,12 +488,12 @@ The selected state must be visible from the fill and border alone. The quantity 
 ### Inputs & Validation
 
 **`text-input`** — Molar mass and mass fields.
-- Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, padding 8px 12px, 0.5px `{colors.hairline}` border.
-- Trailing chevron-selector-vertical icon, 24px box, right-aligned. Two-tone stroke: upper chevron `{colors.ink-muted}`, lower chevron `{colors.ink-tertiary}`. It is decorative — these are native number inputs, not functional dropdowns.
+- Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, padding 8px 12px, 2px `{colors.hairline}` border. The border is always 2px — see the Don't below on why the width never changes.
+- Trailing chevron-selector-vertical icon, 24px box (two 10×6px chevrons stacked), right-aligned. It is a functional stepper, not decorative: the up chevron is always active (`{colors.ink-muted}`); the down chevron mutes to `{colors.ink-tertiary}` and disables once the value is at its floor (0 for all three fields), active (`{colors.ink-muted}`) otherwise. Each field steps by 0.01.
 
-**`text-input-focused`** — Border widens to 2px `{colors.primary}`.
+**`text-input-focused`** — Border color changes to `{colors.primary}`. Width stays 2px, same as rest — only the color transitions, so focusing never shifts layout.
 
-**`text-input-error`** — Border widens to 2px `{colors.error}`. Paired with an `error-message` directly below the field.
+**`text-input-error`** — Border color changes to `{colors.error}`. Width stays 2px. Paired with an `error-message` directly below the field.
 
 **`result-value`** — The calculated result. Not a boxed input — bare typography sitting directly on `card-result`'s background, with no white box, no border, and no badge or lock icon. That absence is the only read-only signal; see the Don't below.
 - Text `{colors.ink-tertiary}` when empty, `{colors.primary}` once a value exists. Type `{typography.result-value}`.
@@ -549,6 +541,7 @@ Validation rules: molar mass must be greater than zero; mass and moles must be n
 - Don't add a marketing hero, a promotional CTA, or footer cross-links.
 - Don't add a white input box, a badge, or a lock icon to the calculated result field. Molar Mass and Mass have a white `text-input` box; the result field does not — that absence is now the only structural signal that it is read-only. Adding one back silently breaks it.
 - Don't pill-round the element tiles or the calculator card.
+- Don't change a `text-input`'s border *width* on focus or error. It's 2px at every state; only the color moves. Changing the width shifts the field's content by a couple of pixels on every focus/blur — that flicker was a real defect, not a style choice.
 
 ## Responsive Behavior
 
@@ -565,13 +558,14 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 - Pills and `toggle-direction` segments: 8px vertical / 12px horizontal padding on desktop (~32px effective height). On touch, padding increases explicitly to 14px vertical / 16px horizontal to clear 44px — this is not automatic from the desktop values.
 - Inputs render at 40px on desktop; 44px on touch.
 - Element tiles hold ≥44px on all viewports.
-- Quantity steppers (− / +) hold ≥44×44px on touch.
+- Quantity steppers (− / +) in Build custom hold ≥44×44px on touch.
 - `button-copy`: 44×44px hit area at all viewports, not just touch — the icon itself stays small (16px) inside it.
+- Exception: the `text-input` increment/decrement stepper is ~16×24px total (two 16×12px chevrons), well under 44px. It intentionally matches native OS spinner proportions rather than the hard requirement — see Known Gaps.
 
 ### Collapsing Strategy
 - **Field row**: two columns → stacked single column below 520px
 - **Element grid**: 5-up → 4-up → 3-up → 2-up
-- **Unit pills**: common units stay visible at all widths; rare units remain behind the "···" reveal
+- **Unit pills**: all units render inline at every width and wrap onto additional lines as needed — there is no reveal/overflow interaction.
 - **Direction toggle**: stays in the card header at all widths; may wrap below the title under 520px
 
 ## Iteration Guide
@@ -589,4 +583,5 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 - Animation and transition timings are not specified; 150–200ms ease is a reasonable default for state changes.
 - Success and warning semantic states are not defined, since the calculator has no success confirmation or warning condition. Add them only if a real use case appears.
 - The explainer/theory section below the calculator has no component definitions yet — that section's design is deliberately deferred.
-- `{colors.surface-4}` is defined but currently unused. It exists as headroom, not as a mandate to find a use for it.
+- `{colors.surface-3}` and `{colors.surface-4}` are defined but currently unused — `surface-3` lost its only consumer when the "···" overflow reveal panel was removed. Both exist as headroom, not as a mandate to find a use for them.
+- The `text-input` stepper's ~16×24px hit area is below the 44px touch-target minimum by design, matching native number-input spinner proportions. This is a deliberate exception to the Touch Targets rule, not an oversight — revisit if usage data shows it's hard to hit on touch devices.
