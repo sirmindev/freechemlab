@@ -182,24 +182,27 @@ test.describe('Validation', () => {
 // ─── 5. Particle Count ───────────────────────────────────────────────────────
 
 test.describe('Particle count', () => {
-  test('1 mol shows ~6.02214 × 10^23 particles', async ({ page }) => {
+  // These assert the complete rendered string, not fragments. The previous
+  // version matched /6\.0221/, /10/ and /23/ independently, which passed on
+  // "6.02214 × 10^235 particles" — an exponent wrong by 10^212 — because /10/
+  // matches the "10" in "10^" and /23/ matches the "23" inside "235".
+
+  test('1 mol shows exactly 6.02214 × 10^23 particles', async ({ page }) => {
     await goto(page);
     await setMolarMass(page, '18.015');
     await setMass(page, '18.015'); // → 1 mol
+    // 1 mol × 6.02214076e23 = 6.02214076e23 → toExponential(5) → "6.02214e+23"
     const text = await page.locator('#particle-count-val').textContent();
-    // Should contain 6.02 and 10^23 (or ×10 notation)
-    expect(text).toMatch(/6\.0221/);
-    expect(text).toMatch(/10/);
-    expect(text).toMatch(/23/);
+    expect(text?.trim()).toBe('6.02214 × 10^23 particles');
   });
 
-  test('2 mol shows ~1.204 × 10^24 particles', async ({ page }) => {
+  test('2 mol shows exactly 1.20443 × 10^24 particles', async ({ page }) => {
     await goto(page);
     await setMolarMass(page, '18.015');
     await setMass(page, '36.03'); // → 2 mol
+    // 2 mol × 6.02214076e23 = 1.204428152e24 → toExponential(5) → "1.20443e+24"
     const text = await page.locator('#particle-count-val').textContent();
-    expect(text).toMatch(/10/);
-    expect(text).toMatch(/24/);
+    expect(text?.trim()).toBe('1.20443 × 10^24 particles');
   });
 });
 
