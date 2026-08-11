@@ -93,8 +93,10 @@ import Layout from '../layouts/Layout.astro';
 				<!-- Molar Mass + Mass: card-field, merged into one card (no gap, no divider) —
 				     split by asymmetric padding: 24px outer edges, 12px on the shared midline -->
 				<div class="field-row w-full bg-surface-soft border border-hairline rounded-[12px] flex flex-col">
-					<!-- Molar Mass -->
-					<div class="field-half flex flex-col justify-between p-6">
+					<!-- Molar Mass: input-slot-a. Permanent — always the first input, never moves,
+					     never re-parented. Must stay the literal first child of .field-row (the
+					     520px+ padding-right rule targets :first-child). -->
+					<div id="input-slot-a" class="field-half flex flex-col justify-between p-6">
 						<div>
 							<div class="flex items-center justify-between mb-2">
 								<label for="molar-mass" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
@@ -148,98 +150,102 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 					</div>
 
-					<!-- Mass -->
-					<div id="mass-container" class="field-half field-half-divider flex flex-col justify-between p-6">
-						<div>
-							<div class="flex items-center justify-between mb-2">
-								<label for="mass-input" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
-									Mass
-								</label>
-							</div>
-							<!-- Copy button aligns with the value row (not the label), per Figma's exact position -->
-							<div class="relative flex items-center">
-								<input
-									type="number"
-									id="mass-input"
-									step="1"
-									placeholder="e.g. 18.02"
-									class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-9 py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all"
-								/>
-								<!-- Functional stepper — hidden while this field is the readonly result -->
-								<div id="mass-input-chevron" class="absolute right-3 flex flex-col h-6 w-4">
-									<button type="button" id="mass-step-up" aria-label="Increase mass" class="flex-1 flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer">
-										<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-									</button>
-									<button type="button" id="mass-step-down" aria-label="Decrease mass" class="flex-1 flex items-center justify-center text-ink-tertiary cursor-not-allowed">
-										<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+					<!-- input-slot-b: permanent shell (layout/divider only). Receives whichever of
+					     Mass/Moles is currently the second input — never touched by the move logic
+					     itself, only its contents change. -->
+					<div id="input-slot-b" class="field-half field-half-divider p-6">
+						<div id="mass-field-content" class="h-full flex flex-col justify-between transition-opacity duration-150">
+							<div>
+								<div class="flex items-center justify-between mb-2">
+									<label for="mass-input" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
+										Mass
+									</label>
+								</div>
+								<!-- Copy button aligns with the value row (not the label), per Figma's exact position -->
+								<div class="relative flex items-center">
+									<input
+										type="number"
+										id="mass-input"
+										step="1"
+										placeholder="e.g. 18.02"
+										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-9 py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all"
+									/>
+									<!-- Functional stepper — hidden while this field is the readonly result -->
+									<div id="mass-input-chevron" class="absolute right-3 flex flex-col h-6 w-4">
+										<button type="button" id="mass-step-up" aria-label="Increase mass" class="flex-1 flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer">
+											<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+										</button>
+										<button type="button" id="mass-step-down" aria-label="Decrease mass" class="flex-1 flex items-center justify-center text-ink-tertiary cursor-not-allowed">
+											<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+										</button>
+									</div>
+									<!-- Copy Result Button (Shown when readonly) -->
+									<button
+										type="button"
+										id="mass-copy-btn"
+										aria-label="Copy mass result"
+										disabled
+										class="hidden absolute right-0 min-h-[44px] min-w-[44px] items-center justify-center text-ink-tertiary cursor-not-allowed transition-colors"
+									>
+										<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+										</svg>
 									</button>
 								</div>
-								<!-- Copy Result Button (Shown when readonly) -->
-								<button
-									type="button"
-									id="mass-copy-btn"
-									aria-label="Copy mass result"
-									disabled
-									class="hidden absolute right-0 min-h-[44px] min-w-[44px] items-center justify-center text-ink-tertiary cursor-not-allowed transition-colors"
-								>
-									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+								<!-- Inline Error Message -->
+								<div id="mass-error" class="hidden flex items-center gap-2 mt-1 text-sm text-brand-error">
+									<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 									</svg>
-								</button>
+									<span>Mass cannot be negative</span>
+								</div>
 							</div>
-							<!-- Inline Error Message -->
-							<div id="mass-error" class="hidden flex items-center gap-2 mt-1 text-sm text-brand-error">
-								<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-								</svg>
-								<span>Mass cannot be negative</span>
-							</div>
-						</div>
-						<!-- Mass Unit Pills -->
-						<div class="mt-4">
-							<div class="flex flex-wrap gap-2 items-center" id="mass-units-primary">
-								<button
-									type="button"
-									data-unit="mg"
-									class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-								>
-									mg
-								</button>
-								<button
-									type="button"
-									data-unit="g"
-									class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
-								>
-									g
-								</button>
-								<button
-									type="button"
-									data-unit="kg"
-									class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-								>
-									kg
-								</button>
-								<button
-									type="button"
-									data-unit="ng"
-									class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-								>
-									ng
-								</button>
-								<button
-									type="button"
-									data-unit="ug"
-									class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-								>
-									&micro;g
-								</button>
-								<button
-									type="button"
-									data-unit="dag"
-									class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-								>
-									dag
-								</button>
+							<!-- Mass Unit Pills -->
+							<div class="mt-4">
+								<div class="flex flex-wrap gap-2 items-center" id="mass-units-primary">
+									<button
+										type="button"
+										data-unit="mg"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									>
+										mg
+									</button>
+									<button
+										type="button"
+										data-unit="g"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
+									>
+										g
+									</button>
+									<button
+										type="button"
+										data-unit="kg"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									>
+										kg
+									</button>
+									<button
+										type="button"
+										data-unit="ng"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									>
+										ng
+									</button>
+									<button
+										type="button"
+										data-unit="ug"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									>
+										&micro;g
+									</button>
+									<button
+										type="button"
+										data-unit="dag"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									>
+										dag
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -366,103 +372,107 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 				</div>
 
-				<!-- Field 3: Moles Container — card-result, no tint, no box on the value.
-				     The absence of a white input box (unlike Molar Mass/Mass) is the only
-				     read-only signal now that the badge and lock icon are gone. -->
-				<div id="moles-container" class="md:col-span-2 bg-surface-soft border border-hairline rounded-[12px] p-6 flex flex-col justify-between">
-					<div>
-						<div class="flex items-center justify-between mb-2">
-							<label for="moles-input" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
-								Moles
-							</label>
-						</div>
-						<!-- Copy button aligns with the value row (not the label), per Figma's exact position -->
-						<div class="relative flex items-center">
-							<input
-								type="number"
-								id="moles-input"
-								step="1"
-								readonly
-								placeholder="0.000000"
-								class="w-full bg-transparent text-ink-tertiary font-mono text-[32px] font-medium rounded-none border-0 px-0 py-0 cursor-not-allowed select-none focus:outline-none transition-all"
-								style="line-height: 1.2;"
-							/>
-							<!-- Functional stepper — shown only while this field is editable (mol -> g mode) -->
-							<div id="moles-input-chevron" class="hidden absolute right-3 flex flex-col h-6 w-4">
-								<button type="button" id="moles-step-up" aria-label="Increase moles" class="flex-1 flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer">
-									<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-								</button>
-								<button type="button" id="moles-step-down" aria-label="Decrease moles" class="flex-1 flex items-center justify-center text-ink-tertiary cursor-not-allowed">
-									<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+				<!-- result-slot: permanent shell (card-result, no tint, no box on the value).
+				     Receives whichever of Mass/Moles is currently the calculated output. The
+				     absence of a white input box (unlike Molar Mass/Mass) is the only read-only
+				     signal now that the badge and lock icon are gone. -->
+				<div id="result-slot" class="md:col-span-2 bg-surface-soft border border-hairline rounded-[12px] p-6">
+					<div id="moles-field-content" class="h-full flex flex-col justify-between transition-opacity duration-150">
+						<div>
+							<div class="flex items-center justify-between mb-2">
+								<label for="moles-input" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
+									Moles
+								</label>
+							</div>
+							<!-- Copy button aligns with the value row (not the label), per Figma's exact position -->
+							<div class="relative flex items-center">
+								<input
+									type="number"
+									id="moles-input"
+									step="1"
+									readonly
+									placeholder="0.000000"
+									class="w-full bg-transparent text-ink-tertiary font-mono text-[32px] font-medium rounded-none border-0 px-0 py-0 cursor-not-allowed select-none focus:outline-none transition-all"
+									style="line-height: 1.2;"
+								/>
+								<!-- Functional stepper — shown only while this field is editable (mol -> g mode) -->
+								<div id="moles-input-chevron" class="hidden absolute right-3 flex flex-col h-6 w-4">
+									<button type="button" id="moles-step-up" aria-label="Increase moles" class="flex-1 flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer">
+										<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+									</button>
+									<button type="button" id="moles-step-down" aria-label="Decrease moles" class="flex-1 flex items-center justify-center text-ink-tertiary cursor-not-allowed">
+										<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+									</button>
+								</div>
+								<!-- Copy Result Button (Shown when readonly) -->
+								<button
+									type="button"
+									id="moles-copy-btn"
+									aria-label="Copy moles result"
+									disabled
+									class="absolute right-0 flex min-h-[44px] min-w-[44px] items-center justify-center text-ink-tertiary cursor-not-allowed transition-colors"
+								>
+									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+									</svg>
 								</button>
 							</div>
-							<!-- Copy Result Button (Shown when readonly) -->
-							<button
-								type="button"
-								id="moles-copy-btn"
-								aria-label="Copy moles result"
-								disabled
-								class="absolute right-0 flex min-h-[44px] min-w-[44px] items-center justify-center text-ink-tertiary cursor-not-allowed transition-colors"
-							>
-								<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+							<!-- Inline Error Message -->
+							<div id="moles-error" class="hidden flex items-center gap-2 mt-1 text-sm text-brand-error">
+								<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 								</svg>
-							</button>
-						</div>
-						<!-- Inline Error Message -->
-						<div id="moles-error" class="hidden flex items-center gap-2 mt-1 text-sm text-brand-error">
-							<svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-							</svg>
-							<span>Moles cannot be negative</span>
-						</div>
+								<span>Moles cannot be negative</span>
+							</div>
 
-						<!-- Secondary Line: Particle Count (Only visible when Moles is the calculated result) -->
-						<div id="particle-count-row" class="pt-3 border-t border-hairline-soft flex flex-wrap items-center justify-between gap-1 text-sm">
-							<span class="font-medium text-ink-muted">Particle count</span>
-							<span id="particle-count-val" class="font-medium font-mono text-ink-tertiary">
-								0 particles
-							</span>
+							<!-- Secondary Line: Particle Count (Only visible when Moles is the calculated result).
+							     Travels with #moles-field-content — it's Moles-specific, not slot-specific. -->
+							<div id="particle-count-row" class="pt-3 border-t border-hairline-soft flex flex-wrap items-center justify-between gap-1 text-sm">
+								<span class="font-medium text-ink-muted">Particle count</span>
+								<span id="particle-count-val" class="font-medium font-mono text-ink-tertiary">
+									0 particles
+								</span>
+							</div>
 						</div>
-					</div>
-					<!-- Moles Unit Pills -->
-					<div class="mt-4">
-						<div class="flex flex-wrap gap-2 items-center" id="moles-units-primary">
-							<button
-								type="button"
-								data-unit="mol"
-								class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
-							>
-								mol
-							</button>
-							<button
-								type="button"
-								data-unit="mmol"
-								class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-							>
-								mmol
-							</button>
-							<button
-								type="button"
-								data-unit="umol"
-								class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-							>
-								&micro;mol
-							</button>
-							<button
-								type="button"
-								data-unit="nmol"
-								class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-							>
-								nmol
-							</button>
-							<button
-								type="button"
-								data-unit="pmol"
-								class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
-							>
-								pmol
-							</button>
+						<!-- Moles Unit Pills -->
+						<div class="mt-4">
+							<div class="flex flex-wrap gap-2 items-center" id="moles-units-primary">
+								<button
+									type="button"
+									data-unit="mol"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
+								>
+									mol
+								</button>
+								<button
+									type="button"
+									data-unit="mmol"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+								>
+									mmol
+								</button>
+								<button
+									type="button"
+									data-unit="umol"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+								>
+									&micro;mol
+								</button>
+								<button
+									type="button"
+									data-unit="nmol"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+								>
+									nmol
+								</button>
+								<button
+									type="button"
+									data-unit="pmol"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+								>
+									pmol
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -551,6 +561,20 @@ import Layout from '../layouts/Layout.astro';
 	const particleCountRow = document.getElementById('particle-count-row');
 	const particleCountVal = document.getElementById('particle-count-val');
 
+	// Permanent slots (never move) vs. movable field-content fragments (Mass/Moles swap
+	// between these two on toggle; Molar Mass always stays in #input-slot-a, untouched).
+	const inputSlotB = document.getElementById('input-slot-b');
+	const resultSlot = document.getElementById('result-slot');
+	const massFieldContent = document.getElementById('mass-field-content');
+	const molesFieldContent = document.getElementById('moles-field-content');
+
+	interface FieldRefs {
+		input: HTMLInputElement | null;
+		chevron: HTMLElement | null;
+		copyBtn: HTMLButtonElement | null;
+		editablePlaceholder: string;
+	}
+
 	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-9 py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all";
 	// result-value: bare typography, no box — the absence of a box is the read-only signal (see DESIGN.md Don't)
 	const READONLY_RESULT_CLASS = "w-full bg-transparent text-ink-tertiary font-mono text-[32px] font-medium rounded-none border-0 px-0 py-0 cursor-not-allowed select-none focus:outline-none transition-all";
@@ -562,62 +586,80 @@ import Layout from '../layouts/Layout.astro';
 	const MOLES_EDITABLE_PLACEHOLDER = "e.g. 0.05";
 	const RESULT_PLACEHOLDER = "0.000000";
 
+	// Generic role assignment — replaces what used to be two mirrored mass-specific/
+	// moles-specific branches. Molar Mass never calls this: it's permanently 'input',
+	// fixed in #input-slot-a, and isn't part of this state machine at all.
+	function setFieldRole(refs: FieldRefs, role: 'input' | 'result') {
+		if (refs.input) {
+			if (role === 'input') {
+				refs.input.readOnly = false;
+				refs.input.className = EDITABLE_INPUT_CLASS;
+				refs.input.placeholder = refs.editablePlaceholder;
+			} else {
+				refs.input.readOnly = true;
+				refs.input.className = READONLY_RESULT_CLASS;
+				refs.input.style.lineHeight = "1.2";
+				refs.input.placeholder = RESULT_PLACEHOLDER;
+			}
+		}
+		refs.chevron?.classList.toggle('hidden', role === 'result');
+		refs.copyBtn?.classList.toggle('hidden', role === 'input');
+	}
+
+	// Moves an already-in-DOM field-content fragment into a new slot (appendChild
+	// relocates, it doesn't clone — event listeners and the input's current value
+	// survive the move untouched) with a brief opacity fade, per DESIGN.md's
+	// documented 150-200ms default. Never call this on initial page load — only on
+	// an actual toggle — so first paint never flashes invisible content.
+	function moveFieldTo(fragment: HTMLElement | null, targetSlot: HTMLElement | null) {
+		if (!fragment || !targetSlot || fragment.parentElement === targetSlot) return;
+		fragment.classList.add('opacity-0');
+		targetSlot.appendChild(fragment);
+		requestAnimationFrame(() => {
+			fragment.classList.remove('opacity-0');
+		});
+	}
+
+	// Physically re-parents Mass/Moles between the input slot and the result slot.
+	// Only called from the toggle click handlers, never on initial render.
+	function assignFieldPositions() {
+		if (currentMode === 'g_to_mol') {
+			moveFieldTo(massFieldContent, inputSlotB);
+			moveFieldTo(molesFieldContent, resultSlot);
+		} else {
+			moveFieldTo(molesFieldContent, inputSlotB);
+			moveFieldTo(massFieldContent, resultSlot);
+		}
+	}
+
 	function updateModeUI() {
 		clearAllErrors();
+
+		const massRefs: FieldRefs = { input: massInput, chevron: massInputChevron, copyBtn: massCopyBtn, editablePlaceholder: MASS_EDITABLE_PLACEHOLDER };
+		const molesRefs: FieldRefs = { input: molesInput, chevron: molesInputChevron, copyBtn: molesCopyBtn, editablePlaceholder: MOLES_EDITABLE_PLACEHOLDER };
+
 		if (currentMode === 'g_to_mol') {
-			// g -> mol: Moles field is READONLY calculated output, Mass field is EDITABLE input
+			// g -> mol: Mass is input (alongside Molar Mass), Moles is the readonly result
 			toggleGtoMolBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
 			toggleGtoMolBtn?.classList.remove('text-ink-muted');
 			toggleMolToGBtn?.classList.remove('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
 			toggleMolToGBtn?.classList.add('text-ink-muted');
 
-			// Editable Mass Field Styling
-			if (massInput) {
-				massInput.readOnly = false;
-				massInput.className = EDITABLE_INPUT_CLASS;
-				massInput.placeholder = MASS_EDITABLE_PLACEHOLDER;
-			}
-			massInputChevron?.classList.remove('hidden');
-			massCopyBtn?.classList.add('hidden');
-
-			// Readonly Moles Field Styling
-			if (molesInput) {
-				molesInput.readOnly = true;
-				molesInput.className = READONLY_RESULT_CLASS;
-				molesInput.style.lineHeight = "1.2";
-				molesInput.placeholder = RESULT_PLACEHOLDER;
-			}
-			molesInputChevron?.classList.add('hidden');
-			molesCopyBtn?.classList.remove('hidden');
+			setFieldRole(massRefs, 'input');
+			setFieldRole(molesRefs, 'result');
 
 			particleCountRow?.classList.remove('hidden');
 			particleCountRow?.classList.add('flex');
 			updateStepperState(massInput, massStepDown);
 		} else {
-			// mol -> g: Mass field is READONLY calculated output, Moles field is EDITABLE input
+			// mol -> g: Moles is input (alongside Molar Mass), Mass is the readonly result
 			toggleMolToGBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
 			toggleMolToGBtn?.classList.remove('text-ink-muted');
 			toggleGtoMolBtn?.classList.remove('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
 			toggleGtoMolBtn?.classList.add('text-ink-muted');
 
-			// Editable Moles Field Styling
-			if (molesInput) {
-				molesInput.readOnly = false;
-				molesInput.className = EDITABLE_INPUT_CLASS;
-				molesInput.placeholder = MOLES_EDITABLE_PLACEHOLDER;
-			}
-			molesInputChevron?.classList.remove('hidden');
-			molesCopyBtn?.classList.add('hidden');
-
-			// Readonly Mass Field Styling
-			if (massInput) {
-				massInput.readOnly = true;
-				massInput.className = READONLY_RESULT_CLASS;
-				massInput.style.lineHeight = "1.2";
-				massInput.placeholder = RESULT_PLACEHOLDER;
-			}
-			massInputChevron?.classList.add('hidden');
-			massCopyBtn?.classList.remove('hidden');
+			setFieldRole(molesRefs, 'input');
+			setFieldRole(massRefs, 'result');
 
 			particleCountRow?.classList.add('hidden');
 			particleCountRow?.classList.remove('flex');
@@ -854,10 +896,11 @@ import Layout from '../layouts/Layout.astro';
 		}
 	});
 
-	// Mode toggle listeners
+	// Mode toggle listeners — re-parent the fields first, then apply roles/recalculate
 	toggleGtoMolBtn?.addEventListener('click', () => {
 		if (currentMode !== 'g_to_mol') {
 			currentMode = 'g_to_mol';
+			assignFieldPositions();
 			updateModeUI();
 		}
 	});
@@ -865,6 +908,7 @@ import Layout from '../layouts/Layout.astro';
 	toggleMolToGBtn?.addEventListener('click', () => {
 		if (currentMode !== 'mol_to_g') {
 			currentMode = 'mol_to_g';
+			assignFieldPositions();
 			updateModeUI();
 		}
 	});

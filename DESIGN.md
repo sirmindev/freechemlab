@@ -311,7 +311,7 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 ### Surface
 - **Canvas** (`{colors.canvas}` #FAF9F5): Page background. Warm off-white, not pure white — the warmth is deliberate and should read as "slightly less clinical," not visibly tinted.
 - **Surface 1** (`{colors.surface-1}` #ffffff): One step above canvas — the calculator card, element tiles, input field interiors.
-- **Surface 2** (`{colors.surface-2}` #F5F3EE): Two steps — the Molar Mass and Mass field containers, the Browse Elements panel.
+- **Surface 2** (`{colors.surface-2}` #F5F3EE): Two steps — the input and result field containers, the Browse Elements panel.
 - **Surface 3** (`{colors.surface-3}` #EFEDE7): Three steps — currently unused since the "···" overflow reveal panel it backed was removed (all units now render inline). Reserved.
 - **Surface 4** (`{colors.surface-4}` #E8E6DF): Four steps — deepest lift, currently unused. Reserved.
 - **Hairline** (`{colors.hairline}` #E5E2DA): Default 0.5px borders on cards, inputs, and dividers.
@@ -371,7 +371,7 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 - **Base unit**: 4px
 - **Tokens**: `{spacing.xxs}` 4px · `{spacing.xs}` 8px · `{spacing.sm}` 12px · `{spacing.md}` 16px · `{spacing.lg}` 24px · `{spacing.xl}` 32px · `{spacing.xxl}` 48px · `{spacing.section}` 96px
 - Calculator card padding: `{spacing.lg}` 24px
-- Field container padding: `{spacing.lg}` 24px. Molar Mass and Mass share a single field card (no gap, no divider) split by asymmetric inner padding — 24px on the outer edges and top/bottom, 12px each on the two sides facing the shared midline, for a 24px total gutter.
+- Field container padding: `{spacing.lg}` 24px. Molar Mass and the current second input share a single field card (no gap, no divider) split by asymmetric inner padding — 24px on the outer edges and top/bottom, 12px each on the two sides facing the shared midline, for a 24px total gutter.
 - Result card padding: `{spacing.lg}` 24px, symmetric on all sides — it is a single field, not split.
 - Pill padding: 8px vertical · 12px horizontal
 - Pill padding (touch viewports): 14px vertical · 16px horizontal, set explicitly — see Touch Targets.
@@ -380,7 +380,7 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 
 ### Grid & Container
 - Single-column page, max content width ~880px. This is a calculator, not a dashboard — it should not sprawl.
-- Molar Mass and Mass render side by side at desktop, each at `flex: 1`.
+- Molar Mass and the current second input render side by side at desktop, each at `flex: 1`.
 - The element grid inside Browse Elements renders 5-up at desktop.
 
 ### Whitespace Philosophy
@@ -466,11 +466,13 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 **`card-calculator`** — The outer card. Everything lives inside it.
 - Background `{colors.surface-1}`, rounded `{rounded.xl}`, padding `{spacing.lg}`, 0.5px `{colors.hairline}` border.
 
-**`card-field`** — Molar Mass and Mass share a single card, side by side. There is no gap and no divider between them — the split is entirely padding: 24px on the outer edges and top/bottom, 12px on the two sides facing the shared midline.
+**`card-field`** — Two inputs share a single card, side by side. There is no gap and no divider between them — the split is entirely padding: 24px on the outer edges and top/bottom, 12px on the two sides facing the shared midline.
 - Background `{colors.surface-2}`, rounded `{rounded.lg}`, 0.5px `{colors.hairline}` border.
+- The first slot is permanent: Molar Mass. It's an input in both calculation directions and never moves, never changes card. The second slot is role-assigned, not field-assigned — it holds whichever of Mass/Moles is currently the *input* for the active direction (Mass in g→mol, Moles in mol→g). Card membership follows input/output role, not field identity — don't hardcode "Molar Mass and Mass" as a fixed pair; the second field genuinely changes.
 
 **`card-result`** — The calculated-output container.
 - Background `{colors.surface-2}`, padding `{spacing.lg}`, otherwise identical to `card-field`. It no longer carries a green tint — see the read-only signal Don't below.
+- Holds whichever of Mass/Moles is currently the *output* — Moles in g→mol, Mass in mol→g. Same role-assignment principle as `card-field`'s second slot: this card's content swaps with direction, its content is never fixed to one field.
 
 **`trigger-browse-elements`** — The row above the result card that opens the Browse Elements panel.
 - Chevron-right icon, 16px box, rotates 90° when the panel is open.
@@ -541,20 +543,21 @@ The particle-count row is the one place in the result block with a visible divid
 - Don't introduce a third font family.
 - Don't nest containers at the same surface level — step up or don't nest.
 - Don't add a marketing hero, a promotional CTA, or footer cross-links.
-- Don't add a white input box, a badge, or a lock icon to the calculated result field. Molar Mass and Mass have a white `text-input` box; the result field does not — that absence is now the only structural signal that it is read-only. Adding one back silently breaks it.
+- Don't add a white input box, a badge, or a lock icon to the calculated result field. Whichever two fields are currently inputs have a white `text-input` box; the result field does not — that absence is now the only structural signal that it is read-only. Adding one back silently breaks it.
 - Don't pill-round the element tiles or the calculator card.
 - Don't change a `text-input`'s border *width* on focus or error. It's 2px at every state; only the color moves. Changing the width shifts the field's content by a couple of pixels on every focus/blur — that flicker was a real defect, not a style choice.
 - Don't add a divider between a field's input/value block and its unit-pill row, or between the Molar Mass/Mass/Moles blocks and their pills. A plain 16px gap is correct there; the only intentional divider in the result block is above the particle-count row.
+- Don't fix `card-field`'s second slot or `card-result`'s content to a specific field (e.g. "Mass is always the input, Moles is always the result"). Both cards are role-assigned and swap contents with the direction toggle — hardcoding by field identity instead of role is exactly the bug that shipped once already.
 
 ## Responsive Behavior
 
 ### Breakpoints
 | Name | Width | Key Changes |
 |---|---|---|
-| Desktop | ≥ 1024px | Molar Mass and Mass side by side; element grid 5-up |
+| Desktop | ≥ 1024px | The two current inputs side by side; element grid 5-up |
 | Tablet | 768 – 1023px | Same two-column field layout; element grid 4-up |
 | Mobile-Lg | 520 – 767px | Fields still side by side; element grid 3-up |
-| Mobile | < 520px | Molar Mass and Mass stack to one column; element grid 2-up; page title scales 24px → 20px |
+| Mobile | < 520px | The two current inputs stack to one column; element grid 2-up; page title scales 24px → 20px |
 
 ### Touch Targets
 All interactive controls hold a minimum 44×44px tap target on touch viewports. This is a hard requirement, not a guideline — it was a defect in an earlier build. State the touch padding explicitly per control; do not leave it to inherit from desktop.
