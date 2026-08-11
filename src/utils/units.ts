@@ -100,11 +100,28 @@ export function calculateMassWithUnits(
 }
 
 /**
- * Formats a calculated numeric result strictly to 6 decimal places for display.
+ * Lower edge of the band where toFixed(6) is faithful. Below 1e-6 it renders a
+ * real result as "0.000000" — 9e-7 would show 0.000001 (one significant figure)
+ * and 5e-7 shows plain 0.000000, losing the value entirely.
+ */
+const FIXED_MIN = 1e-6;
+/**
+ * Upper edge. At/above 1e21 JS toFixed switches to exponential on its own and
+ * emits 15-16 digits, breaking the 6-decimal contract.
+ */
+const FIXED_MAX = 1e21;
+
+/**
+ * Formats a calculated numeric result to 6 decimal places within the range where
+ * that is faithful, and to 4-significant-figure scientific notation outside it.
+ * One rule covers both ends. e-notation is used (not "x 10^n") because this string
+ * is assigned to an <input type="number">, which silently rejects any non-numeric
+ * value and would fall back to rendering its placeholder.
  */
 export function format6Decimals(value: number): string {
   if (isNaN(value) || value <= 0) return '0.000000';
-  return value.toFixed(6);
+  if (value >= FIXED_MIN && value < FIXED_MAX) return value.toFixed(6);
+  return value.toExponential(3);
 }
 
 export const AVOGADRO_CONSTANT = 6.02214076e23;
