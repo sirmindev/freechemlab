@@ -489,7 +489,7 @@ The selected state must be visible from the fill and border alone. The quantity 
 
 **`text-input`** — Molar mass and mass fields.
 - Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, padding 8px 12px, 2px `{colors.hairline}` border. The border is always 2px — see the Don't below on why the width never changes.
-- Trailing chevron-selector-vertical icon, 24px box (two 10×6px chevrons stacked), right-aligned. It is a functional stepper, not decorative: the up chevron is always active (`{colors.ink-muted}`); the down chevron mutes to `{colors.ink-tertiary}` and disables once the value is at its floor (0 for all three fields), active (`{colors.ink-muted}`) otherwise. Each field steps by 0.01.
+- Trailing chevron-selector-vertical icon, 24px box (two 10×6px chevrons stacked), right-aligned. It is a functional stepper, not decorative: the up chevron is always active (`{colors.ink-muted}`); the down chevron mutes to `{colors.ink-tertiary}` and disables once the value is at its floor (0 for all three fields), active (`{colors.ink-muted}`) otherwise. Each field steps by 1 (whole numbers).
 
 **`text-input-focused`** — Border color changes to `{colors.primary}`. Width stays 2px, same as rest — only the color transitions, so focusing never shifts layout.
 
@@ -507,6 +507,8 @@ Validation rules: molar mass must be greater than zero; mass and moles must be n
 - Result value: `{colors.ink-tertiary}` #A8A498 (empty) → `{colors.primary}` #02613E (filled).
 - Particle value: `{colors.ink-tertiary}` #A8A498 (empty) → `{colors.ink}` #14140F (filled).
 - Copy icon: see `button-copy` above.
+
+The particle-count row is the one place in the result block with a visible divider — a 0.5px `{colors.hairline-soft}` border-top, 12px padding above it, no separate margin. Everywhere else a field's input/value block separates from its unit-pill row with a plain 16px gap (`{spacing.md}`), no line. Don't add a divider there; it isn't in the source design.
 
 ### Navigation & Chrome
 
@@ -542,6 +544,7 @@ Validation rules: molar mass must be greater than zero; mass and moles must be n
 - Don't add a white input box, a badge, or a lock icon to the calculated result field. Molar Mass and Mass have a white `text-input` box; the result field does not — that absence is now the only structural signal that it is read-only. Adding one back silently breaks it.
 - Don't pill-round the element tiles or the calculator card.
 - Don't change a `text-input`'s border *width* on focus or error. It's 2px at every state; only the color moves. Changing the width shifts the field's content by a couple of pixels on every focus/blur — that flicker was a real defect, not a style choice.
+- Don't add a divider between a field's input/value block and its unit-pill row, or between the Molar Mass/Mass/Moles blocks and their pills. A plain 16px gap is correct there; the only intentional divider in the result block is above the particle-count row.
 
 ## Responsive Behavior
 
