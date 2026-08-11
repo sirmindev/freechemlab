@@ -445,6 +445,12 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 **`button-icon`** — 32×32px circular utility button (collapse, close).
 - Background `{colors.surface-2}`, icon `{colors.ink-subtle}`, 0.5px `{colors.hairline}` border, rounded `{rounded.full}`.
 
+**`button-copy`** — Bare icon button on the result row. No background, no border, no fill.
+- Icon: copy/duplicate glyph, outline style, matching the app's existing stroke-based icon set (`stroke="currentColor"`).
+- Empty state: `{colors.ink-tertiary}` #A8A498.
+- Filled state: `{colors.ink-muted}` #4A4842.
+- On click, copies the current result value (plain number, no unit label) to the clipboard. Disabled/non-interactive in the empty state, since there is nothing to copy.
+
 ### Cards & Panels
 
 **`card-calculator`** — The outer card. Everything lives inside it.
@@ -488,6 +494,11 @@ The selected state must be visible from the fill and border alone. The quantity 
 
 Validation rules: molar mass must be greater than zero; mass and moles must be non-negative. A field must never render focused and errored simultaneously — the validation logic should resolve to one state.
 
+**`result-empty`** — The result row before a calculation has run.
+- Result value: `{colors.ink-tertiary}` #A8A498 (empty) → `{colors.primary}` #02613E (filled).
+- Particle value: `{colors.ink-tertiary}` #A8A498 (empty) → `{colors.ink}` #14140F (filled).
+- Copy icon: see `button-copy` above.
+
 ### Navigation & Chrome
 
 **`top-nav`** — Wordmark left, minimal. No CTA button.
@@ -509,6 +520,7 @@ Validation rules: molar mass must be greater than zero; mass and moles must be n
 - Apply `{rounded.pill}` only to the direction toggle, unit selectors, and buttons.
 - Keep the calculator above the fold. It is the product.
 - Format all calculated results to 6 decimal places.
+- Empty-state text (result value, particle count value, and the copy icon) uses `{colors.ink-tertiary}`. Filled state restores each element's normal color. Do not invent a separate muted token per element, they all share ink-tertiary.
 
 ### Don't
 - Don't add drop shadows. Depth comes from the surface ladder.
