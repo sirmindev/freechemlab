@@ -833,13 +833,16 @@ import Layout from '../layouts/Layout.astro';
 		}
 	}
 
-	function updatePillStyles(buttons: NodeListOf<HTMLButtonElement>, selectedUnit: string) {
+	// markerClass must be re-applied on every write: this assigns className wholesale,
+	// so omitting it silently strips the .unit-pill-* hook the pill set is queried by,
+	// breaking any later querySelectorAll (and any test selector) for that set.
+	function updatePillStyles(buttons: NodeListOf<HTMLButtonElement>, selectedUnit: string, markerClass: string) {
 		buttons.forEach(btn => {
 			const unit = btn.getAttribute('data-unit');
 			if (unit === selectedUnit) {
-				btn.className = "min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center";
+				btn.className = `${markerClass} min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center`;
 			} else {
-				btn.className = "min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center";
+				btn.className = `${markerClass} min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center`;
 			}
 		});
 	}
@@ -851,7 +854,7 @@ import Layout from '../layouts/Layout.astro';
 			const unit = btn.getAttribute('data-unit') as MolarMassUnit;
 			if (unit) {
 				molarMassUnit = unit;
-				updatePillStyles(mmButtons, molarMassUnit);
+				updatePillStyles(mmButtons, molarMassUnit, 'unit-pill-mm');
 				recalculate();
 			}
 		});
@@ -864,7 +867,7 @@ import Layout from '../layouts/Layout.astro';
 			const unit = btn.getAttribute('data-unit') as MassUnit;
 			if (unit) {
 				massUnit = unit;
-				updatePillStyles(massButtons, massUnit);
+				updatePillStyles(massButtons, massUnit, 'unit-pill-mass');
 				recalculate();
 			}
 		});
@@ -877,7 +880,7 @@ import Layout from '../layouts/Layout.astro';
 			const unit = btn.getAttribute('data-unit') as MolesUnit;
 			if (unit) {
 				molesUnit = unit;
-				updatePillStyles(molesButtons, molesUnit);
+				updatePillStyles(molesButtons, molesUnit, 'unit-pill-moles');
 				recalculate();
 			}
 		});
