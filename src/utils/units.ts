@@ -120,9 +120,12 @@ export function calculateParticles(molesInMol: number): number {
 
 /**
  * Formats particle count into scientific notation, e.g. "6.02214 × 10^23 particles".
+ * A genuine zero renders as "0 particles" — the same string the empty state uses —
+ * so a computed zero and an untouched field don't read as two different states.
  */
 export function formatParticleCount(particles: number): string {
-  if (isNaN(particles) || particles <= 0) return '—';
+  if (isNaN(particles) || particles < 0) return '—';
+  if (particles === 0) return '0 particles';
   const expString = particles.toExponential(5);
   const [mantissa, exponent] = expString.split('e');
   const expNum = parseInt(exponent, 10);
