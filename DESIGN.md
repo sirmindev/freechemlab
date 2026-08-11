@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: FreeChemLab-design-system
-description: "A light, warm scientific-instrument system for a single-purpose chemistry calculator. Built on Linear's structural logic (four-step surface ladder, hairline borders, no drop shadows, disciplined radius scale) inverted for a warm off-white canvas (#FAF9F5). Deep forest green (#02613E) is the single chromatic accent, used only on active controls, focus states, and the calculated-result tint. Public Sans carries all text; DM Mono carries every number, chosen for its unambiguous 0/O and 1/l/I forms since misreading a digit is the primary failure mode of a calculator. Pill-shaped controls are used deliberately for the direction toggle and unit selectors; everything else holds Linear's 8px/12px corners."
+description: "A light, warm scientific-instrument system for a single-purpose chemistry calculator. Built on Linear's structural logic (four-step surface ladder, hairline borders, no drop shadows, disciplined radius scale) inverted for a warm off-white canvas (#FAF9F5). Deep forest green (#02613E) is the single chromatic accent, used only on active controls, focus states, and calculated-result text. Public Sans carries all text; DM Mono carries every number, chosen for its unambiguous 0/O and 1/l/I forms since misreading a digit is the primary failure mode of a calculator. Pill-shaped controls are used deliberately for the direction toggle and unit selectors; everything else holds Linear's 8px/12px corners, with the outer calculator card at 16px."
 
 colors:
   primary: "#02613E"
@@ -31,7 +31,7 @@ colors:
 typography:
   page-title:
     fontFamily: Public Sans
-    fontSize: 28px
+    fontSize: 24px
     fontWeight: 600
     lineHeight: 1.20
     letterSpacing: 0
@@ -80,13 +80,13 @@ typography:
     letterSpacing: 0
   result-value:
     fontFamily: DM Mono
-    fontSize: 24px
+    fontSize: 32px
     fontWeight: 500
     lineHeight: 1.20
     letterSpacing: 0
   particle-count:
     fontFamily: DM Mono
-    fontSize: 13px
+    fontSize: 14px
     fontWeight: 400
     lineHeight: 1.40
     letterSpacing: 0
@@ -123,27 +123,45 @@ components:
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
-    padding: "8px 16px"
+    padding: "8px 12px"
   pill-active-pressed:
     backgroundColor: "{colors.primary-pressed}"
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
-    padding: "8px 16px"
+    padding: "8px 12px"
   pill-inactive:
     backgroundColor: "transparent"
-    textColor: "{colors.ink-subtle}"
+    textColor: "{colors.ink-muted}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
-    padding: "8px 16px"
+    padding: "8px 12px"
     border: "0.5px solid {colors.hairline}"
   pill-inactive-hover:
     backgroundColor: "{colors.surface-2}"
     textColor: "{colors.ink}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
-    padding: "8px 16px"
+    padding: "8px 12px"
     border: "0.5px solid {colors.hairline}"
+
+  toggle-direction:
+    backgroundColor: "transparent"
+    border: "0.5px solid {colors.hairline}"
+    rounded: "{rounded.pill}"
+    padding: "4px"
+  toggle-direction-segment-active:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "8px 12px"
+  toggle-direction-segment-inactive:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-muted}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "8px 12px"
 
   segmented-tab:
     backgroundColor: "transparent"
@@ -186,18 +204,18 @@ components:
 
   card-calculator:
     backgroundColor: "{colors.surface-1}"
-    rounded: "{rounded.lg}"
+    rounded: "{rounded.xl}"
     padding: "{spacing.lg}"
     border: "0.5px solid {colors.hairline}"
   card-field:
     backgroundColor: "{colors.surface-2}"
     rounded: "{rounded.lg}"
-    padding: "{spacing.md}"
+    padding: "{spacing.lg}"
     border: "0.5px solid {colors.hairline}"
   card-result:
-    backgroundColor: "{colors.primary-soft}"
+    backgroundColor: "{colors.surface-2}"
     rounded: "{rounded.lg}"
-    padding: "{spacing.md}"
+    padding: "{spacing.lg}"
     border: "0.5px solid {colors.hairline}"
 
   panel-browse-elements:
@@ -241,20 +259,10 @@ components:
     typography: "{typography.input-value}"
     rounded: "{rounded.md}"
     border: "2px solid {colors.error}"
-  text-input-readonly:
-    backgroundColor: "{colors.primary-soft}"
-    textColor: "{colors.primary-pressed}"
+  result-value:
+    backgroundColor: "transparent"
+    textColor: "{colors.primary}"
     typography: "{typography.result-value}"
-    rounded: "{rounded.md}"
-    padding: "8px 12px"
-    border: "0.5px solid {colors.hairline}"
-
-  badge-calculated:
-    backgroundColor: "{colors.primary-soft}"
-    textColor: "{colors.primary-pressed}"
-    typography: "{typography.body-sm}"
-    rounded: "{rounded.pill}"
-    padding: "2px 8px"
 
   error-message:
     textColor: "{colors.error}"
@@ -287,13 +295,13 @@ FreeChemLab is a single-purpose chemistry calculator, not a SaaS product and not
 
 The structural logic is borrowed from Linear — a surface ladder carrying hierarchy instead of drop shadows, hairline borders, a disciplined radius scale, and a single chromatic accent used scarcely. That logic is inverted for light mode: where Linear's canvas is near-black and surfaces lift toward lighter grays, this system's canvas is a warm off-white (`{colors.canvas}` #FAF9F5) and surfaces lift toward clean white (`{colors.surface-1}` #ffffff).
 
-The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its association with organic chemistry and lab safety, and because green is nearly absent from the calculator-site landscape. It appears on active controls, focus states, and the calculated-result tint. Nowhere else.
+The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its association with organic chemistry and lab safety, and because green is nearly absent from the calculator-site landscape. It appears on active controls, focus states, and calculated-result text. Nowhere else.
 
 **Key Characteristics:**
 - Light warm canvas with a four-step surface ladder for hierarchy — no drop shadows anywhere
 - Single green accent (`{colors.primary}`) reserved for active states, focus, and calculated results
 - Two-family typography: Public Sans for all text, DM Mono for all numbers
-- Pill-shaped controls only where interaction demands it (direction toggle, unit selectors, buttons); cards hold 12px corners, inputs hold 8px
+- Pill-shaped controls only where interaction demands it (direction toggle, unit selectors, buttons); the outer calculator card holds 16px corners, field/result cards hold 12px, inputs hold 8px
 - Red (`{colors.error}`) appears only on validation errors — never decoratively
 - Calculator visible immediately; no hero, no marketing band
 
@@ -303,7 +311,7 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 - **Primary Green** (`{colors.primary}` #02613E): Active fills — direction toggle, active unit pills, primary buttons, focused input borders, active tab underline. White text on top (7.4:1 contrast, passes WCAG AAA).
 - **Primary Hover** (`{colors.primary-hover}` #0B7A4F): Lighter green for hover states on green fills.
 - **Primary Pressed** (`{colors.primary-pressed}` #04442C): Darker green for pressed/active states, and for text sitting on `{colors.primary-soft}`.
-- **Primary Soft** (`{colors.primary-soft}` #DCEEE4): Tint background for the calculated-result field, the Calculated badge, and selected element tiles. Text on top uses `{colors.primary-pressed}`, never white.
+- **Primary Soft** (`{colors.primary-soft}` #DCEEE4): Tint background for selected element tiles. Text on top uses `{colors.primary-pressed}`, never white. It no longer tints the calculated-result field — see `result-value` and the Don't about the read-only signal below.
 
 ### Surface
 - **Canvas** (`{colors.canvas}` #FAF9F5): Page background. Warm off-white, not pure white — the warmth is deliberate and should read as "slightly less clinical," not visibly tinted.
@@ -317,8 +325,8 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 
 ### Text
 - **Ink** (`{colors.ink}` #14140F): Headlines, input values, primary numbers. Near-black.
-- **Ink Muted** (`{colors.ink-muted}` #4A4842): Body copy, secondary values.
-- **Ink Subtle** (`{colors.ink-subtle}` #7A776D): Field labels, captions, breadcrumb, inactive pill text.
+- **Ink Muted** (`{colors.ink-muted}` #4A4842): Body copy, secondary values, field labels, inactive pill and toggle text.
+- **Ink Subtle** (`{colors.ink-subtle}` #7A776D): Captions, breadcrumb.
 - **Ink Tertiary** (`{colors.ink-tertiary}` #A8A498): Placeholder text, disabled state, atomic mass values inside element tiles.
 
 ### Semantic
@@ -345,7 +353,7 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 
 | Token | Family | Size | Weight | Line Height | Use |
 |---|---|---|---|---|---|
-| `{typography.page-title}` | Public Sans | 28px | 600 | 1.20 | Calculator card title |
+| `{typography.page-title}` | Public Sans | 24px | 600 | 1.20 | Calculator card title |
 | `{typography.card-title}` | Public Sans | 20px | 500 | 1.25 | Section headers inside the card |
 | `{typography.label}` | Public Sans | 12px | 600 | 1.30 | Uppercase field labels (MOLAR MASS, MASS, MOLES), +0.4px tracking |
 | `{typography.body}` | Public Sans | 16px | 400 | 1.50 | Explainer prose |
@@ -353,12 +361,12 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 | `{typography.button}` | Public Sans | 14px | 500 | 1.20 | All button and pill labels |
 | `{typography.breadcrumb}` | Public Sans | 13px | 400 | 1.40 | Breadcrumb nav |
 | `{typography.input-value}` | DM Mono | 16px | 400 | 1.40 | Molar mass and mass input values |
-| `{typography.result-value}` | DM Mono | 24px | 500 | 1.20 | The calculated result — 6 decimal places |
-| `{typography.particle-count}` | DM Mono | 13px | 400 | 1.40 | Particle count secondary line |
+| `{typography.result-value}` | DM Mono | 32px | 500 | 1.20 | The calculated result — 6 decimal places |
+| `{typography.particle-count}` | DM Mono | 14px | 400 | 1.40 | Particle count secondary line |
 | `{typography.formula-mono}` | DM Mono | 15px | 500 | 1.40 | Built chemical formulas (e.g. He2LiBe2) |
 
 ### Principles
-- **No negative letter-spacing anywhere.** Linear's aggressive tracking exists for 80px marketing headlines. The largest type here is 28px, and tightening hurts legibility on both small text and numbers.
+- **No negative letter-spacing anywhere.** Linear's aggressive tracking exists for 80px marketing headlines. The largest type here is 32px, and tightening hurts legibility on both small text and numbers.
 - **Labels are the only uppercase treatment**, at 12px/600 with +0.4px tracking. Nothing else is uppercased.
 - **Results are formatted to 6 decimal places**, matching the precision convention used across chemistry calculators.
 
@@ -368,9 +376,10 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 - **Base unit**: 4px
 - **Tokens**: `{spacing.xxs}` 4px · `{spacing.xs}` 8px · `{spacing.sm}` 12px · `{spacing.md}` 16px · `{spacing.lg}` 24px · `{spacing.xl}` 32px · `{spacing.xxl}` 48px · `{spacing.section}` 96px
 - Calculator card padding: `{spacing.lg}` 24px
-- Field container padding: `{spacing.md}` 16px
-- Gap between the Molar Mass and Mass containers: `{spacing.md}` 16px
-- Pill padding: 8px vertical · 16px horizontal
+- Field container padding: `{spacing.lg}` 24px. Molar Mass and Mass share a single field card (no gap, no divider) split by asymmetric inner padding — 24px on the outer edges and top/bottom, 12px each on the two sides facing the shared midline, for a 24px total gutter.
+- Result card padding: `{spacing.lg}` 24px, symmetric on all sides — it is a single field, not split.
+- Pill padding: 8px vertical · 12px horizontal
+- Pill padding (touch viewports): 14px vertical · 16px horizontal, set explicitly — see Touch Targets.
 - Button padding: 10px vertical · 20px horizontal
 - Input padding: 8px vertical · 12px horizontal
 
@@ -404,12 +413,12 @@ Focus and error use a border-width change (0.5px to 2px) rather than a shadow ri
 | `{rounded.xs}` | 4px | Micro chips |
 | `{rounded.sm}` | 6px | Inline tags |
 | `{rounded.md}` | 8px | Inputs, element tiles, overflow panel |
-| `{rounded.lg}` | 12px | Calculator card, field containers, Browse Elements panel |
-| `{rounded.xl}` | 16px | Reserved |
+| `{rounded.lg}` | 12px | Field containers, result card, Browse Elements panel |
+| `{rounded.xl}` | 16px | Calculator card outer radius |
 | `{rounded.pill}` | 9999px | Direction toggle, unit pills, all buttons |
-| `{rounded.full}` | 9999px | Circular icon buttons, the Calculated badge |
+| `{rounded.full}` | 9999px | Circular icon buttons |
 
-**Note on the pill divergence:** Linear's own system explicitly forbids pill-shaped CTAs. This system overrides that deliberately. The direction toggle and unit selectors are mutually-exclusive choice controls, and pill shape signals "pick one of these" more clearly than a rounded rectangle, which reads as a standalone button. Everything outside that pattern holds Linear's 8px/12px corners.
+**Note on the pill divergence:** Linear's own system explicitly forbids pill-shaped CTAs. This system overrides that deliberately. The direction toggle and unit selectors are mutually-exclusive choice controls, and pill shape signals "pick one of these" more clearly than a rounded rectangle, which reads as a standalone button. Everything outside that pattern holds Linear's 8px/12px corners, with the calculator's outer card stepping up to 16px.
 
 ## Components
 
@@ -417,13 +426,19 @@ Focus and error use a border-width change (0.5px to 2px) rather than a shadow ri
 
 ### Pills & Toggles
 
-**`pill-active`** — Selected state for the direction toggle and unit selectors.
-- Background `{colors.primary}`, text `{colors.on-primary}`, type `{typography.button}`, padding 8px 16px, rounded `{rounded.pill}`.
+**`pill-active`** — Selected state for unit selectors.
+- Background `{colors.primary}`, text `{colors.on-primary}`, type `{typography.button}`, padding 8px 12px, rounded `{rounded.pill}`.
 - Pressed state `pill-active-pressed` darkens to `{colors.primary-pressed}`.
 
 **`pill-inactive`** — Unselected state.
-- Transparent background, text `{colors.ink-subtle}`, 0.5px `{colors.hairline}` border, same padding and radius.
+- Transparent background, text `{colors.ink-muted}`, 0.5px `{colors.hairline}` border, same padding and radius.
 - Hover state `pill-inactive-hover` fills to `{colors.surface-2}` and text darkens to `{colors.ink}`.
+
+**`toggle-direction`** — The g→mol / mol→g mode switch in the card header. This is a distinct component, not a reuse of `pill-active`/`pill-inactive` — those toggle a single value (a unit); this toggles calculation direction and each segment always shows both units of that direction, joined by a chevron (e.g. "g › mol").
+- Container: transparent, 0.5px `{colors.hairline}` border, rounded `{rounded.pill}`, 4px padding, 4px gap between the two segments.
+- `toggle-direction-segment-active`: background `{colors.primary}`, text `{colors.on-primary}`, padding 8px 12px, rounded `{rounded.pill}`.
+- `toggle-direction-segment-inactive`: transparent background, text `{colors.ink-muted}`, same padding and radius.
+- Icon: chevron-right, 16px box, between the two unit words. Its stroke inherits the segment's text color — white on the active segment, `{colors.ink-muted}` on the inactive one. It is not a separate color token.
 
 ### Tabs
 
@@ -445,7 +460,7 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 **`button-icon`** — 32×32px circular utility button (collapse, close).
 - Background `{colors.surface-2}`, icon `{colors.ink-subtle}`, 0.5px `{colors.hairline}` border, rounded `{rounded.full}`.
 
-**`button-copy`** — Bare icon button on the result row. No background, no border, no fill.
+**`button-copy`** — Bare icon button in the result field's label row, right-aligned opposite the label. No background, no border, no fill, and no badge or lock icon beside it — see the read-only signal Don't below.
 - Icon: copy/duplicate glyph, outline style, matching the app's existing stroke-based icon set (`stroke="currentColor"`).
 - Empty state: `{colors.ink-tertiary}` #A8A498.
 - Filled state: `{colors.ink-muted}` #4A4842.
@@ -454,13 +469,17 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 ### Cards & Panels
 
 **`card-calculator`** — The outer card. Everything lives inside it.
-- Background `{colors.surface-1}`, rounded `{rounded.lg}`, padding `{spacing.lg}`, 0.5px `{colors.hairline}` border.
+- Background `{colors.surface-1}`, rounded `{rounded.xl}`, padding `{spacing.lg}`, 0.5px `{colors.hairline}` border.
 
-**`card-field`** — Molar Mass and Mass containers.
-- Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, 0.5px `{colors.hairline}` border.
+**`card-field`** — Molar Mass and Mass share a single card, side by side. There is no gap and no divider between them — the split is entirely padding: 24px on the outer edges and top/bottom, 12px on the two sides facing the shared midline.
+- Background `{colors.surface-2}`, rounded `{rounded.lg}`, 0.5px `{colors.hairline}` border.
 
 **`card-result`** — The calculated-output container.
-- Background `{colors.primary-soft}`, otherwise identical to `card-field`. The green tint is what communicates "this is a result, not an input." It is not decorative and must not be applied to editable fields.
+- Background `{colors.surface-2}`, padding `{spacing.lg}`, otherwise identical to `card-field`. It no longer carries a green tint — see the read-only signal Don't below.
+
+**`trigger-browse-elements`** — The row above the result card that opens the Browse Elements panel.
+- Chevron-right icon, 16px box, rotates 90° when the panel is open.
+- "Not sure of the molar mass?" in `{colors.ink-muted}`; "Browse elements" in `{colors.ink}`, underlined.
 
 **`panel-browse-elements`** — The expandable element/preset picker.
 - Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, 0.5px `{colors.hairline}` border.
@@ -478,16 +497,14 @@ The selected state must be visible from the fill and border alone. The quantity 
 
 **`text-input`** — Molar mass and mass fields.
 - Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, padding 8px 12px, 0.5px `{colors.hairline}` border.
+- Trailing chevron-selector-vertical icon, 24px box, right-aligned. Two-tone stroke: upper chevron `{colors.ink-muted}`, lower chevron `{colors.ink-tertiary}`. It is decorative — these are native number inputs, not functional dropdowns.
 
 **`text-input-focused`** — Border widens to 2px `{colors.primary}`.
 
 **`text-input-error`** — Border widens to 2px `{colors.error}`. Paired with an `error-message` directly below the field.
 
-**`text-input-readonly`** — The calculated result field.
-- Background `{colors.primary-soft}`, text `{colors.primary-pressed}`, type `{typography.result-value}`. Not editable. Always accompanied by `badge-calculated`.
-
-**`badge-calculated`** — Small pill label with a lock icon, sitting top-right of the result field's label row.
-- Background `{colors.primary-soft}`, text `{colors.primary-pressed}`, type `{typography.body-sm}`, rounded `{rounded.pill}`, padding 2px 8px.
+**`result-value`** — The calculated result. Not a boxed input — bare typography sitting directly on `card-result`'s background, with no white box, no border, and no badge or lock icon. That absence is the only read-only signal; see the Don't below.
+- Text `{colors.ink-tertiary}` when empty, `{colors.primary}` once a value exists. Type `{typography.result-value}`.
 
 **`error-message`** — Inline validation message below the errored field.
 - Text `{colors.error}`, type `{typography.body-sm}`, preceded by a 14px alert icon in the same color.
@@ -514,13 +531,14 @@ Validation rules: molar mass must be greater than zero; mass and moles must be n
 
 ### Do
 - Use the surface ladder for hierarchy. If two containers sit at the same level, one of them is probably wrong.
-- Reserve `{colors.primary}` for active states, focus, and calculated results.
-- Use `{colors.primary-soft}` as the signal for "calculated" and "selected" — the tint carries the meaning, not an adjacent badge alone.
+- Reserve `{colors.primary}` for active states, focus, and calculated result text.
+- Use `{colors.primary-soft}` as the signal for "selected" — the tint carries the meaning, not an adjacent badge alone.
 - Put every number in DM Mono and every word in Public Sans.
 - Apply `{rounded.pill}` only to the direction toggle, unit selectors, and buttons.
 - Keep the calculator above the fold. It is the product.
 - Format all calculated results to 6 decimal places.
 - Empty-state text (result value, particle count value, and the copy icon) uses `{colors.ink-tertiary}`. Filled state restores each element's normal color. Do not invent a separate muted token per element, they all share ink-tertiary.
+- State touch-viewport padding explicitly on every interactive control, per breakpoint. Never rely on it inheriting from desktop padding — that gap is how the 44px minimum was missed before.
 
 ### Don't
 - Don't add drop shadows. Depth comes from the surface ladder.
@@ -529,7 +547,7 @@ Validation rules: molar mass must be greater than zero; mass and moles must be n
 - Don't introduce a third font family.
 - Don't nest containers at the same surface level — step up or don't nest.
 - Don't add a marketing hero, a promotional CTA, or footer cross-links.
-- Don't apply `card-result`'s green tint to an editable field. It means "read-only output."
+- Don't add a white input box, a badge, or a lock icon to the calculated result field. Molar Mass and Mass have a white `text-input` box; the result field does not — that absence is now the only structural signal that it is read-only. Adding one back silently breaks it.
 - Don't pill-round the element tiles or the calculator card.
 
 ## Responsive Behavior
@@ -540,14 +558,15 @@ Validation rules: molar mass must be greater than zero; mass and moles must be n
 | Desktop | ≥ 1024px | Molar Mass and Mass side by side; element grid 5-up |
 | Tablet | 768 – 1023px | Same two-column field layout; element grid 4-up |
 | Mobile-Lg | 520 – 767px | Fields still side by side; element grid 3-up |
-| Mobile | < 520px | Molar Mass and Mass stack to one column; element grid 2-up; page title scales 28px → 22px |
+| Mobile | < 520px | Molar Mass and Mass stack to one column; element grid 2-up; page title scales 24px → 20px |
 
 ### Touch Targets
-All interactive controls hold a minimum 44×44px tap target on touch viewports. This is a hard requirement, not a guideline — it was a defect in an earlier build.
-- Pills render at 36px effective height on desktop; padding increases to reach 44px on touch.
+All interactive controls hold a minimum 44×44px tap target on touch viewports. This is a hard requirement, not a guideline — it was a defect in an earlier build. State the touch padding explicitly per control; do not leave it to inherit from desktop.
+- Pills and `toggle-direction` segments: 8px vertical / 12px horizontal padding on desktop (~32px effective height). On touch, padding increases explicitly to 14px vertical / 16px horizontal to clear 44px — this is not automatic from the desktop values.
 - Inputs render at 40px on desktop; 44px on touch.
 - Element tiles hold ≥44px on all viewports.
 - Quantity steppers (− / +) hold ≥44×44px on touch.
+- `button-copy`: 44×44px hit area at all viewports, not just touch — the icon itself stays small (16px) inside it.
 
 ### Collapsing Strategy
 - **Field row**: two columns → stacked single column below 520px
@@ -570,4 +589,4 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 - Animation and transition timings are not specified; 150–200ms ease is a reasonable default for state changes.
 - Success and warning semantic states are not defined, since the calculator has no success confirmation or warning condition. Add them only if a real use case appears.
 - The explainer/theory section below the calculator has no component definitions yet — that section's design is deliberately deferred.
-- `{colors.surface-4}` and `{rounded.xl}` are defined but currently unused. They exist as headroom, not as a mandate to find a use for them.
+- `{colors.surface-4}` is defined but currently unused. It exists as headroom, not as a mandate to find a use for it.
