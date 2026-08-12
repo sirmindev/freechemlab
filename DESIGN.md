@@ -96,8 +96,34 @@ typography:
     fontWeight: 500
     lineHeight: 1.40
     letterSpacing: 0
+  element-symbol:
+    fontFamily: Public Sans
+    fontSize: 24px
+    fontWeight: 500
+    lineHeight: 1.20
+    letterSpacing: 0
+    textTransform: uppercase
+  element-name:
+    fontFamily: Public Sans
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.20
+    letterSpacing: 0
+  element-mass:
+    fontFamily: DM Mono
+    fontSize: 14px
+    fontWeight: 500
+    lineHeight: 1.30
+    letterSpacing: 0
+  element-count:
+    fontFamily: DM Mono
+    fontSize: 16px
+    fontWeight: 500
+    lineHeight: 1.30
+    letterSpacing: 0
 
 rounded:
+  xxs: 2px
   xs: 4px
   sm: 6px
   md: 8px
@@ -228,12 +254,39 @@ components:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
     padding: "{spacing.xs}"
-    border: "0.5px solid {colors.hairline}"
+    gap: "{spacing.lg}"
+    border: "1px solid {colors.hairline}"
   element-tile-selected:
-    backgroundColor: "{colors.primary-soft}"
+    backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
     padding: "{spacing.xs}"
-    border: "0.5px solid {colors.primary}"
+    gap: "{spacing.lg}"
+    border: "1px solid {colors.primary}"
+  element-tile-symbol:
+    backgroundColor: "{colors.surface-4}"
+    textColor: "{colors.ink}"
+    typography: "{typography.element-symbol}"
+    rounded: "{rounded.xs}"
+    padding: "{spacing.xs}"
+    size: "40px"
+  element-tile-stepper:
+    backgroundColor: "{colors.surface-1}"
+    rounded: "{rounded.xs}"
+    padding: "{spacing.xxs}"
+    gap: "{spacing.xs}"
+    border: "1px solid {colors.hairline}"
+  element-tile-stepper-button:
+    backgroundColor: "transparent"
+    iconColor: "{colors.ink-muted}"
+    rounded: "{rounded.xxs}"
+    padding: "{spacing.xxs}"
+    size: "32px"
+  element-tile-stepper-button-hover:
+    backgroundColor: "{colors.surface-4}"
+    iconColor: "{colors.ink-muted}"
+    rounded: "{rounded.xxs}"
+    padding: "{spacing.xxs}"
+    size: "32px"
 
   text-input:
     backgroundColor: "{colors.surface-1}"
@@ -306,14 +359,14 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 - **Primary Green** (`{colors.primary}` #02613E): Active fills — direction toggle, active unit pills, primary buttons, focused input borders, active tab underline. White text on top (7.4:1 contrast, passes WCAG AAA).
 - **Primary Hover** (`{colors.primary-hover}` #0B7A4F): Lighter green for hover states on green fills.
 - **Primary Pressed** (`{colors.primary-pressed}` #04442C): Darker green for pressed/active states, and for text sitting on `{colors.primary-soft}`.
-- **Primary Soft** (`{colors.primary-soft}` #DCEEE4): Tint background for selected element tiles. Text on top uses `{colors.primary-pressed}`, never white. It no longer tints the calculated-result field — see `result-value` and the Don't about the read-only signal below.
+- **Primary Soft** (`{colors.primary-soft}` #DCEEE4): Currently unused. It previously tinted selected element tiles and, before that, the calculated-result field; both now signal state without a fill (see `element-tile-selected` and the Don't about the read-only signal below). Retained as a token for any future selected-surface need — text on top would use `{colors.primary-pressed}`, never white.
 
 ### Surface
 - **Canvas** (`{colors.canvas}` #FAF9F5): Page background. Warm off-white, not pure white — the warmth is deliberate and should read as "slightly less clinical," not visibly tinted.
 - **Surface 1** (`{colors.surface-1}` #ffffff): One step above canvas — the calculator card, element tiles, input field interiors.
 - **Surface 2** (`{colors.surface-2}` #F5F3EE): Two steps — the input and result field containers, the Browse Elements panel.
 - **Surface 3** (`{colors.surface-3}` #EFEDE7): Three steps — currently unused since the "···" overflow reveal panel it backed was removed (all units now render inline). Reserved.
-- **Surface 4** (`{colors.surface-4}` #E8E6DF): Four steps — deepest lift, currently unused. Reserved.
+- **Surface 4** (`{colors.surface-4}` #E8E6DF): Four steps — deepest lift. Backs the element tile's symbol chip (`element-tile-symbol`) and the hover fill on the tile's stepper buttons (`element-tile-stepper-button-hover`). These are its only consumers. Both sit *inside* a `{colors.surface-1}` tile, so here the step reads as a recess against white rather than a lift — this is the one place the ladder inverts, and it is intentional: the symbol chip and the hover fill are insets within a card, not cards of their own.
 - **Hairline** (`{colors.hairline}` #E5E2DA): Default 0.5px borders on cards, inputs, and dividers.
 - **Hairline Strong** (`{colors.hairline-strong}` #D3CFC3): Emphasized dividers.
 - **Hairline Tertiary** (`{colors.hairline-tertiary}` #C4C0B2): Nested/tertiary borders inside the element grid.
@@ -381,7 +434,7 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 ### Grid & Container
 - Single-column page, max content width ~880px. This is a calculator, not a dashboard — it should not sprawl.
 - Molar Mass and the current second input render side by side at desktop, each at `flex: 1`.
-- The element grid inside Browse Elements renders 5-up at desktop.
+- The element grid inside Browse Elements renders 3-up at desktop. It was 5-up while the tile was a centered vertical card; the horizontal tile has a hard minimum width of ~260px (40px chip + 12px + name/mass + 24px + 92px stepper + 16px padding), so 5-up no longer fits inside the ~800px usable panel width. Three columns at an 8px gap is the widest that clears that minimum.
 
 ### Whitespace Philosophy
 The warm canvas is the whitespace. Sections separate by lifting onto a surface, not by large gaps. Vertical rhythm inside the card stays at `{spacing.md}` 16px between blocks; the page keeps `{spacing.lg}` 24px between the breadcrumb and the card.
@@ -391,7 +444,8 @@ The warm canvas is the whitespace. Sections separate by lifting onto a surface, 
 | Level | Treatment | Use |
 |---|---|---|
 | 0 (flat) | No border, no shadow | Page background, breadcrumb, footer |
-| 1 (card lift) | `{colors.surface-1}` on canvas, 0.5px `{colors.hairline}` | Calculator card, element tiles, input interiors |
+| 1 (card lift) | `{colors.surface-1}` on canvas, 0.5px `{colors.hairline}` | Calculator card, input interiors |
+| 1 (card lift) | `{colors.surface-1}`, 1px `{colors.hairline}` | Element tiles and their steppers — 1px, not 0.5px, per the source design |
 | 2 (nested lift) | `{colors.surface-2}`, 0.5px `{colors.hairline}` | Field containers, Browse Elements panel |
 | 3 (sub-panel lift) | `{colors.surface-3}`, 0.5px `{colors.hairline}` | Reserved — currently unused |
 | 4 (focus) | 2px `{colors.primary}` border | Focused input |
@@ -405,7 +459,8 @@ Focus and error use a border-color change rather than a shadow ring, because a r
 
 | Token | Value | Use |
 |---|---|---|
-| `{rounded.xs}` | 4px | Micro chips |
+| `{rounded.xxs}` | 2px | Stepper button hover fill inside the element tile |
+| `{rounded.xs}` | 4px | Micro chips, element-tile symbol chip, element-tile stepper |
 | `{rounded.sm}` | 6px | Inline tags |
 | `{rounded.md}` | 8px | Inputs, element tiles, overflow panel |
 | `{rounded.lg}` | 12px | Field containers, result card, Browse Elements panel |
@@ -482,10 +537,32 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 - Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, 0.5px `{colors.hairline}` border.
 
 **`element-tile`** / **`element-tile-selected`** — Individual elements in the Build custom grid.
-- Default: `{colors.surface-1}`, rounded `{rounded.md}`, 0.5px `{colors.hairline}`. Symbol in `{colors.ink}`, name and atomic mass in `{colors.ink-tertiary}`.
-- Selected: `{colors.primary-soft}` fill with a 0.5px `{colors.primary}` border. Symbol and mass shift to `{colors.primary-pressed}` and `{colors.primary-hover}`.
 
-The selected state must be visible from the fill and border alone. The quantity stepper appearing is additional feedback, not the primary signal.
+The tile is a **horizontal** row, not a centered stack. Left to right: symbol chip → name/mass block → stepper, with the stepper pushed to the right edge. Container is `{colors.surface-1}`, rounded `{rounded.md}`, 1px `{colors.hairline}`, `{spacing.xs}` padding, `{spacing.lg}` gap between the left group and the stepper.
+
+- **`element-tile-symbol`** — a 40×40px chip, not bare bold text on the card. Background `{colors.surface-4}`, rounded `{rounded.xs}`, symbol centered in `{typography.element-symbol}` / `{colors.ink}`.
+- **Name + mass** — stacked, **left-aligned**, 4px gap, immediately right of the chip at `{spacing.sm}` 12px. Name in `{typography.element-name}` / `{colors.ink}`; atomic mass in `{typography.element-mass}` / `{colors.ink-muted}`. Neither is `{colors.ink-tertiary}` any more — the horizontal layout gives them enough room to carry full contrast.
+- **`element-tile-stepper`** — its own bordered component at the right edge: `{colors.surface-1}`, rounded `{rounded.xs}`, 1px `{colors.hairline}`, `{spacing.xxs}` padding, `{spacing.xs}` gap, stretched to the tile's inner height. Holds − / count / +. Count in `{typography.element-count}` / `{colors.ink}`.
+- **Selected**: border only. The background stays `{colors.surface-1}` and the border changes to 1px `{colors.primary}`. Nothing else moves — no fill, no text-color shift.
+
+The selected state is carried by the border alone. This is a deliberate lightening: the previous `{colors.primary-soft}` fill plus recolored text was too heavy for a control that can appear 63 times at once on screen, and it competed with the result value for the eye's attention. Green stays scarce.
+
+The stepper is **always visible**, in both states — it no longer appears on selection. Because a stepper is present on an unselected tile, the border is doing all of the selection signalling, which is why it must never be omitted or softened.
+
+**`element-tile-stepper-button`** — the − and + controls.
+- 32×32px box, rounded `{rounded.xxs}`, transparent at rest, holding a 24×24px icon box with a 14px stroke glyph (1.5px stroke, round caps) in `{colors.ink-muted}`.
+- Hover fills the box with `{colors.surface-4}`. The icon color does not change. **Both buttons take the same hover treatment** — the source file defines it only on +, but an asymmetric hover on a two-button stepper reads as a defect, so − mirrors it.
+- The rest state reserves the hover box's full 32×32 footprint, so hovering fills a background that is already there and never shifts the stepper's layout.
+
+**Selection model.** Because the stepper is always visible, "shows a count" and "is in the formula" are two different things, and the tile has to keep them distinct:
+
+- An unselected tile always displays a resting count of **1**. That 1 is a *proposal*, not a quantity — the element is not in the formula and contributes nothing to the computed molar mass.
+- Clicking the tile body, or clicking **+**, sets selected and adds the element to the formula.
+- Clicking **−** at a count of 1 clears selection, removes the element from the formula, and returns the display to its resting 1. This is cart behavior: decrementing the last unit removes the line item. There is no separate remove affordance.
+- Clicking **−** at 2 or above decrements and stays selected.
+- **−** on an already-unselected tile does nothing — there is no state below "not in the formula."
+
+The resting 1 is a display default, so it must not be exposed to assistive tech as a live value. An unselected tile's stepper is marked `aria-disabled`, and the tile's selected state is carried by `aria-pressed` on the tile body — the green border is not a signal a screen reader can see.
 
 ### Inputs & Validation
 
@@ -528,7 +605,7 @@ The particle-count row is the one place in the result block with a visible divid
 ### Do
 - Use the surface ladder for hierarchy. If two containers sit at the same level, one of them is probably wrong.
 - Reserve `{colors.primary}` for active states, focus, and calculated result text.
-- Use `{colors.primary-soft}` as the signal for "selected" — the tint carries the meaning, not an adjacent badge alone.
+- Signal "selected" with a `{colors.primary}` border and nothing else. No tint, no recolored text, no adjacent badge.
 - Put every number in DM Mono and every word in Public Sans.
 - Apply `{rounded.pill}` only to the direction toggle, unit selectors, and buttons.
 - Keep the calculator above the fold. It is the product.
@@ -554,23 +631,23 @@ The particle-count row is the one place in the result block with a visible divid
 ### Breakpoints
 | Name | Width | Key Changes |
 |---|---|---|
-| Desktop | ≥ 1024px | The two current inputs side by side; element grid 5-up |
-| Tablet | 768 – 1023px | Same two-column field layout; element grid 4-up |
-| Mobile-Lg | 520 – 767px | Fields still side by side; element grid 3-up |
-| Mobile | < 520px | The two current inputs stack to one column; element grid 2-up; page title scales 24px → 20px |
+| Desktop | ≥ 1024px | The two current inputs side by side; element grid 3-up |
+| Tablet | 768 – 1023px | Same two-column field layout; element grid 2-up |
+| Mobile-Lg | 520 – 767px | Fields still side by side; element grid 2-up |
+| Mobile | < 520px | The two current inputs stack to one column; element grid 1-up; page title scales 24px → 20px |
 
 ### Touch Targets
 All interactive controls hold a minimum 44×44px tap target on touch viewports. This is a hard requirement, not a guideline — it was a defect in an earlier build. State the touch padding explicitly per control; do not leave it to inherit from desktop.
 - Pills and `toggle-direction` segments: 8px vertical / 12px horizontal padding on desktop (~32px effective height). On touch, padding increases explicitly to 14px vertical / 16px horizontal to clear 44px — this is not automatic from the desktop values.
 - Inputs render at 40px on desktop; 44px on touch.
 - Element tiles hold ≥44px on all viewports.
-- Quantity steppers (− / +) in Build custom hold ≥44×44px on touch.
+- Quantity steppers (− / +) in Build custom paint a 32×32px box at every viewport, matching the source design. The hit area and the painted box are deliberately separate: the `<button>` is a transparent wrapper around a 32×32 inner span that carries the radius and the hover fill. On desktop the wrapper adds no padding (32×32 total); on touch it adds 6px on all sides, giving a 44×44px target while the painted box stays 32×32. The control looks identical at both widths — only the wrapper's padding changes, which is why the fill must live on the inner span and never on the button itself.
 - `button-copy`: 44×44px hit area at all viewports, not just touch — the icon itself stays small (16px) inside it.
 - Exception: the `text-input` increment/decrement stepper is ~16×24px total (two 16×12px chevrons), well under 44px. It intentionally matches native OS spinner proportions rather than the hard requirement — see Known Gaps.
 
 ### Collapsing Strategy
 - **Field row**: two columns → stacked single column below 520px
-- **Element grid**: 5-up → 4-up → 3-up → 2-up
+- **Element grid**: 3-up → 2-up → 1-up. The tile never narrows below ~260px; the column count drops instead.
 - **Unit pills**: all units render inline at every width and wrap onto additional lines as needed — there is no reveal/overflow interaction.
 - **Direction toggle**: stays in the card header at all widths; may wrap below the title under 520px
 
@@ -589,5 +666,6 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 - Animation and transition timings are not specified; 150–200ms ease is a reasonable default for state changes.
 - Success and warning semantic states are not defined, since the calculator has no success confirmation or warning condition. Add them only if a real use case appears.
 - The explainer/theory section below the calculator has no component definitions yet — that section's design is deliberately deferred.
-- `{colors.surface-3}` and `{colors.surface-4}` are defined but currently unused — `surface-3` lost its only consumer when the "···" overflow reveal panel was removed. Both exist as headroom, not as a mandate to find a use for them.
+- `{colors.surface-3}` is defined but currently unused — it lost its only consumer when the "···" overflow reveal panel was removed. It exists as headroom, not as a mandate to find a use for it. (`{colors.surface-4}` is no longer in this list; the element tile's symbol chip and stepper hover fill now consume it.)
+- `{colors.primary-soft}` is now unused, having lost its last consumer when the element tile's selected state went border-only. Kept as a token rather than deleted, since a selected-surface fill is a plausible future need — but do not reach for it to "balance" the tile's selected state. The border is the whole signal, by design.
 - The `text-input` stepper's ~16×24px hit area is below the 44px touch-target minimum by design, matching native number-input spinner proportions. This is a deliberate exception to the Touch Targets rule, not an oversight — revisit if usage data shows it's hard to hit on touch devices.
