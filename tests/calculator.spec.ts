@@ -418,7 +418,7 @@ test.describe('Element tile – selection model', () => {
 
     await expect
       .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
-      .toBe('rgb(211, 207, 195)'); // hairline-strong
+      .toBe('rgb(196, 192, 178)'); // hairline-tertiary
     // Hover is border-only — no fill, same as the selected state
     expect(await tile.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgb(255, 255, 255)');
 

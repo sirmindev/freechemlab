@@ -255,21 +255,21 @@ components:
     rounded: "{rounded.md}"
     padding: "{spacing.xs}"
     gap: "{spacing.xs}"
-    minHeight: "56px"
+    minHeight: "52px"
     border: "1px solid {colors.hairline}"
   element-tile-hover:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
     padding: "{spacing.xs}"
     gap: "{spacing.xs}"
-    minHeight: "56px"
-    border: "1px solid {colors.hairline-strong}"
+    minHeight: "52px"
+    border: "1px solid {colors.hairline-tertiary}"
   element-tile-selected:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
     padding: "{spacing.xs}"
     gap: "{spacing.xs}"
-    minHeight: "56px"
+    minHeight: "52px"
     border: "1px solid {colors.primary}"
   element-tile-symbol:
     backgroundColor: "{colors.surface-4}"
@@ -375,8 +375,8 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 - **Surface 3** (`{colors.surface-3}` #EFEDE7): Three steps — currently unused since the "···" overflow reveal panel it backed was removed (all units now render inline). Reserved.
 - **Surface 4** (`{colors.surface-4}` #E8E6DF): Four steps — deepest lift. Backs the element tile's symbol chip (`element-tile-symbol`) and the hover fill on the tile's stepper buttons (`element-tile-stepper-button-hover`). These are its only consumers. Both sit *inside* a `{colors.surface-1}` tile, so here the step reads as a recess against white rather than a lift — this is the one place the ladder inverts, and it is intentional: the symbol chip and the hover fill are insets within a card, not cards of their own.
 - **Hairline** (`{colors.hairline}` #E5E2DA): Default 0.5px borders on cards, inputs, and dividers.
-- **Hairline Strong** (`{colors.hairline-strong}` #D3CFC3): Emphasized dividers, and the hover border on an unselected element tile — one neutral step up from `{colors.hairline}`, enough to read as "this responds" without borrowing the selected state's meaning.
-- **Hairline Tertiary** (`{colors.hairline-tertiary}` #C4C0B2): Nested/tertiary borders inside the element grid.
+- **Hairline Strong** (`{colors.hairline-strong}` #D3CFC3): Emphasized dividers. It was tried as the element tile's hover border and replaced — against `{colors.hairline}` on a 1px border it was too quiet to register as feedback.
+- **Hairline Tertiary** (`{colors.hairline-tertiary}` #C4C0B2): Nested/tertiary borders inside the element grid, and the **hover border on an unselected element tile**. Two neutral steps up from `{colors.hairline}`, which is what it takes for a 1px border change to read as "this responds". Still unambiguously neutral, so the chromatic/neutral split against `{colors.primary}` remains the signal that separates hover from selected.
 
 ### Text
 - **Ink** (`{colors.ink}` #14140F): Headlines, input values, primary numbers. Near-black.
@@ -556,7 +556,7 @@ The tile is a **horizontal** row, not a centered stack. Left to right: symbol ch
 - **Name + mass** — stacked, **left-aligned**, 4px gap, immediately right of the chip at `{spacing.sm}` 12px. Name in `{typography.element-name}` / `{colors.ink}`; atomic mass in `{typography.element-mass}` / `{colors.ink-muted}`. Neither is `{colors.ink-tertiary}` any more — the horizontal layout gives them enough room to carry full contrast. The name truncates with an ellipsis rather than wrapping or pushing the stepper out of the tile; at the documented column widths it does not truncate for any element in the dataset.
 - **`element-tile-stepper`** — a bare flex row at the right edge, present only while selected. **No container border, no background, no padding, no radius.** The − / count / + sit directly on the tile. Gap `{spacing.xxs}` 4px. Count in `{typography.element-count}` / `{colors.ink}`. Renders 68px wide. The count's size is independent of the buttons' — the buttons came down 28px → 24px without touching it.
   - The 4px gap is doing work the container used to. While the stepper was boxed, a 2px gap was legible because the border corralled the three controls; freestanding, that same 2px reads as cramped. **If the container ever comes back, the gap should tighten again** — the two decisions are coupled, not independent.
-- **Hover (unselected only)**: border shifts from `{colors.hairline}` to `{colors.hairline-strong}`. No fill, no shadow, width stays 1px so nothing reflows. It signals "clickable", not "selected" — which is why it is neutral rather than a lighter green.
+- **Hover (unselected only)**: border shifts from `{colors.hairline}` to `{colors.hairline-tertiary}`. No fill, no shadow, width stays 1px so nothing reflows. It signals "clickable", not "selected" — which is why it is neutral rather than a lighter green. Three border states coexist and stay distinguishable: `hairline` #E5E2DA resting → `hairline-tertiary` #C4C0B2 hover → `primary` #02613E selected. The first two differ by value, the third by hue.
 - **Selected**: border only. The background stays `{colors.surface-1}` and the border changes to 1px `{colors.primary}`. Nothing else moves — no fill, no text-color shift.
 - The hover border applies to **unselected tiles only**. A hover variant outranks the resting border-color class, so if it is left active on a selected tile it will grey out the green border on hover — mount and unmount it with the selected state, don't declare it once and forget it.
 
@@ -568,6 +568,7 @@ The stepper **appears on selection** and unmounts on deselection. It is therefor
 - 24×24px box, rounded `{rounded.xxs}`, transparent at rest, holding a 20×20px icon box with a **12px** stroke glyph (1.5px stroke, round caps) in `{colors.ink-muted}`.
 - **The stroke stays 1.5px as the glyph shrinks.** The exported SVG is scaled to 13.3 units (13.3 ÷ 15.5 = 0.858, giving a 12px glyph), so its `stroke-width` is raised to **1.75** to compensate: 1.75 × 0.858 = 1.50px rendered. Scaling the glyph without that adjustment thins the stroke to 1.29px, which reads as faded rather than smaller.
 - **Both glyphs share one square `viewBox` (`0 0 15.5 15.5`) and one rendered box (13.3 × 13.3).** The minus path is literally the plus's horizontal arm (`M0.75 7.75H14.75`), so the two centre identically by construction rather than by coincidence. They also carry `overflow: visible`, because a 1.75-unit stroke overshoots the viewBox at the round caps and would otherwise be shaved.
+- **The residual sub-pixel offset is layout, not the icons.** Measured from rendered pixels at 10× zoom, the glyph ink sits ~0.35px up-and-left of its circle's centre, and **the offset is identical for + and −** in every configuration tested. It tracks the tile's fractional position: `auto-fill` columns are 251.328125px wide, so a button lands at x=472.3281 and its 1.5px strokes straddle device pixels. Forcing integer-width columns moves the horizontal offset by exactly 1px, confirming the cause. Only the **+** has a vertical stroke, so only the + can visibly expose a horizontal sub-pixel shift — which is why it alone reads as off-centre even though it measures identically to the −. This is not fixable inside the component; it would require abandoning `1fr` columns for integer widths, which costs the responsive grid. Do not "fix" it by nudging one glyph — that would introduce the very asymmetry the measurements show does not exist.
 - **Never give the minus a viewBox sized to its own ink** (e.g. `0 0 15.5 1.5`). An SVG root clips to its viewBox, so a 1.5-unit-tall box crops a 1.75-unit stroke down to **1.28px** while the plus renders at the full 1.5px — the minus then looks thinner than the plus and the pair reads as misaligned. This shipped once and was not obvious from the markup; it is only visible by measuring the rendered stroke.
 - Hover fills a **circle** (`border-radius: 50%`) behind the glyph, sized to the same 24px box, in `{colors.surface-4}` #E8E6DF. The icon color does not change.
 - **Both buttons hover identically** — same fill, same shape, same size. The only difference between them is the glyph. A green `{colors.primary-soft}` tint on **+** was tried and reverted: an asymmetric hover on a two-button pair reads as one control being special rather than as two halves of the same stepper, and "increment" is not a state the accent is meant to mark. `{colors.surface-3}` and `{colors.hairline-strong}` were also considered and rejected — the former too weak against white, the latter too heavy, and `hairline-strong` now has a different job as the tile's hover *border*.
@@ -584,7 +585,7 @@ The stepper **appears on selection** and unmounts on deselection. It is therefor
 
 Because the count only ever renders on a selected tile, it is always a live quantity. **Do not `aria-hidden` it** and do not ship a `disabled` − : an earlier revision needed both because the tile displayed a resting "1" while unselected, and that state no longer exists. Likewise, never mark the stepper container `aria-disabled` — it silently disables + along with −, which is wrong for assistive tech and makes the button non-actionable for automation.
 
-The tile holds a fixed `min-height` equal to its selected height, so mounting the stepper does not change the tile's height or reflow its grid row.
+The tile holds a fixed **52px** `min-height`, so mounting the stepper does not change the tile's height or reflow its grid row. As of the 24px stepper buttons and the unboxed stepper, the tile's *natural* height is 52px in **both** states — the selected and unselected cases converged, so the min-height is currently sitting exactly at natural height rather than above it. It still guards against content shrinking, but it no longer provides headroom: anything that makes the selected state taller than 52px will grow the row. Re-measure both natural heights before changing the chip size, the button size, or the tile's padding.
 
 Selected state is carried by **`aria-current="true"`** on the tile body, present only while selected and removed otherwise — the green border is not a signal a screen reader can see.
 

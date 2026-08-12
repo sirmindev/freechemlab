@@ -1086,9 +1086,9 @@ import Layout from '../layouts/Layout.astro';
 		visible.forEach(el => {
 			const card = document.createElement('div');
 			card.dataset.symbol = el.symbol;
-			// min-h holds the tile at its selected height so mounting the
-			// stepper never changes the row's height.
-			card.className = 'flex min-h-[56px] items-center justify-between gap-2 rounded-md border bg-surface p-2 transition-colors';
+			// min-h holds the tile above its natural height in BOTH states so
+			// mounting the stepper never changes the row's height.
+			card.className = 'flex min-h-[52px] items-center justify-between gap-2 rounded-md border bg-surface p-2 transition-colors';
 
 			// Tile body — clicking it is the select action
 			const body = document.createElement('button');
@@ -1149,7 +1149,7 @@ import Layout from '../layouts/Layout.astro';
 				card.classList.toggle('border-hairline', !selected);
 				// Hover feedback is unselected-only: the hover variant outranks
 				// the green border, so leaving it on would grey out a selected tile.
-				card.classList.toggle('hover:border-hairline-strong', !selected);
+				card.classList.toggle('hover:border-hairline-tertiary', !selected);
 				// aria-current, not aria-pressed: body-click only ever selects,
 				// so toggle-button semantics would misdescribe it. See DESIGN.md.
 				if (selected) {
