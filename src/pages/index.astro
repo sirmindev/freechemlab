@@ -595,6 +595,27 @@ import Layout from '../layouts/Layout.astro';
 	const MOLES_EDITABLE_PLACEHOLDER = "e.g. 0.05";
 	const RESULT_PLACEHOLDER = "0.000000";
 
+	// Renders a restored result for display in an editable field: capped to 12
+	// significant digits so a non-terminating value doesn't expose its full float
+	// (0.3333333333333333), then round-tripped through parseFloat to drop the
+	// trailing zeros toPrecision pads on — 1 stays "1", not "1.00000000000".
+	function toEditableValue(value: number): string {
+		return String(parseFloat(value.toPrecision(12)));
+	}
+
+	// The capped string is display only. Since recalculate() reads the input field,
+	// capping alone would also cap the calculation and drift at the 12th digit
+	// (molar mass 3 came back as 0.999999999999 instead of 1). So pin the pair on
+	// restore and read the uncapped number back for as long as the field still
+	// shows exactly the string we wrote — any edit changes it and retires the pin.
+	const displayPins = new Map<HTMLInputElement, { shown: string; value: number }>();
+
+	function readFieldNumber(input: HTMLInputElement | null): number {
+		const raw = input?.value ?? '';
+		const pin = input ? displayPins.get(input) : undefined;
+		return pin && pin.shown === raw ? pin.value : parseFloat(raw);
+	}
+
 	// Generic role assignment — replaces what used to be two mirrored mass-specific/
 	// moles-specific branches. Molar Mass never calls this: it's permanently 'input',
 	// fixed in #input-slot-a, and isn't part of this state machine at all.
@@ -608,8 +629,13 @@ import Layout from '../layouts/Layout.astro';
 				// from the number (not re-parsing the rounded string) keeps a back-and-
 				// forth toggle lossless. null means the result was empty — leave the
 				// field empty rather than inventing a value.
-				if (refs.rawResult !== null) refs.input.value = String(refs.rawResult);
+				if (refs.rawResult !== null) {
+					const shown = toEditableValue(refs.rawResult);
+					refs.input.value = shown;
+					displayPins.set(refs.input, { shown, value: refs.rawResult });
+				}
 			} else {
+				displayPins.delete(refs.input);
 				refs.input.readOnly = true;
 				refs.input.className = READONLY_RESULT_CLASS;
 				refs.input.style.lineHeight = "1.2";
@@ -775,7 +801,7 @@ import Layout from '../layouts/Layout.astro';
 
 		if (currentMode === 'g_to_mol') {
 			const rawMass = massInput?.value ?? '';
-			const massVal = parseFloat(rawMass);
+			const massVal = readFieldNumber(massInput);
 
 			// Mass validation: must be non-negative
 			if (rawMass.trim() !== '' && (isNaN(massVal) || massVal < 0)) {
@@ -816,7 +842,7 @@ import Layout from '../layouts/Layout.astro';
 			setResultTextState(particleCountVal, true, 'text-ink');
 		} else {
 			const rawMoles = molesInput?.value ?? '';
-			const molesVal = parseFloat(rawMoles);
+			const molesVal = readFieldNumber(molesInput);
 
 			// Moles validation: must be non-negative
 			if (rawMoles.trim() !== '' && (isNaN(molesVal) || molesVal < 0)) {
