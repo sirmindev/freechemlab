@@ -430,7 +430,7 @@ test.describe('Element tile – selection model', () => {
       .toBe('rgb(2, 97, 62)'); // primary, still
   });
 
-  test('hovering + fills its painted box', async ({ page }) => {
+  test('hovering + fills a circle with the primary-soft tint', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
 
@@ -444,7 +444,48 @@ test.describe('Element tile – selection model', () => {
 
     await expect
       .poll(() => plusBox.evaluate(n => getComputedStyle(n).backgroundColor))
-      .toBe('rgb(232, 230, 223)'); // surface-4
+      .toBe('rgb(220, 238, 228)'); // primary-soft
+    // Circular, not the square box it replaced — the shape is a design
+    // decision, so it gets asserted rather than left to the fill alone.
+    const box = await plusBox.boundingBox();
+    expect(await plusBox.evaluate(n => getComputedStyle(n).borderRadius)).toBe('50%');
+    expect(box?.width).toBe(24);
+    expect(box?.height).toBe(24);
+  });
+
+  test('hovering − fills a neutral circle, distinct from +', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await tile.locator('button').first().click();
+
+    const minusBox = tile.locator('[data-step="minus"] > span');
+    expect(await minusBox.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+
+    await tile.locator('[data-step="minus"]').hover();
+
+    await expect
+      .poll(() => minusBox.evaluate(n => getComputedStyle(n).backgroundColor))
+      .toBe('rgb(232, 230, 223)'); // surface-4 — neutral, not the green tint
+    expect(await minusBox.evaluate(n => getComputedStyle(n).borderRadius)).toBe('50%');
+  });
+
+  test('the stepper has no container border or fill of its own', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await tile.locator('button').first().click();
+
+    const stepper = tile.locator('[data-step="minus"]').locator('..');
+    const s = await stepper.evaluate(n => {
+      const c = getComputedStyle(n);
+      return { border: c.borderTopWidth, bg: c.backgroundColor, padding: c.padding };
+    });
+    expect(s.border).toBe('0px');
+    expect(s.bg).toBe('rgba(0, 0, 0, 0)');
+    expect(s.padding).toBe('0px');
   });
 
   test('selected state is border-only — background does not change', async ({ page }) => {
