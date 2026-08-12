@@ -505,17 +505,6 @@ import Layout from '../layouts/Layout.astro';
 		border-top: 0.5px solid var(--color-hairline-soft);
 	}
 
-	/* Browse Elements scroll area: hide the native scrollbar so it consumes zero
-	   layout width. Native scrollbar width is not controllable across browsers —
-	   Chrome/Edge reserve 15px, which cost the grid a whole column. Zero is the
-	   only width that is identical everywhere. Scrolling itself is untouched:
-	   wheel, trackpad and keyboard all still work. See DESIGN.md. */
-	.element-grid-scroll {
-		scrollbar-width: none;              /* Firefox + standards track */
-	}
-	.element-grid-scroll::-webkit-scrollbar {
-		display: none;                      /* Chromium + Safari */
-	}
 	@media (min-width: 520px) {
 		.field-row {
 			flex-direction: row;
@@ -1024,6 +1013,7 @@ import Layout from '../layouts/Layout.astro';
 
 	const elementSearch = document.getElementById('element-search') as HTMLInputElement | null;
 	const elementGrid = document.getElementById('element-grid');
+	const elementGridScroll = document.querySelector('.element-grid-scroll');
 	const elementGridEmpty = document.getElementById('element-grid-empty');
 	const customFormula = document.getElementById('custom-formula');
 	const customMolarMassVal = document.getElementById('custom-molar-mass-val');
@@ -1220,12 +1210,31 @@ import Layout from '../layouts/Layout.astro';
 	// so identical controls antialias differently from column to column. Solve
 	// for whole-pixel columns and gaps instead, keeping the count responsive.
 	const GRID_MIN_COL = 222;    // "Molybdenum" + mounted stepper — see DESIGN.md
-	const GRID_TARGET_COL = 252; // design intent; 3 × 252 + 2 × 8 = 772 exactly
+	const GRID_TARGET_COL = 244; // design intent; 3 × 244 + 2 × 12 = 756 exactly
 	const GRID_MIN_GAP = 8;
+	// The wrapper is overflow-y:auto, so Chrome/Edge take a classic 15px
+	// scrollbar out of its clientWidth and the grid drops a whole column.
+	// Measure the wrapper's border box instead — that width is the same with
+	// a classic scrollbar, an overlay scrollbar or none — and subtract a fixed
+	// reserve. Below the mobile breakpoint scrollbars are overlay, so the
+	// reserve buys nothing and only costs tile width. See DESIGN.md.
+	const SCROLLBAR_RESERVE = 16;
+	const RESERVE_MIN_VIEWPORT = 520;
 
 	function layoutElementGrid() {
-		if (!elementGrid) return;
-		const w = Math.floor(elementGrid.getBoundingClientRect().width);
+		if (!elementGrid || !elementGridScroll) return;
+		const cs = getComputedStyle(elementGridScroll);
+		const inner = elementGridScroll.getBoundingClientRect().width
+			- parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth)
+			- parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+		const reserve = window.matchMedia(`(min-width: ${RESERVE_MIN_VIEWPORT}px)`).matches
+			? SCROLLBAR_RESERVE : 0;
+		// Clamp to the real content box as a safety net: below the breakpoint there
+		// is no reserve, and a *desktop* window narrowed under it still has a
+		// classic scrollbar. Without the clamp the grid overflows by exactly the
+		// scrollbar's width. At and above the breakpoint the clamp only binds if a
+		// platform's scrollbar is wider than the reserve.
+		const w = Math.min(Math.floor(inner) - reserve, elementGridScroll.clientWidth);
 		if (w <= 0) return; // panel collapsed
 
 		let n = Math.max(1, Math.floor((w + GRID_MIN_GAP) / (GRID_TARGET_COL + GRID_MIN_GAP)));
@@ -1235,22 +1244,41 @@ import Layout from '../layouts/Layout.astro';
 		let colW = n === 1 ? w : Math.floor((w - (n - 1) * GRID_MIN_GAP) / n);
 		let gap = GRID_MIN_GAP;
 		if (n > 1) {
-			// Walk the column width down until the leftover splits evenly across
-			// the gaps, so the slack lands in the gaps and never in the columns.
-			for (let c = colW; c > GRID_MIN_COL; c--) {
+			// Largest pair where the column and the gap are both multiples of 4
+			// and together fill the width exactly.
+			let found = false;
+			for (let c = colW - (colW % 4); c >= GRID_MIN_COL; c -= 4) {
 				const rem = w - n * c;
-				if (rem % (n - 1) === 0 && rem / (n - 1) >= GRID_MIN_GAP) {
+				const g = rem / (n - 1);
+				if (Number.isInteger(g) && g >= GRID_MIN_GAP && g % 4 === 0) {
 					colW = c;
-					gap = rem / (n - 1);
+					gap = g;
+					found = true;
 					break;
 				}
 			}
+			// No 4pt pair fits this width: fall back to integer-exact, walking the
+			// column down until the leftover splits evenly across the gaps, so the
+			// slack lands in the gaps and never in the columns.
+			if (!found) {
+				for (let c = colW; c > GRID_MIN_COL; c--) {
+					const rem = w - n * c;
+					if (rem % (n - 1) === 0 && rem / (n - 1) >= GRID_MIN_GAP) {
+						colW = c;
+						gap = rem / (n - 1);
+						break;
+					}
+				}
+			}
 		}
+		// Pin the width so the result is the computed value, not whatever the
+		// parent happens to offer once the scrollbar appears.
+		elementGrid.style.width = `${w}px`;
 		elementGrid.style.gridTemplateColumns = `repeat(${n}, ${colW}px)`;
 		elementGrid.style.columnGap = `${gap}px`;
 	}
 
-	if (elementGrid) new ResizeObserver(layoutElementGrid).observe(elementGrid);
+	if (elementGridScroll) new ResizeObserver(layoutElementGrid).observe(elementGridScroll);
 
 	// --- Formula bar ---
 	function updateFormulaBar() {
