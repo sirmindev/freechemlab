@@ -343,7 +343,7 @@ import Layout from '../layouts/Layout.astro';
 							/>
 
 							<!-- Element Grid -->
-							<div class="max-h-[320px] overflow-y-auto rounded-[8px] pr-0.5 mb-4">
+							<div class="element-grid-scroll max-h-[320px] overflow-y-auto rounded-[8px] mb-4">
 								<!-- Columns are computed to whole pixels by layoutElementGrid() -->
 								<div id="element-grid" class="grid gap-2">
 									<!-- Rendered by JS -->
@@ -503,6 +503,18 @@ import Layout from '../layouts/Layout.astro';
 	}
 	.field-half-divider {
 		border-top: 0.5px solid var(--color-hairline-soft);
+	}
+
+	/* Browse Elements scroll area: hide the native scrollbar so it consumes zero
+	   layout width. Native scrollbar width is not controllable across browsers —
+	   Chrome/Edge reserve 15px, which cost the grid a whole column. Zero is the
+	   only width that is identical everywhere. Scrolling itself is untouched:
+	   wheel, trackpad and keyboard all still work. See DESIGN.md. */
+	.element-grid-scroll {
+		scrollbar-width: none;              /* Firefox + standards track */
+	}
+	.element-grid-scroll::-webkit-scrollbar {
+		display: none;                      /* Chromium + Safari */
 	}
 	@media (min-width: 520px) {
 		.field-row {
@@ -1208,7 +1220,7 @@ import Layout from '../layouts/Layout.astro';
 	// so identical controls antialias differently from column to column. Solve
 	// for whole-pixel columns and gaps instead, keeping the count responsive.
 	const GRID_MIN_COL = 222;    // "Molybdenum" + mounted stepper — see DESIGN.md
-	const GRID_TARGET_COL = 250; // design intent
+	const GRID_TARGET_COL = 252; // design intent; 3 × 252 + 2 × 8 = 772 exactly
 	const GRID_MIN_GAP = 8;
 
 	function layoutElementGrid() {
