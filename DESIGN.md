@@ -567,7 +567,9 @@ The stepper is **always visible**, in both states — it no longer appears on se
 
 The resting 1 is a display default, so it must not be exposed to assistive tech as a live value: while unselected, the count is `aria-hidden` and the − button carries a real `disabled`. **Do not disable the stepper as a whole** — + is the control that selects, so it must stay live in both states. Marking the container `aria-disabled` silently disables + along with −, which is both wrong for assistive tech and, because it makes the button non-actionable, wrong for automation.
 
-Selected state is carried by `aria-pressed` on the tile body — the green border is not a signal a screen reader can see.
+Selected state is carried by **`aria-current="true"`** on the tile body, present only while selected and removed otherwise — the green border is not a signal a screen reader can see.
+
+**Do not use `aria-pressed` here, and do not "fix" the tile to justify it.** `aria-pressed` declares a toggle button: repeated activation is expected to alternate state. The tile body's behavior is one-directional — clicking it only ever selects, and the *only* way back out is the stepper's − at a count of 1 (the cart pattern above). `aria-pressed="true"` on a control that never un-presses on re-activation misdescribes the interaction to anyone navigating by assistive tech. `aria-current` states "this is in the current selection" without promising togglability, which is what the tile actually offers. The page's other `aria-current` uses carry the value `page` inside navigation landmarks; the grid's use of `true` is a separate set and does not collide with them.
 
 ### Inputs & Validation
 

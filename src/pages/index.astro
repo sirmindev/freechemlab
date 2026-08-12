@@ -1133,7 +1133,13 @@ import Layout from '../layouts/Layout.astro';
 				const selected = qty > 0;
 				card.classList.toggle('border-brand-green', selected);
 				card.classList.toggle('border-hairline', !selected);
-				body.setAttribute('aria-pressed', String(selected));
+				// aria-current, not aria-pressed: body-click only ever selects,
+				// so toggle-button semantics would misdescribe it. See DESIGN.md.
+				if (selected) {
+					body.setAttribute('aria-current', 'true');
+				} else {
+					body.removeAttribute('aria-current');
+				}
 				// Only minus is inert while unselected — plus is how you select
 				// and increment, so the stepper as a whole is never aria-disabled.
 				minusBtn.disabled = !selected;

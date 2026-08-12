@@ -347,7 +347,7 @@ test.describe('Element tile – selection model', () => {
     await expect(tile.locator('[data-step]')).toHaveCount(2);
     await expect(tile.getByText('1', { exact: true })).toBeVisible();
     // ...but nothing has been added to the formula
-    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'false');
+    await expect(tile.locator('button').first()).not.toHaveAttribute('aria-current');
     await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
   });
 
@@ -372,7 +372,7 @@ test.describe('Element tile – selection model', () => {
     const tile = hTile(page);
     await tile.locator('button').first().click();
 
-    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
     await expect(tile.locator('[data-step="minus"]')).toBeEnabled();
     // Count stays at 1 — the body click selects, it does not step
     const mass = await page.locator('#custom-molar-mass-val').textContent();
@@ -386,7 +386,7 @@ test.describe('Element tile – selection model', () => {
     const tile = hTile(page);
     await tile.locator('[data-step="plus"]').click();
 
-    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
     // 2 × 1.008 — proves the count landed on 2, not 1
     const mass = await page.locator('#custom-molar-mass-val').textContent();
     expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(2.016, 2);
@@ -398,12 +398,12 @@ test.describe('Element tile – selection model', () => {
 
     const tile = hTile(page);
     await tile.locator('button').first().click(); // selected, count 1
-    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
 
     await tile.locator('[data-step="minus"]').click();
 
     // Deselected, removed from the formula, display back to its resting 1
-    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'false');
+    await expect(tile.locator('button').first()).not.toHaveAttribute('aria-current');
     await expect(tile.locator('[data-step="minus"]')).toBeDisabled();
     await expect(tile.getByText('1', { exact: true })).toBeVisible();
     await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
@@ -417,7 +417,7 @@ test.describe('Element tile – selection model', () => {
     await tile.locator('[data-step="plus"]').click(); // count 2
     await tile.locator('[data-step="minus"]').click(); // back to 1
 
-    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
     const mass = await page.locator('#custom-molar-mass-val').textContent();
     expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
   });
