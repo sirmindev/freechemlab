@@ -595,19 +595,22 @@ import Layout from '../layouts/Layout.astro';
 	const MOLES_EDITABLE_PLACEHOLDER = "e.g. 0.05";
 	const RESULT_PLACEHOLDER = "0.000000";
 
-	// Renders a restored result for display in an editable field: capped to 12
-	// significant digits so a non-terminating value doesn't expose its full float
-	// (0.3333333333333333), then round-tripped through parseFloat to drop the
-	// trailing zeros toPrecision pads on — 1 stays "1", not "1.00000000000".
+	// Renders a restored result for display in an editable field. Goes through
+	// format6Decimals so a restored value reads the same as every other computed
+	// number in the app (Molar Mass excepted — that's a raw typed echo, never
+	// reformatted), then round-trips via parseFloat to drop the zeros it pads on,
+	// keeping 1 as "1" rather than "1.000000". Rounding here is safe only because
+	// the pin below preserves the full float for calculation.
 	function toEditableValue(value: number): string {
-		return String(parseFloat(value.toPrecision(12)));
+		return String(parseFloat(format6Decimals(value)));
 	}
 
-	// The capped string is display only. Since recalculate() reads the input field,
-	// capping alone would also cap the calculation and drift at the 12th digit
-	// (molar mass 3 came back as 0.999999999999 instead of 1). So pin the pair on
-	// restore and read the uncapped number back for as long as the field still
-	// shows exactly the string we wrote — any edit changes it and retires the pin.
+	// The displayed string is display only. Since recalculate() reads the input
+	// field, rounding alone would also round the calculation and reintroduce drift
+	// (molar mass 3 came back as 0.999999999999 when the field was the only copy).
+	// So pin the UNROUNDED float against the shortened string and read the number
+	// back for as long as the field still shows exactly what we wrote — any edit
+	// changes it and retires the pin.
 	const displayPins = new Map<HTMLInputElement, { shown: string; value: number }>();
 
 	function readFieldNumber(input: HTMLInputElement | null): number {
