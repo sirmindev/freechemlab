@@ -344,7 +344,8 @@ import Layout from '../layouts/Layout.astro';
 
 							<!-- Element Grid -->
 							<div class="max-h-[320px] overflow-y-auto rounded-[8px] pr-0.5 mb-4">
-								<div id="element-grid" class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-2">
+								<!-- Columns are computed to whole pixels by layoutElementGrid() -->
+								<div id="element-grid" class="grid gap-2">
 									<!-- Rendered by JS -->
 								</div>
 							</div>
@@ -1098,7 +1099,7 @@ import Layout from '../layouts/Layout.astro';
 				<span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xs bg-surface-4 font-sans text-base font-medium leading-none text-ink">${el.symbol}</span>
 				<span class="flex min-w-0 flex-col gap-1">
 					<span class="truncate font-sans text-sm leading-none text-ink">${el.name}</span>
-					<span class="font-mono text-xs font-medium leading-none text-ink-muted">${el.atomicWeight}</span>
+					<span class="font-mono text-xs font-medium leading-none text-ink-subtle">${el.atomicWeight}</span>
 				</span>
 			`;
 
@@ -1200,6 +1201,44 @@ import Layout from '../layouts/Layout.astro';
 			elementGrid.appendChild(card);
 		});
 	}
+
+	// --- Element grid column math ---
+	// `1fr` resolves to a fractional width (770 / 3 = 251.328125), and each
+	// column inherits a different sub-pixel remainder (.3281 / .6563 / .9844),
+	// so identical controls antialias differently from column to column. Solve
+	// for whole-pixel columns and gaps instead, keeping the count responsive.
+	const GRID_MIN_COL = 222;    // "Molybdenum" + mounted stepper — see DESIGN.md
+	const GRID_TARGET_COL = 250; // design intent
+	const GRID_MIN_GAP = 8;
+
+	function layoutElementGrid() {
+		if (!elementGrid) return;
+		const w = Math.floor(elementGrid.getBoundingClientRect().width);
+		if (w <= 0) return; // panel collapsed
+
+		let n = Math.max(1, Math.floor((w + GRID_MIN_GAP) / (GRID_TARGET_COL + GRID_MIN_GAP)));
+		// Never let a column fall under the width at which the longest name truncates
+		while (n > 1 && Math.floor((w - (n - 1) * GRID_MIN_GAP) / n) < GRID_MIN_COL) n--;
+
+		let colW = n === 1 ? w : Math.floor((w - (n - 1) * GRID_MIN_GAP) / n);
+		let gap = GRID_MIN_GAP;
+		if (n > 1) {
+			// Walk the column width down until the leftover splits evenly across
+			// the gaps, so the slack lands in the gaps and never in the columns.
+			for (let c = colW; c > GRID_MIN_COL; c--) {
+				const rem = w - n * c;
+				if (rem % (n - 1) === 0 && rem / (n - 1) >= GRID_MIN_GAP) {
+					colW = c;
+					gap = rem / (n - 1);
+					break;
+				}
+			}
+		}
+		elementGrid.style.gridTemplateColumns = `repeat(${n}, ${colW}px)`;
+		elementGrid.style.columnGap = `${gap}px`;
+	}
+
+	if (elementGrid) new ResizeObserver(layoutElementGrid).observe(elementGrid);
 
 	// --- Formula bar ---
 	function updateFormulaBar() {

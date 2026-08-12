@@ -504,6 +504,34 @@ test.describe('Element tile – selection model', () => {
     expect(s.padding).toBe('0px');
   });
 
+  test('grid columns and gaps resolve to whole pixels', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const geo = await page.evaluate(() => {
+      const g = document.getElementById('element-grid')!;
+      const tiles = [...g.querySelectorAll('div[data-symbol]')];
+      const cs = getComputedStyle(g);
+      return {
+        widths: [...new Set(tiles.map(t => t.getBoundingClientRect().width))],
+        startFractions: [...new Set(tiles.map(t => +(t.getBoundingClientRect().x % 1).toFixed(4)))],
+        columnGap: parseFloat(cs.columnGap),
+      };
+    });
+
+    // One uniform column width, and it is a whole pixel
+    expect(geo.widths).toHaveLength(1);
+    expect(Number.isInteger(geo.widths[0])).toBe(true);
+    // Wide enough that the longest name still fits with the stepper mounted
+    expect(geo.widths[0]).toBeGreaterThanOrEqual(222);
+    // Every column starts on the same pixel boundary. This is the assertion
+    // that matters: `1fr` gave each column a different sub-pixel remainder
+    // (.3281 / .6563 / .9844), so identical controls antialiased differently
+    // from column to column.
+    expect(geo.startFractions).toHaveLength(1);
+    expect(Number.isInteger(geo.columnGap)).toBe(true);
+  });
+
   test('selected state is border-only — background does not change', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
