@@ -1113,17 +1113,19 @@ import Layout from '../layouts/Layout.astro';
 				btn.type = 'button';
 				btn.dataset.step = kind;
 				btn.setAttribute('aria-label', `${kind === 'plus' ? 'Increase' : 'Decrease'} ${el.name} quantity`);
-				btn.className = 'group flex shrink-0 items-center justify-center p-2 md:p-0 cursor-pointer focus:outline-none';
+				btn.className = 'group flex shrink-0 items-center justify-center p-2.5 md:p-0 cursor-pointer focus:outline-none';
 				btn.innerHTML = `
-					<span class="flex h-7 w-7 items-center justify-center rounded-xxs text-ink-muted transition-colors group-hover:bg-surface-4">
-						<span class="flex h-6 w-6 items-center justify-center">${glyph}</span>
+					<span class="flex h-6 w-6 items-center justify-center rounded-xxs text-ink-muted transition-colors group-hover:bg-surface-4">
+						<span class="flex h-5 w-5 items-center justify-center">${glyph}</span>
 					</span>
 				`;
 				return btn;
 			}
 
-			const minusBtn = stepButton('minus', '<svg width="15.5" height="1.5" viewBox="0 0 15.5 1.5" fill="none"><path d="M0.75 0.75H14.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>');
-			const plusBtn = stepButton('plus', '<svg width="15.5" height="15.5" viewBox="0 0 15.5 15.5" fill="none"><path d="M7.75 0.75V14.75M0.75 7.75H14.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>');
+			// Exported Figma glyphs scaled to 12px (13.3 / 15.5 = 0.858). stroke-width
+			// is raised to 1.75 so it still renders at 1.5px: 1.75 × 0.858 = 1.50.
+			const minusBtn = stepButton('minus', '<svg width="13.3" height="1.29" viewBox="0 0 15.5 1.5" fill="none"><path d="M0.75 0.75H14.75" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" /></svg>');
+			const plusBtn = stepButton('plus', '<svg width="13.3" height="13.3" viewBox="0 0 15.5 15.5" fill="none"><path d="M7.75 0.75V14.75M0.75 7.75H14.75" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" /></svg>');
 
 			const qtyDisplay = document.createElement('span');
 			qtyDisplay.className = 'min-w-[12px] text-center font-mono text-sm font-medium leading-none text-ink select-none';
@@ -1135,6 +1137,9 @@ import Layout from '../layouts/Layout.astro';
 				const selected = qty > 0;
 				card.classList.toggle('border-brand-green', selected);
 				card.classList.toggle('border-hairline', !selected);
+				// Hover feedback is unselected-only: the hover variant outranks
+				// the green border, so leaving it on would grey out a selected tile.
+				card.classList.toggle('hover:border-hairline-strong', !selected);
 				// aria-current, not aria-pressed: body-click only ever selects,
 				// so toggle-button semantics would misdescribe it. See DESIGN.md.
 				if (selected) {

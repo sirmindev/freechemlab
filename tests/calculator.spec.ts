@@ -380,6 +380,9 @@ test.describe('Element tile – selection model', () => {
     // Stepper gone, tile back to its default appearance, out of the formula
     await expect(tile.locator('[data-step]')).toHaveCount(0);
     await expect(tile.locator('button').first()).not.toHaveAttribute('aria-current');
+    // Move off the tile first: clicking leaves the pointer on it, and the tile
+    // hover state would legitimately report hairline-strong instead of hairline.
+    await page.mouse.move(0, 0);
     await expect
       .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
       .toBe('rgb(229, 226, 218)');
@@ -400,6 +403,48 @@ test.describe('Element tile – selection model', () => {
     await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
     const mass = await page.locator('#custom-molar-mass-val').textContent();
     expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
+  });
+
+  test('hovering an unselected tile strengthens its border, without a fill', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await expect
+      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
+      .toBe('rgb(229, 226, 218)'); // hairline
+
+    await tile.hover();
+
+    await expect
+      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
+      .toBe('rgb(211, 207, 195)'); // hairline-strong
+    // Hover is border-only — no fill, same as the selected state
+    expect(await tile.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgb(255, 255, 255)');
+
+    // A selected tile must NOT fall back to the neutral hover border
+    await tile.locator('button').first().click();
+    await tile.hover();
+    await expect
+      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
+      .toBe('rgb(2, 97, 62)'); // primary, still
+  });
+
+  test('hovering + fills its painted box', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await tile.locator('button').first().click(); // stepper only exists once selected
+
+    const plusBox = tile.locator('[data-step="plus"] > span');
+    expect(await plusBox.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+
+    await tile.locator('[data-step="plus"]').hover();
+
+    await expect
+      .poll(() => plusBox.evaluate(n => getComputedStyle(n).backgroundColor))
+      .toBe('rgb(232, 230, 223)'); // surface-4
   });
 
   test('selected state is border-only — background does not change', async ({ page }) => {

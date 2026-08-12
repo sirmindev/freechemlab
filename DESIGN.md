@@ -257,6 +257,13 @@ components:
     gap: "{spacing.xs}"
     minHeight: "56px"
     border: "1px solid {colors.hairline}"
+  element-tile-hover:
+    backgroundColor: "{colors.surface-1}"
+    rounded: "{rounded.md}"
+    padding: "{spacing.xs}"
+    gap: "{spacing.xs}"
+    minHeight: "56px"
+    border: "1px solid {colors.hairline-strong}"
   element-tile-selected:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
@@ -280,12 +287,14 @@ components:
     backgroundColor: "transparent"
     iconColor: "{colors.ink-muted}"
     rounded: "{rounded.xxs}"
-    size: "28px"
+    size: "24px"
+    touchPadding: "10px"
   element-tile-stepper-button-hover:
     backgroundColor: "{colors.surface-4}"
     iconColor: "{colors.ink-muted}"
     rounded: "{rounded.xxs}"
-    size: "28px"
+    size: "24px"
+    touchPadding: "10px"
 
   text-input:
     backgroundColor: "{colors.surface-1}"
@@ -367,7 +376,7 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 - **Surface 3** (`{colors.surface-3}` #EFEDE7): Three steps — currently unused since the "···" overflow reveal panel it backed was removed (all units now render inline). Reserved.
 - **Surface 4** (`{colors.surface-4}` #E8E6DF): Four steps — deepest lift. Backs the element tile's symbol chip (`element-tile-symbol`) and the hover fill on the tile's stepper buttons (`element-tile-stepper-button-hover`). These are its only consumers. Both sit *inside* a `{colors.surface-1}` tile, so here the step reads as a recess against white rather than a lift — this is the one place the ladder inverts, and it is intentional: the symbol chip and the hover fill are insets within a card, not cards of their own.
 - **Hairline** (`{colors.hairline}` #E5E2DA): Default 0.5px borders on cards, inputs, and dividers.
-- **Hairline Strong** (`{colors.hairline-strong}` #D3CFC3): Emphasized dividers.
+- **Hairline Strong** (`{colors.hairline-strong}` #D3CFC3): Emphasized dividers, and the hover border on an unselected element tile — one neutral step up from `{colors.hairline}`, enough to read as "this responds" without borrowing the selected state's meaning.
 - **Hairline Tertiary** (`{colors.hairline-tertiary}` #C4C0B2): Nested/tertiary borders inside the element grid.
 
 ### Text
@@ -434,7 +443,8 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 - Single-column page, max content width ~880px. This is a calculator, not a dashboard — it should not sprawl.
 - Molar Mass and the current second input render side by side at desktop, each at `flex: 1`.
 - The element grid inside Browse Elements is **not** a fixed column count. It is `repeat(auto-fill, minmax(240px, 1fr))`, so the column count falls out of the available width — 3-up in the ~770px panel at desktop, dropping to 2-up and 1-up as the panel narrows.
-- The 240px floor is set by the widest *selected* tile, not by taste. Measured at the reduced type sizes: 2px border + 16px padding + 32px chip + 8px + **85px** ("Molybdenum" at 14px, the longest name in the 63-element dataset) + 8px gap + 82px stepper = **233px**. The unselected tile needs only ~151px, but sizing to that would make every tile truncate the moment it is selected, so the floor is set by the selected case.
+- The 240px floor is set by the widest *selected* tile, not by taste. Measured empirically rather than derived: with "Molybdenum" (the longest name in the 63-element dataset) selected, the name begins to truncate once the column falls **below 228px**. The panel delivers 251.3px, leaving **23.3px of headroom**. The unselected tile needs far less, but sizing to that would make every tile truncate the moment it is selected, so the floor is set by the selected case.
+- Measure this by narrowing the column until `scrollWidth > clientWidth` on the name, not by summing the parts. The name span reports its *content* width whenever there is room to spare, so reading its rendered width tells you nothing about remaining headroom — that mistake made an 8px gain look like no gain at all.
 - **4-up does not fit and cannot be made to fit by shrinking type.** At 4-up the panel yields 186.5px columns, of which the fixed furniture (chip, stepper, padding, gaps) consumes 152px, leaving **34.5px** for the name against the 85px it needs. Fitting "Molybdenum" into 34.5px requires roughly a 5.7px font — less than half the system's 12px floor. Even deleting the stepper's border and shrinking it to 60px only buys a 9.3px font. 4-up needs a grid about **924px** wide; this panel is **770px**. The 4-column mockup is drawn on a wider canvas than the app's actual panel and only ever shows "Hydrogen", which is 62px — comfortably inside a width that "Molybdenum" overruns by 23px.
 - If the column rule is ever revisited, measure against **"Molybdenum" with the stepper mounted**, not against "Hydrogen" and not against the unselected tile. Sizing to either of those is exactly the error that produced a 5-up, then a 3-up, then a 4-up estimate that each failed on contact with real content.
 
@@ -545,17 +555,20 @@ The tile is a **horizontal** row, not a centered stack. Left to right: symbol ch
 - **`element-tile-symbol`** — a 32×32px chip, not bare bold text on the card. Background `{colors.surface-4}`, rounded `{rounded.xs}`, symbol centered in `{typography.element-symbol}` / `{colors.ink}`.
   - **Never apply `text-transform: uppercase` to the symbol.** The source design marks it uppercase, but only ever renders `H` — a single-letter symbol where the transform is invisible. Applied to the real dataset it produces `HE`, `NA`, `MG`, which are not chemical symbols; the case of the second letter is meaningful notation, not styling. Symbols render exactly as stored.
 - **Name + mass** — stacked, **left-aligned**, 4px gap, immediately right of the chip at `{spacing.sm}` 12px. Name in `{typography.element-name}` / `{colors.ink}`; atomic mass in `{typography.element-mass}` / `{colors.ink-muted}`. Neither is `{colors.ink-tertiary}` any more — the horizontal layout gives them enough room to carry full contrast. The name truncates with an ellipsis rather than wrapping or pushing the stepper out of the tile; at the documented column widths it does not truncate for any element in the dataset.
-- **`element-tile-stepper`** — its own bordered component at the right edge, present only while selected: `{colors.surface-1}`, rounded `{rounded.xs}`, 1px `{colors.hairline}`, `{spacing.xxs}` padding, 2px gap, stretched to the tile's inner height. Holds − / count / +. Count in `{typography.element-count}` / `{colors.ink}`. Renders 82px wide.
+- **`element-tile-stepper`** — its own bordered component at the right edge, present only while selected: `{colors.surface-1}`, rounded `{rounded.xs}`, 1px `{colors.hairline}`, `{spacing.xxs}` padding, 2px gap, stretched to the tile's inner height. Holds − / count / +. Count in `{typography.element-count}` / `{colors.ink}`. Renders 74px wide. The count's size is independent of the buttons' — the buttons came down from 28px to 24px without touching it.
+- **Hover (unselected only)**: border shifts from `{colors.hairline}` to `{colors.hairline-strong}`. No fill, no shadow, width stays 1px so nothing reflows. It signals "clickable", not "selected" — which is why it is neutral rather than a lighter green.
 - **Selected**: border only. The background stays `{colors.surface-1}` and the border changes to 1px `{colors.primary}`. Nothing else moves — no fill, no text-color shift.
+- The hover border applies to **unselected tiles only**. A hover variant outranks the resting border-color class, so if it is left active on a selected tile it will grey out the green border on hover — mount and unmount it with the selected state, don't declare it once and forget it.
 
 The selected state is carried by the border alone. This is a deliberate lightening: the previous `{colors.primary-soft}` fill plus recolored text was too heavy for a control that can appear 63 times at once on screen, and it competed with the result value for the eye's attention. Green stays scarce.
 
 The stepper **appears on selection** and unmounts on deselection. It is therefore a second, redundant signal alongside the border — an unselected tile is distinguishable both by its hairline border and by having no stepper at all.
 
 **`element-tile-stepper-button`** — the − and + controls.
-- 28×28px box, rounded `{rounded.xxs}`, transparent at rest, holding a 24×24px icon box with a 14px stroke glyph (1.5px stroke, round caps) in `{colors.ink-muted}`. The glyph keeps its full designed size while the painted box comes down — shrinking a 1.5px stroke reads as a rendering artifact, not as smaller type.
+- 24×24px box, rounded `{rounded.xxs}`, transparent at rest, holding a 20×20px icon box with a **12px** stroke glyph (1.5px stroke, round caps) in `{colors.ink-muted}`.
+- **The stroke stays 1.5px as the glyph shrinks.** The exported SVG is scaled to 13.3 units (13.3 ÷ 15.5 = 0.858, giving a 12px glyph), so its `stroke-width` is raised to **1.75** to compensate: 1.75 × 0.858 = 1.50px rendered. Scaling the glyph without that adjustment thins the stroke to 1.29px, which reads as faded rather than smaller.
 - Hover fills the box with `{colors.surface-4}`. The icon color does not change. **Both buttons take the same hover treatment** — the source file defines it only on +, but an asymmetric hover on a two-button stepper reads as a defect, so − mirrors it.
-- The rest state reserves the hover box's full 28×28 footprint, so hovering fills a background that is already there and never shifts the stepper's layout.
+- The rest state reserves the hover box's full 24×24 footprint, so hovering fills a background that is already there and never shifts the stepper's layout.
 
 **Selection model.** The stepper is **not** rendered until the tile is selected. There is no state in which a stepper is visible on a tile that is not in the formula, so "shows a count" and "is in the formula" are the same condition:
 
@@ -652,7 +665,7 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 - Pills and `toggle-direction` segments: 8px vertical / 12px horizontal padding on desktop (~32px effective height). On touch, padding increases explicitly to 14px vertical / 16px horizontal to clear 44px — this is not automatic from the desktop values.
 - Inputs render at 40px on desktop; 44px on touch.
 - Element tiles hold ≥44px on all viewports.
-- Quantity steppers (− / +) in Build custom paint a 28×28px box at every viewport. The hit area and the painted box are deliberately separate: the `<button>` is a transparent wrapper around a 28×28 inner span that carries the radius and the hover fill. On desktop the wrapper adds no padding (28×28 total); on touch it adds 8px on all sides, giving a 44×44px target while the painted box stays 28×28. The control looks identical at both widths — only the wrapper's padding changes, which is why the fill must live on the inner span and never on the button itself.
+- Quantity steppers (− / +) in Build custom paint a 24×24px box at every viewport. The hit area and the painted box are deliberately separate: the `<button>` is a transparent wrapper around a 24×24 inner span that carries the radius and the hover fill. On desktop the wrapper adds no padding (24×24 total); on touch it adds **10px** on all sides, giving a 44×44px target while the painted box stays 24×24. Measured at a 390px viewport: hit area 44×44, painted box 24×24. The control looks identical at both widths — only the wrapper's padding changes, which is why the fill must live on the inner span and never on the button itself. Shrinking the visual size is always paid for by growing the wrapper's padding, never by letting the target shrink with it.
 - `button-copy`: 44×44px hit area at all viewports, not just touch — the icon itself stays small (16px) inside it.
 - Exception: the `text-input` increment/decrement stepper is ~16×24px total (two 16×12px chevrons), well under 44px. It intentionally matches native OS spinner proportions rather than the hard requirement — see Known Gaps.
 
