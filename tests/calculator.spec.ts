@@ -430,45 +430,61 @@ test.describe('Element tile – selection model', () => {
       .toBe('rgb(2, 97, 62)'); // primary, still
   });
 
-  test('hovering + fills a circle with the primary-soft tint', async ({ page }) => {
-    await goto(page);
-    await openCustomTab(page);
+  // Both buttons must hover identically — same fill, same shape, same size.
+  for (const kind of ['plus', 'minus'] as const) {
+    test(`hovering ${kind} fills a 24px surface-4 circle`, async ({ page }) => {
+      await goto(page);
+      await openCustomTab(page);
 
-    const tile = hTile(page);
-    await tile.locator('button').first().click(); // stepper only exists once selected
+      const tile = hTile(page);
+      await tile.locator('button').first().click(); // stepper only exists once selected
 
-    const plusBox = tile.locator('[data-step="plus"] > span');
-    expect(await plusBox.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+      const box = tile.locator(`[data-step="${kind}"] > span`);
+      expect(await box.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
 
-    await tile.locator('[data-step="plus"]').hover();
+      await tile.locator(`[data-step="${kind}"]`).hover();
 
-    await expect
-      .poll(() => plusBox.evaluate(n => getComputedStyle(n).backgroundColor))
-      .toBe('rgb(220, 238, 228)'); // primary-soft
-    // Circular, not the square box it replaced — the shape is a design
-    // decision, so it gets asserted rather than left to the fill alone.
-    const box = await plusBox.boundingBox();
-    expect(await plusBox.evaluate(n => getComputedStyle(n).borderRadius)).toBe('50%');
-    expect(box?.width).toBe(24);
-    expect(box?.height).toBe(24);
-  });
+      await expect
+        .poll(() => box.evaluate(n => getComputedStyle(n).backgroundColor))
+        .toBe('rgb(232, 230, 223)'); // surface-4 — the same for both buttons
+      expect(await box.evaluate(n => getComputedStyle(n).borderRadius)).toBe('50%');
+      const rect = await box.boundingBox();
+      expect(rect?.width).toBe(24);
+      expect(rect?.height).toBe(24);
+    });
+  }
 
-  test('hovering − fills a neutral circle, distinct from +', async ({ page }) => {
+  test('+ and − glyphs are built identically and sit dead-centre', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
 
     const tile = hTile(page);
     await tile.locator('button').first().click();
 
-    const minusBox = tile.locator('[data-step="minus"] > span');
-    expect(await minusBox.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
+    const geom = await tile.evaluate(n => ['minus', 'plus'].map(k => {
+      const btn = n.querySelector(`[data-step="${k}"]`)!;
+      const circle = btn.querySelector('span')!.getBoundingClientRect();
+      const svg = btn.querySelector('svg')!;
+      const r = svg.getBoundingClientRect();
+      const p = svg.querySelector('path')!.getBoundingClientRect();
+      return {
+        viewBox: svg.getAttribute('viewBox'),
+        svgBox: [+r.width.toFixed(2), +r.height.toFixed(2)],
+        dx: +((p.x + p.width / 2) - (circle.x + circle.width / 2)).toFixed(2),
+        dy: +((p.y + p.height / 2) - (circle.y + circle.height / 2)).toFixed(2),
+      };
+    }));
+    const [minus, plus] = geom;
 
-    await tile.locator('[data-step="minus"]').hover();
-
-    await expect
-      .poll(() => minusBox.evaluate(n => getComputedStyle(n).backgroundColor))
-      .toBe('rgb(232, 230, 223)'); // surface-4 — neutral, not the green tint
-    expect(await minusBox.evaluate(n => getComputedStyle(n).borderRadius)).toBe('50%');
+    // Same coordinate system and same rendered box — a mismatched viewBox is
+    // what previously clipped the minus stroke to 1.28px against the plus's 1.5px.
+    expect(minus.viewBox).toBe(plus.viewBox);
+    expect(minus.svgBox).toEqual(plus.svgBox);
+    // Both centred in their circle, and centred the same way as each other
+    for (const g of geom) {
+      expect(Math.abs(g.dx)).toBeLessThanOrEqual(0.5);
+      expect(Math.abs(g.dy)).toBeLessThanOrEqual(0.5);
+    }
   });
 
   test('the stepper has no container border or fill of its own', async ({ page }) => {

@@ -288,14 +288,8 @@ components:
     rounded: "50%"
     size: "24px"
     touchPadding: "10px"
-  element-tile-stepper-button-minus-hover:
+  element-tile-stepper-button-hover:
     backgroundColor: "{colors.surface-4}"
-    iconColor: "{colors.ink-muted}"
-    rounded: "50%"
-    size: "24px"
-    touchPadding: "10px"
-  element-tile-stepper-button-plus-hover:
-    backgroundColor: "{colors.primary-soft}"
     iconColor: "{colors.ink-muted}"
     rounded: "50%"
     size: "24px"
@@ -372,7 +366,7 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 - **Primary Green** (`{colors.primary}` #02613E): Active fills — direction toggle, active unit pills, primary buttons, focused input borders, active tab underline. White text on top (7.4:1 contrast, passes WCAG AAA).
 - **Primary Hover** (`{colors.primary-hover}` #0B7A4F): Lighter green for hover states on green fills.
 - **Primary Pressed** (`{colors.primary-pressed}` #04442C): Darker green for pressed/active states, and for text sitting on `{colors.primary-soft}`.
-- **Primary Soft** (`{colors.primary-soft}` #DCEEE4): The hover fill on the element tile's **+** button — a 24px circle marking increment as the positive action. That is its only consumer. It previously tinted selected element tiles and, before that, the calculated-result field; both now signal state without a fill (see `element-tile-selected` and the Don't about the read-only signal below). Where it backs text rather than an icon, text on top uses `{colors.primary-pressed}`, never white.
+- **Primary Soft** (`{colors.primary-soft}` #DCEEE4): **Currently unused — no consumers.** It previously tinted selected element tiles and, before that, the calculated-result field; both now signal state without a fill (see `element-tile-selected` and the Don't about the read-only signal below). It was also briefly the element tile's **+** hover fill, which was reverted so both stepper buttons hover identically. Retained as a token for a future selected-surface need — text on top would use `{colors.primary-pressed}`, never white.
 
 ### Surface
 - **Canvas** (`{colors.canvas}` #FAF9F5): Page background. Warm off-white, not pure white — the warmth is deliberate and should read as "slightly less clinical," not visibly tinted.
@@ -573,10 +567,10 @@ The stepper **appears on selection** and unmounts on deselection. It is therefor
 **`element-tile-stepper-button`** — the − and + controls.
 - 24×24px box, rounded `{rounded.xxs}`, transparent at rest, holding a 20×20px icon box with a **12px** stroke glyph (1.5px stroke, round caps) in `{colors.ink-muted}`.
 - **The stroke stays 1.5px as the glyph shrinks.** The exported SVG is scaled to 13.3 units (13.3 ÷ 15.5 = 0.858, giving a 12px glyph), so its `stroke-width` is raised to **1.75** to compensate: 1.75 × 0.858 = 1.50px rendered. Scaling the glyph without that adjustment thins the stroke to 1.29px, which reads as faded rather than smaller.
-- Hover fills a **circle** (`border-radius: 50%`) behind the glyph, sized to the same 24px box. The icon color does not change in either state.
-  - **−  hover: `{colors.surface-4}` #E8E6DF** — neutral.
-  - **+ hover: `{colors.primary-soft}` #DCEEE4** — the green tint, marking + as the positive action against −'s neutral one.
-- The two fills are deliberately **matched in lightness and split by hue**, not by weight. #E8E6DF and #DCEEE4 sit at near-identical luminance, so neither button looks heavier than the other; only the temperature differs. `{colors.surface-3}` would have made − visibly weaker than +, and `{colors.hairline-strong}` visibly heavier and dirtier — and reusing `hairline-strong` here would also collide with its new job as the tile's hover *border*. The shape is symmetric; only the hue distinguishes them.
+- **Both glyphs share one square `viewBox` (`0 0 15.5 15.5`) and one rendered box (13.3 × 13.3).** The minus path is literally the plus's horizontal arm (`M0.75 7.75H14.75`), so the two centre identically by construction rather than by coincidence. They also carry `overflow: visible`, because a 1.75-unit stroke overshoots the viewBox at the round caps and would otherwise be shaved.
+- **Never give the minus a viewBox sized to its own ink** (e.g. `0 0 15.5 1.5`). An SVG root clips to its viewBox, so a 1.5-unit-tall box crops a 1.75-unit stroke down to **1.28px** while the plus renders at the full 1.5px — the minus then looks thinner than the plus and the pair reads as misaligned. This shipped once and was not obvious from the markup; it is only visible by measuring the rendered stroke.
+- Hover fills a **circle** (`border-radius: 50%`) behind the glyph, sized to the same 24px box, in `{colors.surface-4}` #E8E6DF. The icon color does not change.
+- **Both buttons hover identically** — same fill, same shape, same size. The only difference between them is the glyph. A green `{colors.primary-soft}` tint on **+** was tried and reverted: an asymmetric hover on a two-button pair reads as one control being special rather than as two halves of the same stepper, and "increment" is not a state the accent is meant to mark. `{colors.surface-3}` and `{colors.hairline-strong}` were also considered and rejected — the former too weak against white, the latter too heavy, and `hairline-strong` now has a different job as the tile's hover *border*.
 - 50% is used literally rather than a radius token. `{rounded.pill}`/`{rounded.full}` (9999px) would render identically on a square box, but the intent here is "circle", not "pill", and the distinction matters if the box ever stops being square.
 - The rest state reserves the hover box's full 24×24 footprint, so hovering fills a background that is already there and never shifts the stepper's layout.
 
@@ -691,7 +685,7 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 2. When adding a container, decide its surface level first. That decision drives everything else.
 3. Default text to `{typography.body-sm}` and numbers to `{typography.input-value}`.
 4. Add new states as separate component entries (`-focused`, `-pressed`, `-error`, `-selected`).
-5. Treat green as scarce. If it appears on a surface that is not active, focused, or a result, it has not earned the role. The one sanctioned exception is the element tile's **+** hover circle, where `{colors.primary-soft}` marks increment as the positive half of a two-button pair — it is transient, 24px, and paired against a neutral − so the contrast carries meaning rather than decoration.
+5. Treat green as scarce. If it appears on a surface that is not active, focused, or a result, it has not earned the role. There are no exceptions — a tint on the **+** stepper button was tried and reverted, because "increment" is not a state the accent is meant to mark.
 6. Any new numeric display inherits DM Mono automatically — this is not optional styling.
 
 ## Known Gaps
@@ -701,5 +695,5 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 - Success and warning semantic states are not defined, since the calculator has no success confirmation or warning condition. Add them only if a real use case appears.
 - The explainer/theory section below the calculator has no component definitions yet — that section's design is deliberately deferred.
 - `{colors.surface-3}` is defined but currently unused — it lost its only consumer when the "···" overflow reveal panel was removed. It exists as headroom, not as a mandate to find a use for it. (`{colors.surface-4}` is no longer in this list; the element tile's symbol chip and stepper hover fill now consume it.)
-- `{colors.primary-soft}` lost its last consumer when the element tile's selected state went border-only, and regained one as the **+** button's hover circle. Do not reach for it to "balance" the tile's *selected* state — that border is the whole signal, by design. Its only sanctioned use is the + hover.
+- `{colors.primary-soft}` is unused. It lost its last consumer when the element tile's selected state went border-only, briefly regained one as the **+** hover circle, and lost it again when both stepper buttons were matched. Kept as a token rather than deleted, since a selected-surface fill is a plausible future need — but do not reach for it to "balance" the tile's selected state, and do not reintroduce it on a single stepper button.
 - The `text-input` stepper's ~16×24px hit area is below the 44px touch-target minimum by design, matching native number-input spinner proportions. This is a deliberate exception to the Touch Targets rule, not an oversight — revisit if usage data shows it's hard to hit on touch devices.

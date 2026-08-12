@@ -1110,26 +1110,32 @@ import Layout from '../layouts/Layout.astro';
 
 			// 24px painted circle at every width; the button pads out to 44px on
 			// touch so the hit area grows without the fill growing with it.
-			function stepButton(kind: 'minus' | 'plus', glyph: string, hoverFill: string) {
+			function stepButton(kind: 'minus' | 'plus', glyph: string) {
 				const btn = document.createElement('button');
 				btn.type = 'button';
 				btn.dataset.step = kind;
 				btn.setAttribute('aria-label', `${kind === 'plus' ? 'Increase' : 'Decrease'} ${el.name} quantity`);
 				btn.className = 'group flex shrink-0 items-center justify-center p-2.5 md:p-0 cursor-pointer focus:outline-none';
 				btn.innerHTML = `
-					<span class="flex h-6 w-6 items-center justify-center rounded-[50%] text-ink-muted transition-colors ${hoverFill}">
+					<span class="flex h-6 w-6 items-center justify-center rounded-[50%] text-ink-muted transition-colors group-hover:bg-surface-4">
 						<span class="flex h-5 w-5 items-center justify-center">${glyph}</span>
 					</span>
 				`;
 				return btn;
 			}
 
-			// Exported Figma glyphs scaled to 12px (13.3 / 15.5 = 0.858). stroke-width
-			// is raised to 1.75 so it still renders at 1.5px: 1.75 × 0.858 = 1.50.
-			// Minus reads neutral, plus reads positive — surface-4 and primary-soft
-			// sit at near-identical lightness, so the pair matches in weight.
-			const minusBtn = stepButton('minus', '<svg width="13.3" height="1.29" viewBox="0 0 15.5 1.5" fill="none"><path d="M0.75 0.75H14.75" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" /></svg>', 'group-hover:bg-surface-4');
-			const plusBtn = stepButton('plus', '<svg width="13.3" height="13.3" viewBox="0 0 15.5 15.5" fill="none"><path d="M7.75 0.75V14.75M0.75 7.75H14.75" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" /></svg>', 'group-hover:bg-primary-soft');
+			// Both glyphs share one square viewBox and one rendered box, so they
+			// centre identically by construction — the minus IS the plus's
+			// horizontal arm. The minus previously used a 1.5-unit-tall viewBox,
+			// which clipped its own 1.75-unit stroke down to 1.28px and made it
+			// visibly thinner than the plus. overflow-visible keeps the round caps
+			// from being shaved at the arm tips.
+			// Scaled to 12px (13.3 / 15.5 = 0.858); stroke-width 1.75 renders at
+			// 1.5px (1.75 × 0.858 = 1.50).
+			const ICON_OPEN = '<svg width="13.3" height="13.3" viewBox="0 0 15.5 15.5" fill="none" class="overflow-visible">';
+			const ICON_ATTRS = 'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"';
+			const minusBtn = stepButton('minus', `${ICON_OPEN}<path d="M0.75 7.75H14.75" ${ICON_ATTRS} /></svg>`);
+			const plusBtn = stepButton('plus', `${ICON_OPEN}<path d="M7.75 0.75V14.75M0.75 7.75H14.75" ${ICON_ATTRS} /></svg>`);
 
 			const qtyDisplay = document.createElement('span');
 			qtyDisplay.className = 'min-w-[12px] text-center font-mono text-sm font-medium leading-none text-ink select-none';
