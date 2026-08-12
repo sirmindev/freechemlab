@@ -295,11 +295,8 @@ test.describe('Browse panel – Build custom', () => {
     const hCard = page.locator('#element-grid > div').filter({ hasText: 'H' }).first();
     await hCard.locator('button').first().click(); // info area click → qty 1
 
-    // Now the stepper should appear; click + once more
-    await page.locator('#element-grid > div').filter({ hasText: 'H' }).first()
-      .locator('button[aria-label]').or(
-        page.locator('#element-grid > div').filter({ hasText: 'H' }).first().locator('button').last()
-      ).click();
+    // Stepper is always present; click + once more to reach 2
+    await hCard.locator('[data-step="plus"]').click();
 
     // Click Oxygen card
     const oCard = page.locator('#element-grid > div').filter({ hasText: 'Oxygen' }).first();
@@ -327,6 +324,125 @@ test.describe('Browse panel – Build custom', () => {
     expect(parseFloat(mmVal)).toBeCloseTo(12.011, 2);
     // Panel collapsed
     await expect(page.locator('#browse-panel')).toBeHidden();
+  });
+});
+
+// ─── 7b. Element Tile – Selection Model ──────────────────────────────────────
+
+test.describe('Element tile – selection model', () => {
+  async function openCustomTab(page: Page) {
+    await page.click('#browse-trigger');
+    await page.click('#tab-custom');
+    await page.waitForSelector('#element-grid button', { state: 'visible' });
+  }
+
+  const hTile = (page: Page) => page.locator('#element-grid > div[data-symbol="H"]');
+
+  test('unselected tile shows a resting 1 but is not in the formula', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    // The stepper is visible without any interaction, showing 1
+    await expect(tile.locator('[data-step]')).toHaveCount(2);
+    await expect(tile.getByText('1', { exact: true })).toBeVisible();
+    // ...but nothing has been added to the formula
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
+  });
+
+  test('minus is inert on an unselected tile', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await expect(tile.locator('[data-step="minus"]')).toBeDisabled();
+    // Plus stays live — it is how an unselected tile gets selected
+    await expect(tile.locator('[data-step="plus"]')).toBeEnabled();
+    // The resting 1 is not announced as a quantity
+    await expect(tile.getByText('1', { exact: true })).toHaveAttribute('aria-hidden', 'true');
+    // Still nothing in the formula
+    await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
+  });
+
+  test('clicking the tile body selects at the shown count, without incrementing', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await tile.locator('button').first().click();
+
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(tile.locator('[data-step="minus"]')).toBeEnabled();
+    // Count stays at 1 — the body click selects, it does not step
+    const mass = await page.locator('#custom-molar-mass-val').textContent();
+    expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
+  });
+
+  test('first + press on an unselected tile selects AND increments, landing on 2', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await tile.locator('[data-step="plus"]').click();
+
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'true');
+    // 2 × 1.008 — proves the count landed on 2, not 1
+    const mass = await page.locator('#custom-molar-mass-val').textContent();
+    expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(2.016, 2);
+  });
+
+  test('minus at a count of 1 clears selection and reverts to the resting 1', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await tile.locator('button').first().click(); // selected, count 1
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'true');
+
+    await tile.locator('[data-step="minus"]').click();
+
+    // Deselected, removed from the formula, display back to its resting 1
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'false');
+    await expect(tile.locator('[data-step="minus"]')).toBeDisabled();
+    await expect(tile.getByText('1', { exact: true })).toBeVisible();
+    await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
+  });
+
+  test('minus at 2 or above decrements and stays selected', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    await tile.locator('[data-step="plus"]').click(); // count 2
+    await tile.locator('[data-step="minus"]').click(); // back to 1
+
+    await expect(tile.locator('button').first()).toHaveAttribute('aria-pressed', 'true');
+    const mass = await page.locator('#custom-molar-mass-val').textContent();
+    expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
+  });
+
+  test('selected state is border-only — background does not change', async ({ page }) => {
+    await goto(page);
+    await openCustomTab(page);
+
+    const tile = hTile(page);
+    const bgBefore = await tile.evaluate(n => getComputedStyle(n).backgroundColor);
+    const borderBefore = await tile.evaluate(n => getComputedStyle(n).borderTopColor);
+
+    await tile.locator('button').first().click();
+
+    // Poll past the 150ms border-color transition
+    await expect
+      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
+      .toBe('rgb(2, 97, 62)');
+    const bgAfter = await tile.evaluate(n => getComputedStyle(n).backgroundColor);
+
+    // Background is untouched white in both states
+    expect(bgBefore).toBe('rgb(255, 255, 255)');
+    expect(bgAfter).toBe('rgb(255, 255, 255)');
+    // Only the border moves, hairline -> primary green
+    expect(borderBefore).toBe('rgb(229, 226, 218)');
   });
 });
 
@@ -401,13 +517,12 @@ test.describe('Touch targets – 44px minimum', () => {
     await page.click('#tab-custom');
     await page.waitForSelector('#element-grid > div', { state: 'visible' });
 
-    // Add one element so steppers appear
+    // Steppers are always rendered; select the first tile anyway so both
+    // the enabled and disabled minus paths are covered by the measurement.
     await page.locator('#element-grid > div').first().locator('button').first().click();
     await page.waitForTimeout(100);
 
-    const stepperButtons = page.locator('#element-grid button').filter({ hasText: '+' }).or(
-      page.locator('#element-grid button').filter({ hasText: '−' })
-    );
+    const stepperButtons = page.locator('#element-grid > div').first().locator('[data-step]');
     const count = await stepperButtons.count();
     expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i++) {

@@ -344,7 +344,7 @@ import Layout from '../layouts/Layout.astro';
 
 							<!-- Element Grid -->
 							<div class="max-h-[320px] overflow-y-auto rounded-[8px] pr-0.5 mb-4">
-								<div id="element-grid" class="grid grid-cols-5 gap-2">
+								<div id="element-grid" class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-2">
 									<!-- Rendered by JS -->
 								</div>
 							</div>
@@ -1084,70 +1084,96 @@ import Layout from '../layouts/Layout.astro';
 		elementGridEmpty?.classList.toggle('hidden', !isEmpty);
 
 		visible.forEach(el => {
-			const qty = quantities.get(el.symbol) ?? 0;
 			const card = document.createElement('div');
-			card.className = [
-				'flex flex-col items-center justify-between rounded-[10px] border transition-all overflow-hidden',
-				qty > 0 ? 'border-brand-green bg-primary-soft' : 'border-hairline bg-surface'
-			].join(' ');
+			card.dataset.symbol = el.symbol;
+			card.className = 'flex items-center justify-between gap-6 rounded-md border bg-surface p-2 transition-colors';
 
-			const infoArea = document.createElement('button');
-			infoArea.type = 'button';
-			infoArea.className = 'w-full flex flex-col items-center pt-3 pb-2 cursor-pointer select-none focus:outline-none';
-			infoArea.innerHTML = `
-				<span class="text-lg font-bold font-mono text-ink leading-tight">${el.symbol}</span>
-				<span class="text-[10px] font-medium text-stone leading-none mt-0.5 truncate w-full text-center px-1">${el.name}</span>
-				<span class="text-[10px] font-mono text-ink-tertiary mt-0.5">${el.atomicWeight}</span>
+			// Tile body — selects at the shown count, without incrementing
+			const body = document.createElement('button');
+			body.type = 'button';
+			body.className = 'flex flex-1 min-w-0 items-center gap-3 text-left cursor-pointer select-none focus:outline-none';
+			body.innerHTML = `
+				<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xs bg-surface-4 font-sans text-2xl font-medium leading-none text-ink">${el.symbol}</span>
+				<span class="flex min-w-0 flex-col gap-1">
+					<span class="truncate font-sans text-base leading-none text-ink">${el.name}</span>
+					<span class="font-mono text-sm font-medium leading-none text-ink-muted">${el.atomicWeight}</span>
+				</span>
 			`;
-			infoArea.addEventListener('click', () => {
-				if (!quantities.has(el.symbol) || quantities.get(el.symbol) === 0) {
-					quantities.set(el.symbol, 1);
-					renderGrid(filter);
-					updateFormulaBar();
-				}
+
+			// Stepper — always visible, in both selected and unselected states
+			const stepper = document.createElement('div');
+			stepper.className = 'flex shrink-0 items-center gap-2 self-stretch rounded-xs border border-hairline bg-surface p-1';
+
+			// 32px painted box at every width; the button pads out to 44px on
+			// touch so the hit area grows without the fill growing with it.
+			function stepButton(kind: 'minus' | 'plus', glyph: string) {
+				const btn = document.createElement('button');
+				btn.type = 'button';
+				btn.dataset.step = kind;
+				btn.setAttribute('aria-label', `${kind === 'plus' ? 'Increase' : 'Decrease'} ${el.name} quantity`);
+				btn.className = 'group flex shrink-0 items-center justify-center p-1.5 md:p-0 cursor-pointer focus:outline-none disabled:pointer-events-none';
+				btn.innerHTML = `
+					<span class="flex h-8 w-8 items-center justify-center rounded-xxs text-ink-muted transition-colors group-hover:bg-surface-4">
+						<span class="flex h-6 w-6 items-center justify-center">${glyph}</span>
+					</span>
+				`;
+				return btn;
+			}
+
+			const minusBtn = stepButton('minus', '<svg width="15.5" height="1.5" viewBox="0 0 15.5 1.5" fill="none"><path d="M0.75 0.75H14.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>');
+			const plusBtn = stepButton('plus', '<svg width="15.5" height="15.5" viewBox="0 0 15.5 15.5" fill="none"><path d="M7.75 0.75V14.75M0.75 7.75H14.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>');
+
+			const qtyDisplay = document.createElement('span');
+			qtyDisplay.className = 'min-w-[16px] text-center font-mono text-base font-medium leading-none text-ink select-none';
+
+			// The resting "1" is a proposal, not a quantity — an unselected tile
+			// shows it but contributes nothing to the formula.
+			function sync() {
+				const qty = quantities.get(el.symbol) ?? 0;
+				const selected = qty > 0;
+				card.classList.toggle('border-brand-green', selected);
+				card.classList.toggle('border-hairline', !selected);
+				body.setAttribute('aria-pressed', String(selected));
+				// Only minus is inert while unselected — plus is how you select
+				// and increment, so the stepper as a whole is never aria-disabled.
+				minusBtn.disabled = !selected;
+				// The resting 1 is a proposal, so don't announce it as a quantity
+				qtyDisplay.setAttribute('aria-hidden', String(!selected));
+				qtyDisplay.textContent = String(selected ? qty : 1);
+			}
+
+			function commit() {
+				sync();
+				updateFormulaBar();
+			}
+
+			body.addEventListener('click', () => {
+				if ((quantities.get(el.symbol) ?? 0) > 0) return;
+				quantities.set(el.symbol, Number(qtyDisplay.textContent));
+				commit();
 			});
 
-			card.appendChild(infoArea);
+			plusBtn.addEventListener('click', () => {
+				quantities.set(el.symbol, (quantities.get(el.symbol) ?? 1) + 1);
+				commit();
+			});
 
-			// Stepper (visible only when qty > 0)
-			if (qty > 0) {
-				const stepper = document.createElement('div');
-				stepper.className = 'w-full flex items-center justify-between border-t border-hairline';
+			minusBtn.addEventListener('click', () => {
+				const current = quantities.get(el.symbol) ?? 0;
+				if (current <= 1) {
+					quantities.delete(el.symbol);
+				} else {
+					quantities.set(el.symbol, current - 1);
+				}
+				commit();
+			});
 
-				const minusBtn = document.createElement('button');
-				minusBtn.type = 'button';
-				minusBtn.className = 'flex-1 flex items-center justify-center min-h-[44px] text-base font-semibold text-steel hover:text-ink hover:bg-surface-soft transition-colors cursor-pointer focus:outline-none';
-				minusBtn.textContent = '−';
-				minusBtn.addEventListener('click', () => {
-					const current = quantities.get(el.symbol) ?? 0;
-					if (current <= 1) {
-						quantities.delete(el.symbol);
-					} else {
-						quantities.set(el.symbol, current - 1);
-					}
-					renderGrid(filter);
-					updateFormulaBar();
-				});
-
-				const qtyDisplay = document.createElement('span');
-				qtyDisplay.className = 'px-1 text-sm font-semibold font-mono text-ink select-none min-w-[20px] text-center';
-				qtyDisplay.textContent = String(qty);
-
-				const plusBtn = document.createElement('button');
-				plusBtn.type = 'button';
-				plusBtn.className = 'flex-1 flex items-center justify-center min-h-[44px] text-base font-semibold text-steel hover:text-ink hover:bg-surface-soft transition-colors cursor-pointer focus:outline-none';
-				plusBtn.textContent = '+';
-				plusBtn.addEventListener('click', () => {
-					quantities.set(el.symbol, (quantities.get(el.symbol) ?? 0) + 1);
-					renderGrid(filter);
-					updateFormulaBar();
-				});
-
-				stepper.appendChild(minusBtn);
-				stepper.appendChild(qtyDisplay);
-				stepper.appendChild(plusBtn);
-				card.appendChild(stepper);
-			}
+			stepper.appendChild(minusBtn);
+			stepper.appendChild(qtyDisplay);
+			stepper.appendChild(plusBtn);
+			card.appendChild(body);
+			card.appendChild(stepper);
+			sync();
 
 			elementGrid.appendChild(card);
 		});

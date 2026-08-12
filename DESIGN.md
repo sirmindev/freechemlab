@@ -102,7 +102,7 @@ typography:
     fontWeight: 500
     lineHeight: 1.20
     letterSpacing: 0
-    textTransform: uppercase
+    textTransform: none
   element-name:
     fontFamily: Public Sans
     fontSize: 16px
@@ -434,7 +434,9 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 ### Grid & Container
 - Single-column page, max content width ~880px. This is a calculator, not a dashboard — it should not sprawl.
 - Molar Mass and the current second input render side by side at desktop, each at `flex: 1`.
-- The element grid inside Browse Elements renders 3-up at desktop. It was 5-up while the tile was a centered vertical card; the horizontal tile has a hard minimum width of ~260px (40px chip + 12px + name/mass + 24px + 92px stepper + 16px padding), so 5-up no longer fits inside the ~800px usable panel width. Three columns at an 8px gap is the widest that clears that minimum.
+- The element grid inside Browse Elements is **not** a fixed column count. It is `repeat(auto-fill, minmax(280px, 1fr))`, so the column count falls out of the available width — 2-up in the ~770px panel at desktop, 1-up below ~570px.
+- The 280px floor is set by the widest tile content, not by taste: 8px padding + 40px chip + 12px + **94px** (the rendered width of "Molybdenum", the longest name in the 63-element dataset) + 24px gap + 106px stepper + 8px padding + 2px border ≈ 294px of content. Anything narrower truncates real element names, which defeats the point of the horizontal layout — the name is the reason the tile went horizontal.
+- This replaced a fixed 5-up grid and, briefly, a fixed 3-up one. 3-up measured at 251px per tile against a 294px requirement and truncated most names past six characters. If the column rule is ever changed back to fixed counts, measure against "Molybdenum" and the 106px stepper, not against the source design's "Hydrogen" and its narrower 92px stepper.
 
 ### Whitespace Philosophy
 The warm canvas is the whitespace. Sections separate by lifting onto a surface, not by large gaps. Vertical rhythm inside the card stays at `{spacing.md}` 16px between blocks; the page keeps `{spacing.lg}` 24px between the breadcrumb and the card.
@@ -541,6 +543,7 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 The tile is a **horizontal** row, not a centered stack. Left to right: symbol chip → name/mass block → stepper, with the stepper pushed to the right edge. Container is `{colors.surface-1}`, rounded `{rounded.md}`, 1px `{colors.hairline}`, `{spacing.xs}` padding, `{spacing.lg}` gap between the left group and the stepper.
 
 - **`element-tile-symbol`** — a 40×40px chip, not bare bold text on the card. Background `{colors.surface-4}`, rounded `{rounded.xs}`, symbol centered in `{typography.element-symbol}` / `{colors.ink}`.
+  - **Never apply `text-transform: uppercase` to the symbol.** The source design marks it uppercase, but only ever renders `H` — a single-letter symbol where the transform is invisible. Applied to the real dataset it produces `HE`, `NA`, `MG`, which are not chemical symbols; the case of the second letter is meaningful notation, not styling. Symbols render exactly as stored.
 - **Name + mass** — stacked, **left-aligned**, 4px gap, immediately right of the chip at `{spacing.sm}` 12px. Name in `{typography.element-name}` / `{colors.ink}`; atomic mass in `{typography.element-mass}` / `{colors.ink-muted}`. Neither is `{colors.ink-tertiary}` any more — the horizontal layout gives them enough room to carry full contrast.
 - **`element-tile-stepper`** — its own bordered component at the right edge: `{colors.surface-1}`, rounded `{rounded.xs}`, 1px `{colors.hairline}`, `{spacing.xxs}` padding, `{spacing.xs}` gap, stretched to the tile's inner height. Holds − / count / +. Count in `{typography.element-count}` / `{colors.ink}`.
 - **Selected**: border only. The background stays `{colors.surface-1}` and the border changes to 1px `{colors.primary}`. Nothing else moves — no fill, no text-color shift.
@@ -562,7 +565,9 @@ The stepper is **always visible**, in both states — it no longer appears on se
 - Clicking **−** at 2 or above decrements and stays selected.
 - **−** on an already-unselected tile does nothing — there is no state below "not in the formula."
 
-The resting 1 is a display default, so it must not be exposed to assistive tech as a live value. An unselected tile's stepper is marked `aria-disabled`, and the tile's selected state is carried by `aria-pressed` on the tile body — the green border is not a signal a screen reader can see.
+The resting 1 is a display default, so it must not be exposed to assistive tech as a live value: while unselected, the count is `aria-hidden` and the − button carries a real `disabled`. **Do not disable the stepper as a whole** — + is the control that selects, so it must stay live in both states. Marking the container `aria-disabled` silently disables + along with −, which is both wrong for assistive tech and, because it makes the button non-actionable, wrong for automation.
+
+Selected state is carried by `aria-pressed` on the tile body — the green border is not a signal a screen reader can see.
 
 ### Inputs & Validation
 
@@ -631,10 +636,12 @@ The particle-count row is the one place in the result block with a visible divid
 ### Breakpoints
 | Name | Width | Key Changes |
 |---|---|---|
-| Desktop | ≥ 1024px | The two current inputs side by side; element grid 3-up |
+| Desktop | ≥ 1024px | The two current inputs side by side; element grid 2-up |
 | Tablet | 768 – 1023px | Same two-column field layout; element grid 2-up |
-| Mobile-Lg | 520 – 767px | Fields still side by side; element grid 2-up |
+| Mobile-Lg | 520 – 767px | Fields still side by side; element grid 1-up |
 | Mobile | < 520px | The two current inputs stack to one column; element grid 1-up; page title scales 24px → 20px |
+
+The element grid's column counts above are *observed outcomes* of the 280px `auto-fill` floor at each width, not breakpoints the grid itself declares. It has no media queries.
 
 ### Touch Targets
 All interactive controls hold a minimum 44×44px tap target on touch viewports. This is a hard requirement, not a guideline — it was a defect in an earlier build. State the touch padding explicitly per control; do not leave it to inherit from desktop.
@@ -647,7 +654,7 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 
 ### Collapsing Strategy
 - **Field row**: two columns → stacked single column below 520px
-- **Element grid**: 3-up → 2-up → 1-up. The tile never narrows below ~260px; the column count drops instead.
+- **Element grid**: 2-up → 1-up, via an `auto-fill` 280px floor rather than declared breakpoints. The tile never narrows below 280px; the column count drops instead.
 - **Unit pills**: all units render inline at every width and wrap onto additional lines as needed — there is no reveal/overflow interaction.
 - **Direction toggle**: stays in the card header at all widths; may wrap below the title under 520px
 
