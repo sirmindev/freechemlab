@@ -295,7 +295,7 @@ test.describe('Browse panel – Build custom', () => {
     const hCard = page.locator('#element-grid > div').filter({ hasText: 'H' }).first();
     await hCard.locator('button').first().click(); // info area click → qty 1
 
-    // Stepper is always present; click + once more to reach 2
+    // The body click above mounted the stepper; + is only reachable after it
     await hCard.locator('[data-step="plus"]').click();
 
     // Click Oxygen card
@@ -338,61 +338,36 @@ test.describe('Element tile – selection model', () => {
 
   const hTile = (page: Page) => page.locator('#element-grid > div[data-symbol="H"]');
 
-  test('unselected tile shows a resting 1 but is not in the formula', async ({ page }) => {
+  test('unselected tile has no stepper and is not in the formula', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
 
     const tile = hTile(page);
-    // The stepper is visible without any interaction, showing 1
-    await expect(tile.locator('[data-step]')).toHaveCount(2);
-    await expect(tile.getByText('1', { exact: true })).toBeVisible();
-    // ...but nothing has been added to the formula
+    // No stepper exists until the tile is selected — asserting its absence is
+    // the whole point of this test, so it must stay a count-zero check.
+    await expect(tile.locator('[data-step]')).toHaveCount(0);
     await expect(tile.locator('button').first()).not.toHaveAttribute('aria-current');
     await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
   });
 
-  test('minus is inert on an unselected tile', async ({ page }) => {
+  test('clicking the tile body reveals the stepper at 1 and selects', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
 
     const tile = hTile(page);
-    await expect(tile.locator('[data-step="minus"]')).toBeDisabled();
-    // Plus stays live — it is how an unselected tile gets selected
-    await expect(tile.locator('[data-step="plus"]')).toBeEnabled();
-    // The resting 1 is not announced as a quantity
-    await expect(tile.getByText('1', { exact: true })).toHaveAttribute('aria-hidden', 'true');
-    // Still nothing in the formula
-    await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
-  });
+    await expect(tile.locator('[data-step]')).toHaveCount(0);
 
-  test('clicking the tile body selects at the shown count, without incrementing', async ({ page }) => {
-    await goto(page);
-    await openCustomTab(page);
-
-    const tile = hTile(page);
     await tile.locator('button').first().click();
 
+    // The stepper is mounted by the select action, starting at 1
+    await expect(tile.locator('[data-step]')).toHaveCount(2);
+    await expect(tile.getByText('1', { exact: true })).toBeVisible();
     await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
-    await expect(tile.locator('[data-step="minus"]')).toBeEnabled();
-    // Count stays at 1 — the body click selects, it does not step
     const mass = await page.locator('#custom-molar-mass-val').textContent();
     expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
   });
 
-  test('first + press on an unselected tile selects AND increments, landing on 2', async ({ page }) => {
-    await goto(page);
-    await openCustomTab(page);
-
-    const tile = hTile(page);
-    await tile.locator('[data-step="plus"]').click();
-
-    await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
-    // 2 × 1.008 — proves the count landed on 2, not 1
-    const mass = await page.locator('#custom-molar-mass-val').textContent();
-    expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(2.016, 2);
-  });
-
-  test('minus at a count of 1 clears selection and reverts to the resting 1', async ({ page }) => {
+  test('minus at a count of 1 deselects and removes the stepper', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
 
@@ -402,10 +377,12 @@ test.describe('Element tile – selection model', () => {
 
     await tile.locator('[data-step="minus"]').click();
 
-    // Deselected, removed from the formula, display back to its resting 1
+    // Stepper gone, tile back to its default appearance, out of the formula
+    await expect(tile.locator('[data-step]')).toHaveCount(0);
     await expect(tile.locator('button').first()).not.toHaveAttribute('aria-current');
-    await expect(tile.locator('[data-step="minus"]')).toBeDisabled();
-    await expect(tile.getByText('1', { exact: true })).toBeVisible();
+    await expect
+      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
+      .toBe('rgb(229, 226, 218)');
     await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
   });
 
@@ -414,9 +391,12 @@ test.describe('Element tile – selection model', () => {
     await openCustomTab(page);
 
     const tile = hTile(page);
+    // The stepper only exists after selecting, so + is reachable only here
+    await tile.locator('button').first().click(); // selected, count 1
     await tile.locator('[data-step="plus"]').click(); // count 2
     await tile.locator('[data-step="minus"]').click(); // back to 1
 
+    await expect(tile.locator('[data-step]')).toHaveCount(2);
     await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
     const mass = await page.locator('#custom-molar-mass-val').textContent();
     expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
@@ -517,14 +497,15 @@ test.describe('Touch targets – 44px minimum', () => {
     await page.click('#tab-custom');
     await page.waitForSelector('#element-grid > div', { state: 'visible' });
 
-    // Steppers are always rendered; select the first tile anyway so both
-    // the enabled and disabled minus paths are covered by the measurement.
+    // REQUIRED: the stepper does not exist until the tile is selected, so this
+    // click is a prerequisite, not a convenience. Removing it makes the loop
+    // below iterate zero elements and pass vacuously.
     await page.locator('#element-grid > div').first().locator('button').first().click();
     await page.waitForTimeout(100);
 
     const stepperButtons = page.locator('#element-grid > div').first().locator('[data-step]');
     const count = await stepperButtons.count();
-    expect(count).toBeGreaterThan(0);
+    expect(count).toBe(2);
     for (let i = 0; i < count; i++) {
       const box = await stepperButtons.nth(i).boundingBox();
       if (box) {

@@ -344,7 +344,7 @@ import Layout from '../layouts/Layout.astro';
 
 							<!-- Element Grid -->
 							<div class="max-h-[320px] overflow-y-auto rounded-[8px] pr-0.5 mb-4">
-								<div id="element-grid" class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-2">
+								<div id="element-grid" class="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-2">
 									<!-- Rendered by JS -->
 								</div>
 							</div>
@@ -1086,34 +1086,36 @@ import Layout from '../layouts/Layout.astro';
 		visible.forEach(el => {
 			const card = document.createElement('div');
 			card.dataset.symbol = el.symbol;
-			card.className = 'flex items-center justify-between gap-6 rounded-md border bg-surface p-2 transition-colors';
+			// min-h holds the tile at its selected height so mounting the
+			// stepper never changes the row's height.
+			card.className = 'flex min-h-[56px] items-center justify-between gap-2 rounded-md border bg-surface p-2 transition-colors';
 
-			// Tile body — selects at the shown count, without incrementing
+			// Tile body — clicking it is the select action
 			const body = document.createElement('button');
 			body.type = 'button';
 			body.className = 'flex flex-1 min-w-0 items-center gap-3 text-left cursor-pointer select-none focus:outline-none';
 			body.innerHTML = `
-				<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xs bg-surface-4 font-sans text-2xl font-medium leading-none text-ink">${el.symbol}</span>
+				<span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xs bg-surface-4 font-sans text-base font-medium leading-none text-ink">${el.symbol}</span>
 				<span class="flex min-w-0 flex-col gap-1">
-					<span class="truncate font-sans text-base leading-none text-ink">${el.name}</span>
-					<span class="font-mono text-sm font-medium leading-none text-ink-muted">${el.atomicWeight}</span>
+					<span class="truncate font-sans text-sm leading-none text-ink">${el.name}</span>
+					<span class="font-mono text-xs font-medium leading-none text-ink-muted">${el.atomicWeight}</span>
 				</span>
 			`;
 
-			// Stepper — always visible, in both selected and unselected states
+			// Stepper — mounted on select, removed on deselect
 			const stepper = document.createElement('div');
-			stepper.className = 'flex shrink-0 items-center gap-2 self-stretch rounded-xs border border-hairline bg-surface p-1';
+			stepper.className = 'flex shrink-0 items-center gap-0.5 self-stretch rounded-xs border border-hairline bg-surface p-1';
 
-			// 32px painted box at every width; the button pads out to 44px on
+			// 28px painted box at every width; the button pads out to 44px on
 			// touch so the hit area grows without the fill growing with it.
 			function stepButton(kind: 'minus' | 'plus', glyph: string) {
 				const btn = document.createElement('button');
 				btn.type = 'button';
 				btn.dataset.step = kind;
 				btn.setAttribute('aria-label', `${kind === 'plus' ? 'Increase' : 'Decrease'} ${el.name} quantity`);
-				btn.className = 'group flex shrink-0 items-center justify-center p-1.5 md:p-0 cursor-pointer focus:outline-none disabled:pointer-events-none';
+				btn.className = 'group flex shrink-0 items-center justify-center p-2 md:p-0 cursor-pointer focus:outline-none';
 				btn.innerHTML = `
-					<span class="flex h-8 w-8 items-center justify-center rounded-xxs text-ink-muted transition-colors group-hover:bg-surface-4">
+					<span class="flex h-7 w-7 items-center justify-center rounded-xxs text-ink-muted transition-colors group-hover:bg-surface-4">
 						<span class="flex h-6 w-6 items-center justify-center">${glyph}</span>
 					</span>
 				`;
@@ -1124,10 +1126,10 @@ import Layout from '../layouts/Layout.astro';
 			const plusBtn = stepButton('plus', '<svg width="15.5" height="15.5" viewBox="0 0 15.5 15.5" fill="none"><path d="M7.75 0.75V14.75M0.75 7.75H14.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>');
 
 			const qtyDisplay = document.createElement('span');
-			qtyDisplay.className = 'min-w-[16px] text-center font-mono text-base font-medium leading-none text-ink select-none';
+			qtyDisplay.className = 'min-w-[12px] text-center font-mono text-sm font-medium leading-none text-ink select-none';
 
-			// The resting "1" is a proposal, not a quantity — an unselected tile
-			// shows it but contributes nothing to the formula.
+			// The stepper only exists while selected, so its count is always a
+			// live quantity — nothing here is a proposal, and nothing is inert.
 			function sync() {
 				const qty = quantities.get(el.symbol) ?? 0;
 				const selected = qty > 0;
@@ -1137,15 +1139,12 @@ import Layout from '../layouts/Layout.astro';
 				// so toggle-button semantics would misdescribe it. See DESIGN.md.
 				if (selected) {
 					body.setAttribute('aria-current', 'true');
+					qtyDisplay.textContent = String(qty);
+					if (!stepper.isConnected) card.appendChild(stepper);
 				} else {
 					body.removeAttribute('aria-current');
+					stepper.remove();
 				}
-				// Only minus is inert while unselected — plus is how you select
-				// and increment, so the stepper as a whole is never aria-disabled.
-				minusBtn.disabled = !selected;
-				// The resting 1 is a proposal, so don't announce it as a quantity
-				qtyDisplay.setAttribute('aria-hidden', String(!selected));
-				qtyDisplay.textContent = String(selected ? qty : 1);
 			}
 
 			function commit() {
@@ -1153,14 +1152,15 @@ import Layout from '../layouts/Layout.astro';
 				updateFormulaBar();
 			}
 
+			// Body click is the select action: it reveals the stepper at 1
 			body.addEventListener('click', () => {
 				if ((quantities.get(el.symbol) ?? 0) > 0) return;
-				quantities.set(el.symbol, Number(qtyDisplay.textContent));
+				quantities.set(el.symbol, 1);
 				commit();
 			});
 
 			plusBtn.addEventListener('click', () => {
-				quantities.set(el.symbol, (quantities.get(el.symbol) ?? 1) + 1);
+				quantities.set(el.symbol, (quantities.get(el.symbol) ?? 0) + 1);
 				commit();
 			});
 
@@ -1178,7 +1178,8 @@ import Layout from '../layouts/Layout.astro';
 			stepper.appendChild(qtyDisplay);
 			stepper.appendChild(plusBtn);
 			card.appendChild(body);
-			card.appendChild(stepper);
+			// sync() mounts the stepper if this element is already selected —
+			// it survives a search re-render, so don't append it unconditionally.
 			sync();
 
 			elementGrid.appendChild(card);
