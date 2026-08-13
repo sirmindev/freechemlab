@@ -1118,7 +1118,10 @@ import Layout from '../layouts/Layout.astro';
 				btn.type = 'button';
 				btn.dataset.step = kind;
 				btn.setAttribute('aria-label', `${kind === 'plus' ? 'Increase' : 'Decrease'} ${el.name} quantity`);
-				btn.className = 'group flex shrink-0 items-center justify-center p-2.5 md:p-0 cursor-pointer focus:outline-none';
+				// `mobile:` is the project's own 520px breakpoint (--breakpoint-mobile),
+				// not Tailwind's stock md at 768 — the touch padding should drop at the
+				// same width the rest of the layout switches to its desktop form.
+				btn.className = 'group flex shrink-0 items-center justify-center p-2.5 mobile:p-0 cursor-pointer focus:outline-none';
 				btn.innerHTML = `
 					<span class="flex h-6 w-6 items-center justify-center rounded-[50%] text-ink-muted transition-colors group-hover:bg-surface-4">
 						<span class="flex h-5 w-5 items-center justify-center">${glyph}</span>
