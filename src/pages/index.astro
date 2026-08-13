@@ -254,16 +254,40 @@ import Layout from '../layouts/Layout.astro';
 				<!-- Browse Elements Trigger + Panel (col-span-2, between inputs and result) -->
 				<div class="md:col-span-2">
 					<!-- Trigger: trigger-browse-elements -->
+					<!--
+						`items-start` + the h-5 chevron box pin the chevron to line one, so it
+						does not recentre against a wrapped block. `text-left` resets the UA
+						button default (`text-align: center`), which Tailwind preflight leaves
+						alone. `gap-2` (not gap-1) is sized for the OPEN state: rotating the
+						chevron 90° swaps its visual extent, so it overflows its own layout box
+						by half the difference and eats into the gap — see the svg below.
+					-->
 					<button
 						id="browse-trigger"
 						type="button"
-						class="flex items-center gap-1 text-sm text-ink-muted hover:text-ink transition-colors cursor-pointer"
+						class="flex items-start gap-2 text-left text-sm text-ink-muted hover:text-ink transition-colors cursor-pointer"
 					>
-						<svg id="browse-chevron" class="shrink-0 text-ink-muted transition-transform duration-200" width="7.5" height="13.5" viewBox="0 0 7.5 13.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M0.75 12.75L6.75 6.75L0.75 0.75" />
-						</svg>
-						<span>Not sure of the molar mass?</span>
-						<span class="text-ink underline">Browse elements</span>
+						<span class="flex h-5 shrink-0 items-center">
+							<!--
+								viewBox maps 1:1 to px, so stroke-width 1.5 renders as exactly
+								1.5px. Shrink the glyph by editing the box AND the path together;
+								scaling via width/height alone would thin the stroke with it.
+							-->
+							<svg id="browse-chevron" class="shrink-0 text-ink-muted transition-transform duration-200" width="6" height="10.5" viewBox="0 0 6 10.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M0.75 9.75L5.25 5.25L0.75 0.75" />
+							</svg>
+						</span>
+						<!--
+							One text flow, not two flex children. "Browse elements" is an inline
+							span inside the sentence. Both halves are `whitespace-nowrap`, so the
+							single space between them is the ONLY soft-wrap opportunity in the
+							row — the break can therefore only ever land after the question and
+							before the link, at whatever width it lands. A hard <br> would force
+							that break at every width, including desktop.
+						-->
+						<span>
+							<span class="whitespace-nowrap">Not sure of the molar mass?</span> <span class="text-ink underline whitespace-nowrap">Browse elements</span>
+						</span>
 					</button>
 
 					<!-- Collapsible Panel -->
