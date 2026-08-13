@@ -85,6 +85,24 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Sitewide fast-tap: nothing in this app sets touch-action anywhere, so
+   every button/link inherits the browser default (`auto`), which leaves
+   double-tap-to-zoom enabled (viewport has no user-scalable/maximum-scale
+   restriction — see Layout.astro). On rapid repeated taps — e.g. holding a
+   stepper +/- button — the second tap can be swallowed by the zoom gesture
+   instead of registering as a click. `manipulation` disables double-tap-zoom
+   on these elements while still allowing pan/pinch-zoom on the page itself,
+   since touch-action is evaluated per touched element, not globally.
+   `select` is deliberately excluded: WebKit has a history of flaky native
+   picker behavior (dropdown opening/closing, missed selections) when
+   touch-action is applied to native `<select>` elements on iOS Safari, and
+   the reported bug (rapid double-tap swallowed as zoom) doesn't apply to
+   select's single-tap-to-open-picker interaction the way it does to
+   repeated-tap buttons like the steppers and unit pills. */
+button, a {
+  touch-action: manipulation;
+}
+
 /* Suppress native number-input spinners — replaced by the decorative
    chevron-selector-vertical icon on Molar Mass / Mass per DESIGN.md */
 input[type="number"]::-webkit-outer-spin-button,

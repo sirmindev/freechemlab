@@ -109,15 +109,41 @@ import Layout from '../layouts/Layout.astro';
 									id="molar-mass"
 									step="1"
 									placeholder="e.g. 18.02"
-									class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-9 py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all"
+									class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[72px] py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all"
 								/>
-								<!-- Functional stepper — replaces the native spinner, matches chevron-selector-vertical -->
-								<div class="absolute right-3 flex flex-col h-6 w-4">
-									<button type="button" id="molar-mass-step-up" aria-label="Increase molar mass" class="flex-1 flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer">
-										<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+								<!-- Functional stepper — one capsule, not two circles. Rounding is per-side,
+								     not per-button: "-" is permanently rounded-l-full/square-right (it never
+								     appears without "+" beside it), "+" is rounded-full (full circle) while
+								     alone and switches to rounded-r-full/square-left the moment "-" mounts —
+								     toggled in updateStepperState alongside its other state classes. The two
+								     chips sit flush (the row has no `gap-*`), so the only seam is the 1px
+								     white divider; nothing else may add a gap or the capsule silhouette
+								     breaks apart into two circles again. Fill lives per-button on each
+								     painted chip (bg-surface-4 default) — 24×24 at `mobile:` (≥520px) and up,
+								     28×28 below it — not on a shared pill background. No border in any state.
+								     Hover/pressed are wrapped in an explicit `(hover: hover)` media condition
+								     (Tailwind's own `hover:`/`group-hover:` already carry that scoping by
+								     default — see DESIGN.md — but `active`/`group-active` do not, so pressed
+								     is scoped explicitly) so touch taps never show a stuck hover/press fill.
+								     Right-anchored (not left): the row's width is intrinsic to its visible
+								     children, so hiding/showing "-" and the divider changes the LEFT edge
+								     only — "+" stays pinned to the same x position at every value, by
+								     construction. Each button paints small but hit-tests the input's full
+								     44px height: `py-2` (mobile) / `mobile:py-2.5` (desktop) on the
+								     transparent outer `<button>` makes up the difference to 44px against the
+								     28px/24px chip, same "hit area independent of painted size" pattern as
+								     the element-grid stepper (`element-tile-stepper-button`). -->
+								<div id="molar-mass-stepper" class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+									<button type="button" id="molar-mass-step-down" aria-label="Decrease molar mass" class="hidden group flex items-center justify-center py-2 mobile:py-2.5 cursor-not-allowed focus:outline-none">
+										<span class="flex h-7 w-7 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+											<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+										</span>
 									</button>
-									<button type="button" id="molar-mass-step-down" aria-label="Decrease molar mass" class="flex-1 flex items-center justify-center text-ink-tertiary cursor-not-allowed">
-										<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+									<div id="molar-mass-stepper-divider" class="hidden w-px h-7 mobile:h-6 bg-white"></div>
+									<button type="button" id="molar-mass-step-up" aria-label="Increase molar mass" class="group flex items-center justify-center py-2 mobile:py-2.5 cursor-pointer focus:outline-none">
+										<span class="flex h-7 w-7 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+											<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+										</span>
 									</button>
 								</div>
 							</div>
@@ -168,15 +194,22 @@ import Layout from '../layouts/Layout.astro';
 										id="mass-input"
 										step="1"
 										placeholder="e.g. 18.02"
-										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-9 py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all"
+										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[72px] py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all"
 									/>
-									<!-- Functional stepper — hidden while this field is the readonly result -->
-									<div id="mass-input-chevron" class="absolute right-3 flex flex-col h-6 w-4">
-										<button type="button" id="mass-step-up" aria-label="Increase mass" class="flex-1 flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer">
-											<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+									<!-- Functional stepper — hidden while this field is the readonly result.
+									     See molar-mass-stepper above for the capsule-shape/fill/hit-area
+									     rationale — identical component, reused verbatim. -->
+									<div id="mass-input-stepper" class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+										<button type="button" id="mass-step-down" aria-label="Decrease mass" class="hidden group flex items-center justify-center py-2 mobile:py-2.5 cursor-not-allowed focus:outline-none">
+											<span class="flex h-7 w-7 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+												<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+											</span>
 										</button>
-										<button type="button" id="mass-step-down" aria-label="Decrease mass" class="flex-1 flex items-center justify-center text-ink-tertiary cursor-not-allowed">
-											<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+										<div id="mass-stepper-divider" class="hidden w-px h-7 mobile:h-6 bg-white"></div>
+										<button type="button" id="mass-step-up" aria-label="Increase mass" class="group flex items-center justify-center py-2 mobile:py-2.5 cursor-pointer focus:outline-none">
+											<span class="flex h-7 w-7 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+												<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+											</span>
 										</button>
 									</div>
 									<!-- Copy Result Button (Shown when readonly) -->
@@ -420,13 +453,20 @@ import Layout from '../layouts/Layout.astro';
 									class="w-full bg-transparent text-ink-tertiary font-mono text-[32px] font-medium rounded-none border-0 px-0 py-0 cursor-not-allowed select-none focus:outline-none transition-all"
 									style="line-height: 1.2;"
 								/>
-								<!-- Functional stepper — shown only while this field is editable (mol -> g mode) -->
-								<div id="moles-input-chevron" class="hidden absolute right-3 flex flex-col h-6 w-4">
-									<button type="button" id="moles-step-up" aria-label="Increase moles" class="flex-1 flex items-center justify-center text-ink-muted hover:text-ink cursor-pointer">
-										<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+								<!-- Functional stepper — shown only while this field is editable (mol -> g mode).
+								     See molar-mass-stepper above for the capsule-shape/fill/hit-area
+								     rationale — identical component, reused verbatim. -->
+								<div id="moles-input-stepper" class="hidden absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+									<button type="button" id="moles-step-down" aria-label="Decrease moles" class="hidden group flex items-center justify-center py-2 mobile:py-2.5 cursor-not-allowed focus:outline-none">
+										<span class="flex h-7 w-7 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+											<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+										</span>
 									</button>
-									<button type="button" id="moles-step-down" aria-label="Decrease moles" class="flex-1 flex items-center justify-center text-ink-tertiary cursor-not-allowed">
-										<svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+									<div id="moles-stepper-divider" class="hidden w-px h-7 mobile:h-6 bg-white"></div>
+									<button type="button" id="moles-step-up" aria-label="Increase moles" class="group flex items-center justify-center py-2 mobile:py-2.5 cursor-pointer focus:outline-none">
+										<span class="flex h-7 w-7 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+											<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+										</span>
 									</button>
 								</div>
 								<!-- Copy Result Button (Shown when readonly) -->
@@ -569,19 +609,22 @@ import Layout from '../layouts/Layout.astro';
 	const molarMassError = document.getElementById('molar-mass-error');
 	const molarMassStepUp = document.getElementById('molar-mass-step-up') as HTMLButtonElement | null;
 	const molarMassStepDown = document.getElementById('molar-mass-step-down') as HTMLButtonElement | null;
+	const molarMassStepperDivider = document.getElementById('molar-mass-stepper-divider');
 
 	const massInput = document.getElementById('mass-input') as HTMLInputElement | null;
 	const massError = document.getElementById('mass-error');
-	const massInputChevron = document.getElementById('mass-input-chevron');
+	const massInputStepper = document.getElementById('mass-input-stepper');
 	const massStepUp = document.getElementById('mass-step-up') as HTMLButtonElement | null;
 	const massStepDown = document.getElementById('mass-step-down') as HTMLButtonElement | null;
+	const massStepperDivider = document.getElementById('mass-stepper-divider');
 	const massCopyBtn = document.getElementById('mass-copy-btn') as HTMLButtonElement | null;
 
 	const molesInput = document.getElementById('moles-input') as HTMLInputElement | null;
 	const molesError = document.getElementById('moles-error');
-	const molesInputChevron = document.getElementById('moles-input-chevron');
+	const molesInputStepper = document.getElementById('moles-input-stepper');
 	const molesStepUp = document.getElementById('moles-step-up') as HTMLButtonElement | null;
 	const molesStepDown = document.getElementById('moles-step-down') as HTMLButtonElement | null;
+	const molesStepperDivider = document.getElementById('moles-stepper-divider');
 	const molesCopyBtn = document.getElementById('moles-copy-btn') as HTMLButtonElement | null;
 
 	const particleCountRow = document.getElementById('particle-count-row');
@@ -604,13 +647,13 @@ import Layout from '../layouts/Layout.astro';
 
 	interface FieldRefs {
 		input: HTMLInputElement | null;
-		chevron: HTMLElement | null;
+		stepper: HTMLElement | null;
 		copyBtn: HTMLButtonElement | null;
 		editablePlaceholder: string;
 		rawResult: number | null;
 	}
 
-	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-9 py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all";
+	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[72px] py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all";
 	// result-value: bare typography, no box — the absence of a box is the read-only signal (see DESIGN.md Don't)
 	const READONLY_RESULT_CLASS = "w-full bg-transparent text-ink-tertiary font-mono text-[32px] font-medium rounded-none border-0 px-0 py-0 cursor-not-allowed select-none focus:outline-none transition-all";
 
@@ -671,7 +714,7 @@ import Layout from '../layouts/Layout.astro';
 				refs.input.placeholder = RESULT_PLACEHOLDER;
 			}
 		}
-		refs.chevron?.classList.toggle('hidden', role === 'result');
+		refs.stepper?.classList.toggle('hidden', role === 'result');
 		refs.copyBtn?.classList.toggle('hidden', role === 'input');
 	}
 
@@ -704,8 +747,8 @@ import Layout from '../layouts/Layout.astro';
 	function updateModeUI() {
 		clearAllErrors();
 
-		const massRefs: FieldRefs = { input: massInput, chevron: massInputChevron, copyBtn: massCopyBtn, editablePlaceholder: MASS_EDITABLE_PLACEHOLDER, rawResult: lastMassResult };
-		const molesRefs: FieldRefs = { input: molesInput, chevron: molesInputChevron, copyBtn: molesCopyBtn, editablePlaceholder: MOLES_EDITABLE_PLACEHOLDER, rawResult: lastMolesResult };
+		const massRefs: FieldRefs = { input: massInput, stepper: massInputStepper, copyBtn: massCopyBtn, editablePlaceholder: MASS_EDITABLE_PLACEHOLDER, rawResult: lastMassResult };
+		const molesRefs: FieldRefs = { input: molesInput, stepper: molesInputStepper, copyBtn: molesCopyBtn, editablePlaceholder: MOLES_EDITABLE_PLACEHOLDER, rawResult: lastMolesResult };
 
 		if (currentMode === 'g_to_mol') {
 			// g -> mol: Mass is input (alongside Molar Mass), Moles is the readonly result
@@ -719,7 +762,7 @@ import Layout from '../layouts/Layout.astro';
 
 			particleCountRow?.classList.remove('hidden');
 			particleCountRow?.classList.add('flex');
-			updateStepperState(massInput, massStepDown);
+			updateStepperState(massInput, massStepDown, massStepUp, massStepperDivider);
 		} else {
 			// mol -> g: Moles is input (alongside Molar Mass), Mass is the readonly result
 			toggleMolToGBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
@@ -732,7 +775,7 @@ import Layout from '../layouts/Layout.astro';
 
 			particleCountRow?.classList.add('hidden');
 			particleCountRow?.classList.remove('flex');
-			updateStepperState(molesInput, molesStepDown);
+			updateStepperState(molesInput, molesStepDown, molesStepUp, molesStepperDivider);
 		}
 		recalculate();
 	}
@@ -786,19 +829,39 @@ import Layout from '../layouts/Layout.astro';
 	// Functional stepper (replaces the native spinner). Floor is 0 for all three
 	// fields — molar mass separately shows a validation error at exactly 0, the
 	// stepper itself just won't go negative.
-	function updateStepperState(input: HTMLInputElement | null, downBtn: HTMLButtonElement | null) {
-		if (!input || !downBtn) return;
+	//
+	// "-" (and its divider) only exist in the DOM's visible flow once there's a
+	// positive value to decrement — negative molar mass/mass/moles has no
+	// physical meaning, so a value of exactly 0 (or empty) collapses the pill
+	// to a single "+" circle rather than showing a "-" that could only ever be
+	// disabled. This is deliberately keyed to `current > 0`, not "any non-empty
+	// input" — typing "0" explicitly still collapses to "+"-only.
+	function updateStepperState(input: HTMLInputElement | null, downBtn: HTMLButtonElement | null, upBtn: HTMLButtonElement | null, divider?: HTMLElement | null) {
+		if (!input || !downBtn || !upBtn) return;
+		// The painted chip (fill + glyph color) lives on the button's inner <span>,
+		// not the button itself — the button is the transparent hit-area carrier
+		// (see field-stepper-pill markup). Only the chip's text color needs to
+		// swap between enabled/disabled; its hover/pressed fill classes are static
+		// and simply never trigger while the button carries `disabled`.
+		const chip = downBtn.firstElementChild as HTMLElement | null;
+		const upChip = upBtn.firstElementChild as HTMLElement | null;
 		const step = parseFloat(input.step) || 1;
 		const current = input.value === '' ? 0 : parseFloat(input.value);
+		const hasValue = !isNaN(current) && current > 0;
+		downBtn.classList.toggle('hidden', !hasValue);
+		divider?.classList.toggle('hidden', !hasValue);
+		// "+" is a full circle while it's alone; the moment "-" mounts beside it,
+		// it drops to right-only rounding so the pair reads as one capsule split
+		// by the divider, not two independent circles with a gap between them.
+		upChip?.classList.toggle('rounded-full', !hasValue);
+		upChip?.classList.toggle('rounded-r-full', hasValue);
+
 		const disabled = isNaN(current) || current - step < 0;
 		downBtn.disabled = disabled;
-		if (disabled) {
-			downBtn.classList.remove('text-ink-muted', 'cursor-pointer', 'hover:text-ink');
-			downBtn.classList.add('text-ink-tertiary', 'cursor-not-allowed');
-		} else {
-			downBtn.classList.remove('text-ink-tertiary', 'cursor-not-allowed');
-			downBtn.classList.add('text-ink-muted', 'cursor-pointer', 'hover:text-ink');
-		}
+		downBtn.classList.toggle('cursor-not-allowed', disabled);
+		downBtn.classList.toggle('cursor-pointer', !disabled);
+		chip?.classList.toggle('text-ink-tertiary', disabled);
+		chip?.classList.toggle('text-ink-muted', !disabled);
 	}
 
 	function stepInput(input: HTMLInputElement | null, direction: 'up' | 'down') {
@@ -992,15 +1055,15 @@ import Layout from '../layouts/Layout.astro';
 	// Input listeners
 	molarMassInput?.addEventListener('input', () => {
 		recalculate();
-		updateStepperState(molarMassInput, molarMassStepDown);
+		updateStepperState(molarMassInput, molarMassStepDown, molarMassStepUp, molarMassStepperDivider);
 	});
 	massInput?.addEventListener('input', () => {
 		recalculate();
-		updateStepperState(massInput, massStepDown);
+		updateStepperState(massInput, massStepDown, massStepUp, massStepperDivider);
 	});
 	molesInput?.addEventListener('input', () => {
 		recalculate();
-		updateStepperState(molesInput, molesStepDown);
+		updateStepperState(molesInput, molesStepDown, molesStepUp, molesStepperDivider);
 	});
 
 	// Stepper button listeners
@@ -1013,9 +1076,9 @@ import Layout from '../layouts/Layout.astro';
 
 	// Initial render setup
 	updateModeUI();
-	updateStepperState(molarMassInput, molarMassStepDown);
-	updateStepperState(massInput, massStepDown);
-	updateStepperState(molesInput, molesStepDown);
+	updateStepperState(molarMassInput, molarMassStepDown, molarMassStepUp, molarMassStepperDivider);
+	updateStepperState(massInput, massStepDown, massStepUp, massStepperDivider);
+	updateStepperState(molesInput, molesStepDown, molesStepUp, molesStepperDivider);
 </script>
 
 <script>
