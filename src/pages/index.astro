@@ -1131,17 +1131,26 @@ import Layout from '../layouts/Layout.astro';
 			// centre identically by construction — the minus IS the plus's
 			// horizontal arm. The minus previously used a 1.5-unit-tall viewBox,
 			// which clipped its own 1.75-unit stroke down to 1.28px and made it
-			// visibly thinner than the plus. overflow-visible keeps the round caps
-			// from being shaved at the arm tips.
-			// Scaled to 12px (13.3 / 15.5 = 0.858); stroke-width 1.75 renders at
-			// 1.5px (1.75 × 0.858 = 1.50).
-			const ICON_OPEN = '<svg width="13.3" height="13.3" viewBox="0 0 15.5 15.5" fill="none" class="overflow-visible">';
-			const ICON_ATTRS = 'stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"';
-			const minusBtn = stepButton('minus', `${ICON_OPEN}<path d="M0.75 7.75H14.75" ${ICON_ATTRS} /></svg>`);
-			const plusBtn = stepButton('plus', `${ICON_OPEN}<path d="M7.75 0.75V14.75M0.75 7.75H14.75" ${ICON_ATTRS} /></svg>`);
+			// visibly thinner than the plus.
+			// 14 × 14 at viewBox 14 means scale is exactly 1, so a user unit is a
+			// CSS pixel and the box centres on whole pixels in both containers:
+			// (20 − 14) / 2 = 3 in the spacer span, (24 − 14) / 2 = 5 in the circle.
+			// Painted extent is 0.25–13.75 (round caps overshoot each end by half
+			// the stroke), which stays inside the 14px box — so no overflow-visible.
+			const ICON_OPEN = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none">';
+			const ICON_ATTRS = 'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+			const minusBtn = stepButton('minus', `${ICON_OPEN}<path d="M1 7H13" ${ICON_ATTRS} /></svg>`);
+			const plusBtn = stepButton('plus', `${ICON_OPEN}<path d="M7 1V13M1 7H13" ${ICON_ATTRS} /></svg>`);
 
 			const qtyDisplay = document.createElement('span');
-			qtyDisplay.className = 'min-w-[12px] text-center font-mono text-sm font-medium leading-none text-ink select-none';
+			qtyDisplay.className = 'text-center font-mono text-sm font-medium leading-none text-ink select-none';
+
+			// Fixed width per digit count, not a floor with content sizing above it.
+			// A content-sized count is fractional past nine (16.81px at 2 digits,
+			// 25.20 at 3), which puts the plus button at a fractional x — the same
+			// condition behind the original plus-glyph subpixel defect. Each width is
+			// a multiple of 4 and clears the 8.4px monospace advance per digit.
+			const COUNT_W = [12, 20, 28]; // 1, 2, 3 digits
 
 			// The stepper only exists while selected, so its count is always a
 			// live quantity — nothing here is a proposal, and nothing is inert.
@@ -1157,7 +1166,11 @@ import Layout from '../layouts/Layout.astro';
 				// so toggle-button semantics would misdescribe it. See DESIGN.md.
 				if (selected) {
 					body.setAttribute('aria-current', 'true');
-					qtyDisplay.textContent = String(qty);
+					const text = String(qty);
+					qtyDisplay.textContent = text;
+					// Caps at the 3-digit width: past 999 the digits overflow the box
+					// rather than widening it, which keeps the plus on a whole pixel.
+					qtyDisplay.style.width = `${COUNT_W[Math.min(text.length, COUNT_W.length) - 1]}px`;
 					if (!stepper.isConnected) card.appendChild(stepper);
 				} else {
 					body.removeAttribute('aria-current');
