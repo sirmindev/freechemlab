@@ -466,9 +466,10 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 ### Spacing System
 - **Base unit**: 4px
 - **Tokens**: `{spacing.xxs}` 4px · `{spacing.xs}` 8px · `{spacing.sm}` 12px · `{spacing.md}` 16px · `{spacing.lg}` 24px · `{spacing.xl}` 32px · `{spacing.xxl}` 48px · `{spacing.section}` 96px
-- Calculator card padding: 16px below 520px, `{spacing.lg}` 24px at `mobile:` (≥520px) and up. Symmetric on all sides at both breakpoints — only the value changes, not the axis split. Reduced from a flat 24px specifically for the outer card; field/result card padding below is unaffected.
-- Field container padding: `{spacing.lg}` 24px. Molar Mass and the current second input share a single field card (no gap, no divider) split by asymmetric inner padding — 24px on the outer edges and top/bottom, 12px each on the two sides facing the shared midline, for a 24px total gutter.
-- Result card padding: `{spacing.lg}` 24px, symmetric on all sides — it is a single field, not split.
+- Calculator card padding: 16px below 520px, `{spacing.lg}` 24px at `mobile:` (≥520px) and up. Symmetric on all sides at both breakpoints — only the value changes, not the axis split.
+- Field container padding: 16px below 520px, `{spacing.lg}` 24px at `mobile:` (≥520px) and up — same mobile-reduction pattern as the outer card. Molar Mass and the current second input share a single field card (no gap, no divider) split by asymmetric inner padding at `mobile:` and up — 24px on the outer edges and top/bottom, 12px each on the two sides facing the shared midline, for a 24px total gutter; below 520px both sides of the split are the flat 16px (no midline-gutter reduction — the fields are stacked, not side by side, so there is no shared midline to gutter).
+- Result card padding: 16px below 520px, `{spacing.lg}` 24px at `mobile:` (≥520px) and up, symmetric on all sides at both breakpoints — it is a single field, not split.
+- Browse Elements panel tab content padding (Presets and Build custom): 16px below 520px, 20px (not a spacing token) at `mobile:` (≥520px) and up. Matches the outer card's mobile-reduction pattern; the panel's own desktop value stays a bespoke 20px, not 24px.
 - Pill padding: 8px vertical · 12px horizontal
 - Pill padding (touch viewports): 14px vertical · 16px horizontal, set explicitly — see Touch Targets.
 - Button padding: 10px vertical · 20px horizontal
@@ -618,12 +619,12 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 **`card-calculator`** — The outer card. Everything lives inside it.
 - Background `{colors.surface-1}`, rounded `{rounded.xl}`, padding 16px below 520px / `{spacing.lg}` (24px) at `mobile:` and up, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
 
-**`card-field`** — Two inputs share a single card, side by side. There is no gap and no divider between them — the split is entirely padding: 24px on the outer edges and top/bottom, 12px on the two sides facing the shared midline.
-- Background `{colors.surface-2}`, rounded `{rounded.lg}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
+**`card-field`** — Two inputs share a single card, side by side. There is no gap and no divider between them — the split is entirely padding: 24px on the outer edges and top/bottom, 12px on the two sides facing the shared midline (at `mobile:`/≥520px; below 520px the fields stack and padding is a flat 16px on all sides).
+- Background `{colors.surface-2}`, rounded `{rounded.lg}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, padding 16px below 520px / `{spacing.lg}` (24px, split as above) at `mobile:` and up.
 - The first slot is permanent: Molar Mass. It's an input in both calculation directions and never moves, never changes card. The second slot is role-assigned, not field-assigned — it holds whichever of Mass/Moles is currently the *input* for the active direction (Mass in g→mol, Moles in mol→g). Card membership follows input/output role, not field identity — don't hardcode "Molar Mass and Mass" as a fixed pair; the second field genuinely changes.
 
 **`card-result`** — The calculated-output container.
-- Background `{colors.surface-2}`, padding `{spacing.lg}`, otherwise identical to `card-field`. It no longer carries a green tint — see the read-only signal Don't below.
+- Background `{colors.surface-2}`, padding 16px below 520px / `{spacing.lg}` (24px) at `mobile:` and up — same breakpoint pattern as `card-field`, otherwise identical to it. It no longer carries a green tint — see the read-only signal Don't below.
 - Holds whichever of Mass/Moles is currently the *output* — Moles in g→mol, Mass in mol→g. Same role-assignment principle as `card-field`'s second slot: this card's content swaps with direction, its content is never fixed to one field.
 
 **`trigger-browse-elements`** — The row above the result card that opens the Browse Elements panel.

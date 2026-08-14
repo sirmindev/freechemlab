@@ -96,7 +96,7 @@ import Layout from '../layouts/Layout.astro';
 					<!-- Molar Mass: input-slot-a. Permanent — always the first input, never moves,
 					     never re-parented. Must stay the literal first child of .field-row (the
 					     520px+ padding-right rule targets :first-child). -->
-					<div id="input-slot-a" class="field-half flex flex-col justify-between p-6">
+					<div id="input-slot-a" class="field-half flex flex-col justify-between p-[16px] mobile:p-6">
 						<div>
 							<div class="flex items-center justify-between mb-2">
 								<label for="molar-mass" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
@@ -182,7 +182,7 @@ import Layout from '../layouts/Layout.astro';
 					<!-- input-slot-b: permanent shell (layout/divider only). Receives whichever of
 					     Mass/Moles is currently the second input — never touched by the move logic
 					     itself, only its contents change. -->
-					<div id="input-slot-b" class="field-half field-half-divider p-6">
+					<div id="input-slot-b" class="field-half field-half-divider p-[16px] mobile:p-6">
 						<div id="mass-field-content" class="h-full flex flex-col justify-between transition-opacity duration-150">
 							<div>
 								<div class="flex items-center justify-between mb-2">
@@ -347,7 +347,7 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 
 						<!-- Presets Tab Content -->
-						<div id="panel-presets" class="p-5">
+						<div id="panel-presets" class="p-[16px] mobile:p-5">
 							<label for="preset-select" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">
 								Common Compounds
 							</label>
@@ -393,7 +393,7 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 
 						<!-- Build Custom Tab Content -->
-						<div id="panel-custom" class="hidden p-5">
+						<div id="panel-custom" class="hidden p-[16px] mobile:p-5">
 							<!-- Search -->
 							<input
 								type="search"
@@ -437,7 +437,7 @@ import Layout from '../layouts/Layout.astro';
 				     Receives whichever of Mass/Moles is currently the calculated output. The
 				     absence of a white input box (unlike Molar Mass/Mass) is the only read-only
 				     signal now that the badge and lock icon are gone. -->
-				<div id="result-slot" class="md:col-span-2 bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-6">
+				<div id="result-slot" class="md:col-span-2 bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-[16px] mobile:p-6">
 					<div id="moles-field-content" class="h-full flex flex-col justify-between transition-opacity duration-150">
 						<div>
 							<div class="flex items-center justify-between mb-2">
