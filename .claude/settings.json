@@ -6,7 +6,9 @@
       "Bash(node scratch-evidence.cjs)",
       "Bash(sed -i \"s|page.locator\\('section'\\).screenshot|page.locator\\('main section'\\).first\\(\\).screenshot|\" scratch-evidence.cjs)",
       "Bash(git commit -m 'fix: render a computed zero particle count as '\\\\''0 particles'\\\\'' \\(F3\\) *)",
-      "Bash(git commit -m 'refactor: convert borders to box-shadow:inset site-wide \\(WCAG forced-colors fallback included\\) *)"
+      "Bash(git commit -m 'refactor: convert borders to box-shadow:inset site-wide \\(WCAG forced-colors fallback included\\) *)",
+      "Bash(node -e ' *)",
+      "Bash(git commit -m '@ *)"
     ],
     "additionalDirectories": [
       "\\tmp"

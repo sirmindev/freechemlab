@@ -231,7 +231,7 @@ components:
   card-calculator:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.xl}"
-    padding: "{spacing.lg}"
+    padding: "16px below 520px, {spacing.lg} (24px) at `mobile:` (≥520px) and up"
     boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
   card-field:
     backgroundColor: "{colors.surface-2}"
@@ -466,7 +466,7 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 ### Spacing System
 - **Base unit**: 4px
 - **Tokens**: `{spacing.xxs}` 4px · `{spacing.xs}` 8px · `{spacing.sm}` 12px · `{spacing.md}` 16px · `{spacing.lg}` 24px · `{spacing.xl}` 32px · `{spacing.xxl}` 48px · `{spacing.section}` 96px
-- Calculator card padding: `{spacing.lg}` 24px
+- Calculator card padding: 16px below 520px, `{spacing.lg}` 24px at `mobile:` (≥520px) and up. Symmetric on all sides at both breakpoints — only the value changes, not the axis split. Reduced from a flat 24px specifically for the outer card; field/result card padding below is unaffected.
 - Field container padding: `{spacing.lg}` 24px. Molar Mass and the current second input share a single field card (no gap, no divider) split by asymmetric inner padding — 24px on the outer edges and top/bottom, 12px each on the two sides facing the shared midline, for a 24px total gutter.
 - Result card padding: `{spacing.lg}` 24px, symmetric on all sides — it is a single field, not split.
 - Pill padding: 8px vertical · 12px horizontal
@@ -616,7 +616,7 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 ### Cards & Panels
 
 **`card-calculator`** — The outer card. Everything lives inside it.
-- Background `{colors.surface-1}`, rounded `{rounded.xl}`, padding `{spacing.lg}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
+- Background `{colors.surface-1}`, rounded `{rounded.xl}`, padding 16px below 520px / `{spacing.lg}` (24px) at `mobile:` and up, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
 
 **`card-field`** — Two inputs share a single card, side by side. There is no gap and no divider between them — the split is entirely padding: 24px on the outer edges and top/bottom, 12px on the two sides facing the shared midline.
 - Background `{colors.surface-2}`, rounded `{rounded.lg}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
