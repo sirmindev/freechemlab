@@ -109,7 +109,7 @@ import Layout from '../layouts/Layout.astro';
 									id="molar-mass"
 									step="1"
 									placeholder="e.g. 18.02"
-									class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-2.5 mobile:py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all"
+									class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[11px] mobile:py-[9px] focus:py-[10px] mobile:focus:py-[8px] border border-hairline focus:outline-none focus:border-2 focus:border-brand-green focus:ring-0 transition-all"
 								/>
 								<!-- Functional stepper — one capsule, not two circles. Rounding is per-side,
 								     not per-button: "-" is permanently rounded-l-full/square-right (it never
@@ -197,7 +197,7 @@ import Layout from '../layouts/Layout.astro';
 										id="mass-input"
 										step="1"
 										placeholder="e.g. 18.02"
-										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-2.5 mobile:py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all"
+										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[11px] mobile:py-[9px] focus:py-[10px] mobile:focus:py-[8px] border border-hairline focus:outline-none focus:border-2 focus:border-brand-green focus:ring-0 transition-all"
 									/>
 									<!-- Functional stepper — hidden while this field is the readonly result.
 									     See molar-mass-stepper above for the capsule-shape/fill/hit-area
@@ -656,7 +656,7 @@ import Layout from '../layouts/Layout.astro';
 		rawResult: number | null;
 	}
 
-	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-2.5 mobile:py-2 border-2 border-hairline focus:outline-none focus:border-brand-green focus:ring-0 transition-all";
+	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[11px] mobile:py-[9px] focus:py-[10px] mobile:focus:py-[8px] border border-hairline focus:outline-none focus:border-2 focus:border-brand-green focus:ring-0 transition-all";
 	// result-value: bare typography, no box — the absence of a box is the read-only signal (see DESIGN.md Don't)
 	const READONLY_RESULT_CLASS = "w-full bg-transparent text-ink-tertiary font-mono text-[32px] font-medium rounded-none border-0 px-0 py-0 cursor-not-allowed select-none focus:outline-none transition-all";
 
@@ -790,24 +790,30 @@ import Layout from '../layouts/Layout.astro';
 		recalculate();
 	}
 
+	// Error swaps both border-width (1px -> 2px) and vertical padding (11/9px ->
+	// 10/8px) together, so the border grows by 1px/side exactly as the padding
+	// shrinks by 1px/side and the total box height never moves. Focus does the
+	// same trade via pure CSS (`focus:` / `mobile:focus:` variants baked into
+	// EDITABLE_INPUT_CLASS); error needs it done in JS because it's a toggled
+	// class, not a pseudo-class.
 	function clearAllErrors() {
 		molarMassError?.classList.add('hidden');
-		molarMassInput?.classList.remove('border-brand-error');
-		molarMassInput?.classList.add('border-hairline');
+		molarMassInput?.classList.remove('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
+		molarMassInput?.classList.add('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
 
 		// Only reset the hairline border on mass/moles when they're the editable
 		// text-input — the readonly result-value has no box, and re-adding a
 		// border here would silently restore it (see DESIGN.md's read-only Don't).
 		massError?.classList.add('hidden');
 		if (massInput && !massInput.readOnly) {
-			massInput.classList.remove('border-brand-error');
-			massInput.classList.add('border-hairline');
+			massInput.classList.remove('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
+			massInput.classList.add('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
 		}
 
 		molesError?.classList.add('hidden');
 		if (molesInput && !molesInput.readOnly) {
-			molesInput.classList.remove('border-brand-error');
-			molesInput.classList.add('border-hairline');
+			molesInput.classList.remove('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
+			molesInput.classList.add('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
 		}
 	}
 
@@ -896,8 +902,8 @@ import Layout from '../layouts/Layout.astro';
 			if (molarMassError) {
 				molarMassError.classList.remove('hidden');
 			}
-			molarMassInput?.classList.add('border-brand-error');
-			molarMassInput?.classList.remove('border-hairline');
+			molarMassInput?.classList.add('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
+			molarMassInput?.classList.remove('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
 			hasError = true;
 		}
 
@@ -910,8 +916,8 @@ import Layout from '../layouts/Layout.astro';
 				if (massError) {
 					massError.classList.remove('hidden');
 				}
-				massInput?.classList.add('border-brand-error');
-				massInput?.classList.remove('border-hairline');
+				massInput?.classList.add('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
+				massInput?.classList.remove('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
 				hasError = true;
 			}
 
@@ -951,8 +957,8 @@ import Layout from '../layouts/Layout.astro';
 				if (molesError) {
 					molesError.classList.remove('hidden');
 				}
-				molesInput?.classList.add('border-brand-error');
-				molesInput?.classList.remove('border-hairline');
+				molesInput?.classList.add('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
+				molesInput?.classList.remove('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
 				hasError = true;
 			}
 

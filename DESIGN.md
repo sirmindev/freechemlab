@@ -300,20 +300,22 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.input-value}"
     rounded: "{rounded.md}"
-    padding: "TWO explicitly different values by breakpoint, not one shared spec — 10px vertical below 520px, 8px vertical at `mobile:` (≥520px) and up; 12px left at both. Right padding is separate again and reserves the stepper capsule: 80px below 520px, 72px at `mobile:` and up."
-    height: "TWO explicitly different values by breakpoint — 48px below 520px, 44px at `mobile:` (≥520px) and up. Composed as line-height 24px + vertical padding (20px mobile / 16px desktop) + border 4px; there is no `height` declaration, so the only lever is the vertical padding."
-    border: "2px solid {colors.hairline}"
+    padding: "Vertical padding is now state-dependent, on top of the existing per-breakpoint split — FOUR values total, not two. Resting: 11px vertical below 520px, 9px at `mobile:` (≥520px) and up. Focus/error: 10px vertical below 520px, 8px at `mobile:` and up — i.e. 1px less per side than resting, at each breakpoint. Left padding stays 12px in every state. Right padding is unrelated to this and still reserves the stepper capsule: 80px below 520px, 72px at `mobile:` and up."
+    height: "48px below 520px, 44px at `mobile:` (≥520px) and up — IDENTICAL in every state (rest/focus/error). There is no `height` declaration; height is emergent from line-height 24px + vertical padding×2 + border×2, and the padding numbers above are deliberately the border-width delta (1px vs 2px) inverted, so the two sums cancel: 24+22+2=48 at rest equals 24+20+4=48 at focus/error (below 520px); 24+18+2=44 equals 24+16+4=44 at/above it. Verified with real computed-style measurements (not just arithmetic) at both breakpoints, all three fields, all three states — see the Don't below for the mechanism and why it replaced an earlier reopened trade-off."
+    border: "1px solid {colors.hairline} at rest, 2px at focus/error — see text-input-focused/text-input-error"
   text-input-focused:
     backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
     typography: "{typography.input-value}"
     rounded: "{rounded.md}"
+    padding: "10px vertical below 520px, 8px at `mobile:` and up — 1px less per side than resting, exactly offsetting the border growing by 1px per side"
     border: "2px solid {colors.primary}"
   text-input-error:
     backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
     typography: "{typography.input-value}"
     rounded: "{rounded.md}"
+    padding: "Same as text-input-focused: 10px vertical below 520px, 8px at `mobile:` and up"
     border: "2px solid {colors.error}"
 
   field-stepper-pill:
@@ -538,7 +540,7 @@ The warm canvas is the whitespace. Sections separate by lifting onto a surface, 
 
 **There are no drop shadows in this system.** Depth is carried entirely by the surface ladder plus hairline borders. If something needs to feel raised, it moves up a surface step — it does not gain a shadow.
 
-Focus and error use a border-color change rather than a shadow ring, because a ring reads poorly against a flat bordered card system. The border is 2px at rest and stays 2px through every state — only the color moves (hairline → primary → error). An earlier build changed the width instead (0.5px → 2px on focus), which shifted the input's content by a couple of pixels on every focus/blur; keeping the width constant was the fix.
+Focus and error use a border-color change plus a border-*width* change (1px at rest, 2px on focus/error) — color moves (hairline → primary → error) and width grows together. An earlier build changed width alone on focus (0.5px → 2px) and that shifted the input's content by a couple of pixels on every focus/blur, which was fixed at the time by holding width constant at 2px everywhere. That constant-width rule was later dropped in favor of the current 1px/2px split, which reopened the same content-shift risk — and was closed again the same way box-model shifts always get closed: not by refusing to change border width, but by pairing it with an equal-and-opposite padding change. Vertical padding is 1px per side larger at rest than at focus/error (11px/9px vs 10px/8px, see `text-input`/`text-input-focused` below), so `border + padding` sums to the same total at every state and the input's total height (48px / 44px per breakpoint) never moves. Verified with real computed-height measurements, not just arithmetic — see the Don't below.
 
 ## Shapes
 
@@ -681,12 +683,12 @@ Selected state is carried by **`aria-current="true"`** on the tile body, present
 ### Inputs & Validation
 
 **`text-input`** — Molar mass and mass fields.
-- Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, padding 8px 12px, 2px `{colors.hairline}` border. The border is always 2px — see the Don't below on why the width never changes.
+- Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, left padding 12px, 1px `{colors.hairline}` border at rest. Vertical padding is 11px below 520px / 9px at `mobile:` and up — 1px more per side than focus/error carries, which is what keeps the field's total height fixed when the border grows. See `text-input`'s `padding`/`height` entries above for the exact numbers and the Don't below for why this pairing exists.
 - Trailing chevron-selector-vertical icon, 24px box (two 10×6px chevrons stacked), right-aligned. It is a functional stepper, not decorative: the up chevron is always active (`{colors.ink-muted}`); the down chevron mutes to `{colors.ink-tertiary}` and disables once the value is at its floor (0 for all three fields), active (`{colors.ink-muted}`) otherwise. Each field steps by 1 (whole numbers).
 
-**`text-input-focused`** — Border color changes to `{colors.primary}`. Width stays 2px, same as rest — only the color transitions, so focusing never shifts layout.
+**`text-input-focused`** — Border color changes to `{colors.primary}` and width steps from the 1px resting border to 2px. Vertical padding steps down by 1px per side in the same instant (11px→10px / 9px→8px), so the border's growth and the padding's shrink cancel and the field's total height never moves.
 
-**`text-input-error`** — Border color changes to `{colors.error}`. Width stays 2px. Paired with an `error-message` directly below the field.
+**`text-input-error`** — Border color changes to `{colors.error}`, same width and padding trade as focus (1px→2px border, 1px/side padding reduction). Paired with an `error-message` directly below the field.
 
 **`result-value`** — The calculated result. Not a boxed input — bare typography sitting directly on `card-result`'s background, with no white box, no border, and no badge or lock icon. That absence is the only read-only signal; see the Don't below.
 - Text `{colors.ink-tertiary}` when empty, `{colors.primary}` once a value exists. Type `{typography.result-value}`.
@@ -736,7 +738,7 @@ The particle-count row is the one place in the result block with a visible divid
 - Don't add a marketing hero, a promotional CTA, or footer cross-links.
 - Don't add a white input box, a badge, or a lock icon to the calculated result field. Whichever two fields are currently inputs have a white `text-input` box; the result field does not — that absence is now the only structural signal that it is read-only. Adding one back silently breaks it.
 - Don't pill-round the element tiles or the calculator card.
-- Don't change a `text-input`'s border *width* on focus or error. It's 2px at every state; only the color moves. Changing the width shifts the field's content by a couple of pixels on every focus/blur — that flicker was a real defect, not a style choice.
+- **Don't change `text-input`'s border-width without also compensating padding.** The field's total height (48px / 44px per breakpoint) has no `height` declaration behind it — it's purely line-height + padding×2 + border×2, so any border-width change that isn't offset elsewhere WILL shift height on every focus/blur or error/clear. This shipped as a real defect twice already: once when focus alone changed width (0.5px → 2px) with nothing offsetting it, and once when the resting border was dropped to 1px while focus/error stayed 2px with nothing offsetting it either. The current, closed form: resting vertical padding is 1px/side larger than focus/error's (11px/9px vs 10px/8px — see `text-input`), so the border's ±1px/side and the padding's ∓1px/side always cancel. If the border width ever changes again, the padding pair above has to move with it, by the same amount, in the opposite direction — verify with real computed-height measurements at both breakpoints and all three fields, not just arithmetic, since a `transition-all` is in play and a synchronous read immediately after a focus/error trigger will report the pre-transition value.
 - Don't add a divider between a field's input/value block and its unit-pill row, or between the Molar Mass/Mass/Moles blocks and their pills. A plain 16px gap is correct there; the only intentional divider in the result block is above the particle-count row.
 - Don't fix `card-field`'s second slot or `card-result`'s content to a specific field (e.g. "Mass is always the input, Moles is always the result"). Both cards are role-assigned and swap contents with the direction toggle — hardcoding by field identity instead of role is exactly the bug that shipped once already.
 
