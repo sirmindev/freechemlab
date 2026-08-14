@@ -18,7 +18,7 @@ import Layout from '../layouts/Layout.astro';
 					<li>
 						<a
 							href="/calculators"
-							class="px-3 py-1.5 text-sm font-medium text-ink bg-surface rounded-full border border-hairline transition-colors"
+							class="px-3 py-1.5 text-sm font-medium text-ink bg-surface rounded-full inset-ring-1 inset-ring-hairline transition-colors"
 							aria-current="page"
 						>
 							Calculator
@@ -52,7 +52,7 @@ import Layout from '../layouts/Layout.astro';
 		</nav>
 
 		<!-- Calculator Card Shell -->
-		<section class="bg-surface border border-hairline rounded-[16px] p-6">
+		<section class="bg-surface inset-ring-1 inset-ring-hairline rounded-[16px] p-6">
 			<!-- Header Row -->
 			<header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-hairline-soft">
 				<div>
@@ -62,7 +62,7 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 
 				<!-- Direction Toggle: toggle-direction, two-word segments joined by a chevron -->
-				<div class="inline-flex items-center gap-1 p-1 bg-transparent border border-hairline rounded-full self-start sm:self-auto">
+				<div class="inline-flex items-center gap-1 p-1 bg-transparent inset-ring-1 inset-ring-hairline rounded-full self-start sm:self-auto">
 					<button
 						id="toggle-g-to-mol"
 						type="button"
@@ -92,7 +92,7 @@ import Layout from '../layouts/Layout.astro';
 			<div class="flex flex-col gap-6">
 				<!-- Molar Mass + Mass: card-field, merged into one card (no gap, no divider) —
 				     split by asymmetric padding: 24px outer edges, 12px on the shared midline -->
-				<div class="field-row w-full bg-surface-soft border border-hairline rounded-[12px] flex flex-col">
+				<div class="field-row w-full bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] flex flex-col">
 					<!-- Molar Mass: input-slot-a. Permanent — always the first input, never moves,
 					     never re-parented. Must stay the literal first child of .field-row (the
 					     520px+ padding-right rule targets :first-child). -->
@@ -109,7 +109,7 @@ import Layout from '../layouts/Layout.astro';
 									id="molar-mass"
 									step="1"
 									placeholder="e.g. 18.02"
-									class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[11px] mobile:py-[9px] focus:py-[10px] mobile:focus:py-[8px] border border-hairline focus:outline-none focus:border-2 focus:border-brand-green focus:ring-0 transition-all"
+									class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] inset-ring-1 inset-ring-hairline focus:outline-none focus:inset-ring-2 focus:inset-ring-primary focus:ring-0 transition-all"
 								/>
 								<!-- Functional stepper — one capsule, not two circles. Rounding is per-side,
 								     not per-button: "-" is permanently rounded-l-full/square-right (it never
@@ -171,7 +171,7 @@ import Layout from '../layouts/Layout.astro';
 								<button
 									type="button"
 									data-unit="kg/kmol"
-									class="unit-pill-mm min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-mm min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									kg/kmol
 								</button>
@@ -197,7 +197,7 @@ import Layout from '../layouts/Layout.astro';
 										id="mass-input"
 										step="1"
 										placeholder="e.g. 18.02"
-										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[11px] mobile:py-[9px] focus:py-[10px] mobile:focus:py-[8px] border border-hairline focus:outline-none focus:border-2 focus:border-brand-green focus:ring-0 transition-all"
+										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] inset-ring-1 inset-ring-hairline focus:outline-none focus:inset-ring-2 focus:inset-ring-primary focus:ring-0 transition-all"
 									/>
 									<!-- Functional stepper — hidden while this field is the readonly result.
 									     See molar-mass-stepper above for the capsule-shape/fill/hit-area
@@ -242,7 +242,7 @@ import Layout from '../layouts/Layout.astro';
 									<button
 										type="button"
 										data-unit="mg"
-										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										mg
 									</button>
@@ -256,28 +256,28 @@ import Layout from '../layouts/Layout.astro';
 									<button
 										type="button"
 										data-unit="kg"
-										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										kg
 									</button>
 									<button
 										type="button"
 										data-unit="ng"
-										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										ng
 									</button>
 									<button
 										type="button"
 										data-unit="ug"
-										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										&micro;g
 									</button>
 									<button
 										type="button"
 										data-unit="dag"
-										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										dag
 									</button>
@@ -327,7 +327,7 @@ import Layout from '../layouts/Layout.astro';
 					</button>
 
 					<!-- Collapsible Panel -->
-					<div id="browse-panel" class="hidden mt-3 bg-surface-soft border border-hairline rounded-[12px] overflow-hidden">
+					<div id="browse-panel" class="hidden mt-3 bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] overflow-hidden">
 						<!-- Tabs -->
 						<div class="flex border-b border-hairline">
 							<button
@@ -353,7 +353,7 @@ import Layout from '../layouts/Layout.astro';
 							</label>
 							<select
 								id="preset-select"
-								class="w-full bg-surface-soft border border-hairline text-ink text-sm font-sans rounded-[8px] px-3.5 py-2.5 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+								class="w-full bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] px-3.5 py-2.5 focus:outline-none focus:inset-ring-primary focus:ring-1 focus:ring-brand-green transition-all"
 							>
 								<option value="">Select a compound…</option>
 								<optgroup label="Common">
@@ -399,7 +399,7 @@ import Layout from '../layouts/Layout.astro';
 								type="search"
 								id="element-search"
 								placeholder="Search by name or symbol…"
-								class="w-full bg-surface-soft border border-hairline text-ink text-sm font-sans rounded-[8px] px-3.5 py-2.5 mb-4 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green transition-all"
+								class="w-full bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] px-3.5 py-2.5 mb-4 focus:outline-none focus:inset-ring-primary focus:ring-1 focus:ring-brand-green transition-all"
 							/>
 
 							<!-- Element Grid -->
@@ -437,7 +437,7 @@ import Layout from '../layouts/Layout.astro';
 				     Receives whichever of Mass/Moles is currently the calculated output. The
 				     absence of a white input box (unlike Molar Mass/Mass) is the only read-only
 				     signal now that the badge and lock icon are gone. -->
-				<div id="result-slot" class="md:col-span-2 bg-surface-soft border border-hairline rounded-[12px] p-6">
+				<div id="result-slot" class="md:col-span-2 bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-6">
 					<div id="moles-field-content" class="h-full flex flex-col justify-between transition-opacity duration-150">
 						<div>
 							<div class="flex items-center justify-between mb-2">
@@ -515,28 +515,28 @@ import Layout from '../layouts/Layout.astro';
 								<button
 									type="button"
 									data-unit="mmol"
-									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									mmol
 								</button>
 								<button
 									type="button"
 									data-unit="umol"
-									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									&micro;mol
 								</button>
 								<button
 									type="button"
 									data-unit="nmol"
-									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									nmol
 								</button>
 								<button
 									type="button"
 									data-unit="pmol"
-									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									pmol
 								</button>
@@ -656,7 +656,7 @@ import Layout from '../layouts/Layout.astro';
 		rawResult: number | null;
 	}
 
-	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[11px] mobile:py-[9px] focus:py-[10px] mobile:focus:py-[8px] border border-hairline focus:outline-none focus:border-2 focus:border-brand-green focus:ring-0 transition-all";
+	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] inset-ring-1 inset-ring-hairline focus:outline-none focus:inset-ring-2 focus:inset-ring-primary focus:ring-0 transition-all";
 	// result-value: bare typography, no box — the absence of a box is the read-only signal (see DESIGN.md Don't)
 	const READONLY_RESULT_CLASS = "w-full bg-transparent text-ink-tertiary font-mono text-[32px] font-medium rounded-none border-0 px-0 py-0 cursor-not-allowed select-none focus:outline-none transition-all";
 
@@ -790,30 +790,30 @@ import Layout from '../layouts/Layout.astro';
 		recalculate();
 	}
 
-	// Error swaps both border-width (1px -> 2px) and vertical padding (11/9px ->
-	// 10/8px) together, so the border grows by 1px/side exactly as the padding
-	// shrinks by 1px/side and the total box height never moves. Focus does the
-	// same trade via pure CSS (`focus:` / `mobile:focus:` variants baked into
+	// Error and focus both swap the inset-ring width (1px -> 2px) alongside the
+	// color. box-shadow:inset never participates in box sizing, so unlike a
+	// real border this never shifts the input's height — no padding trade
+	// needed. Focus does the swap via pure CSS (`focus:` variants baked into
 	// EDITABLE_INPUT_CLASS); error needs it done in JS because it's a toggled
 	// class, not a pseudo-class.
 	function clearAllErrors() {
 		molarMassError?.classList.add('hidden');
-		molarMassInput?.classList.remove('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
-		molarMassInput?.classList.add('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
+		molarMassInput?.classList.remove('inset-ring-error', 'inset-ring-2');
+		molarMassInput?.classList.add('inset-ring-hairline', 'inset-ring-1');
 
-		// Only reset the hairline border on mass/moles when they're the editable
+		// Only reset the hairline ring on mass/moles when they're the editable
 		// text-input — the readonly result-value has no box, and re-adding a
 		// border here would silently restore it (see DESIGN.md's read-only Don't).
 		massError?.classList.add('hidden');
 		if (massInput && !massInput.readOnly) {
-			massInput.classList.remove('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
-			massInput.classList.add('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
+			massInput.classList.remove('inset-ring-error', 'inset-ring-2');
+			massInput.classList.add('inset-ring-hairline', 'inset-ring-1');
 		}
 
 		molesError?.classList.add('hidden');
 		if (molesInput && !molesInput.readOnly) {
-			molesInput.classList.remove('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
-			molesInput.classList.add('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
+			molesInput.classList.remove('inset-ring-error', 'inset-ring-2');
+			molesInput.classList.add('inset-ring-hairline', 'inset-ring-1');
 		}
 	}
 
@@ -902,8 +902,8 @@ import Layout from '../layouts/Layout.astro';
 			if (molarMassError) {
 				molarMassError.classList.remove('hidden');
 			}
-			molarMassInput?.classList.add('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
-			molarMassInput?.classList.remove('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
+			molarMassInput?.classList.add('inset-ring-error', 'inset-ring-2');
+			molarMassInput?.classList.remove('inset-ring-hairline', 'inset-ring-1');
 			hasError = true;
 		}
 
@@ -916,8 +916,8 @@ import Layout from '../layouts/Layout.astro';
 				if (massError) {
 					massError.classList.remove('hidden');
 				}
-				massInput?.classList.add('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
-				massInput?.classList.remove('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
+				massInput?.classList.add('inset-ring-error', 'inset-ring-2');
+				massInput?.classList.remove('inset-ring-hairline', 'inset-ring-1');
 				hasError = true;
 			}
 
@@ -957,8 +957,8 @@ import Layout from '../layouts/Layout.astro';
 				if (molesError) {
 					molesError.classList.remove('hidden');
 				}
-				molesInput?.classList.add('border-brand-error', 'border-2', 'py-[10px]', 'mobile:py-[8px]');
-				molesInput?.classList.remove('border-hairline', 'border', 'py-[11px]', 'mobile:py-[9px]');
+				molesInput?.classList.add('inset-ring-error', 'inset-ring-2');
+				molesInput?.classList.remove('inset-ring-hairline', 'inset-ring-1');
 				hasError = true;
 			}
 
@@ -994,7 +994,7 @@ import Layout from '../layouts/Layout.astro';
 			if (unit === selectedUnit) {
 				btn.className = `${markerClass} min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center`;
 			} else {
-				btn.className = `${markerClass} min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent border border-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center`;
+				btn.className = `${markerClass} min-h-[44px] md:min-h-0 px-4 py-[14px] md:px-3 md:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center`;
 			}
 		});
 	}
@@ -1194,7 +1194,7 @@ import Layout from '../layouts/Layout.astro';
 			card.dataset.symbol = el.symbol;
 			// min-h holds the tile above its natural height in BOTH states so
 			// mounting the stepper never changes the row's height.
-			card.className = 'flex min-h-[52px] items-center justify-between gap-2 rounded-md border bg-surface p-2 transition-colors';
+			card.className = 'flex min-h-[52px] items-center justify-between gap-2 rounded-md inset-ring-1 bg-surface p-2 transition-colors';
 
 			// Tile body — clicking it is the select action
 			const body = document.createElement('button');
@@ -1263,11 +1263,11 @@ import Layout from '../layouts/Layout.astro';
 			function sync() {
 				const qty = quantities.get(el.symbol) ?? 0;
 				const selected = qty > 0;
-				card.classList.toggle('border-brand-green', selected);
-				card.classList.toggle('border-hairline', !selected);
+				card.classList.toggle('inset-ring-primary', selected);
+				card.classList.toggle('inset-ring-hairline', !selected);
 				// Hover feedback is unselected-only: the hover variant outranks
 				// the green border, so leaving it on would grey out a selected tile.
-				card.classList.toggle('hover:border-hairline-tertiary', !selected);
+				card.classList.toggle('hover:inset-ring-hairline-tertiary', !selected);
 				// aria-current, not aria-pressed: body-click only ever selects,
 				// so toggle-button semantics would misdescribe it. See DESIGN.md.
 				if (selected) {

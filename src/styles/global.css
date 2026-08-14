@@ -114,3 +114,23 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* Windows High Contrast Mode (forced-colors) fallback for the site's
+   border -> box-shadow:inset conversion (see DESIGN.md). `box-shadow` is
+   treated as decorative and computes to `none` in forced-colors mode, while
+   `border` is treated as structural and left alone — so every element that
+   now signals its edge with `inset-ring-*` would otherwise render with no
+   visible edge at all here. Forced-colors mode also collapses this app's
+   surface ladder (canvas/surface-1/surface-2/etc. all resolve toward the
+   same system background), so that edge is doing double duty as the only
+   remaining cue a container's boundary exists. Every inset-ring-* user gets
+   this fallback — none of them are safe to skip. A flat 1px CanvasText
+   border is used regardless of which width/color state was active, since
+   state no longer needs to reserve box-model space and there is nothing to
+   gain from reproducing the 1px/2px distinction here. */
+@media (forced-colors: active) {
+  [class*="inset-ring-"] {
+    box-shadow: none;
+    border: 1px solid CanvasText;
+  }
+}

@@ -381,11 +381,12 @@ test.describe('Element tile – selection model', () => {
     await expect(tile.locator('[data-step]')).toHaveCount(0);
     await expect(tile.locator('button').first()).not.toHaveAttribute('aria-current');
     // Move off the tile first: clicking leaves the pointer on it, and the tile
-    // hover state would legitimately report hairline-strong instead of hairline.
+    // hover state would legitimately report hairline-tertiary instead of hairline.
+    // Edge is box-shadow:inset, not border (see DESIGN.md) — assert on boxShadow.
     await page.mouse.move(0, 0);
     await expect
-      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
-      .toBe('rgb(229, 226, 218)');
+      .poll(() => tile.evaluate(n => getComputedStyle(n).boxShadow))
+      .toContain('rgb(229, 226, 218) 0px 0px 0px 1px inset');
     await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
   });
 
@@ -405,29 +406,30 @@ test.describe('Element tile – selection model', () => {
     expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
   });
 
-  test('hovering an unselected tile strengthens its border, without a fill', async ({ page }) => {
+  test('hovering an unselected tile strengthens its edge, without a fill', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
 
+    // Edge is box-shadow:inset, not border (see DESIGN.md) — assert on boxShadow.
     const tile = hTile(page);
     await expect
-      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
-      .toBe('rgb(229, 226, 218)'); // hairline
+      .poll(() => tile.evaluate(n => getComputedStyle(n).boxShadow))
+      .toContain('rgb(229, 226, 218) 0px 0px 0px 1px inset'); // hairline
 
     await tile.hover();
 
     await expect
-      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
-      .toBe('rgb(196, 192, 178)'); // hairline-tertiary
-    // Hover is border-only — no fill, same as the selected state
+      .poll(() => tile.evaluate(n => getComputedStyle(n).boxShadow))
+      .toContain('rgb(196, 192, 178) 0px 0px 0px 1px inset'); // hairline-tertiary
+    // Hover is edge-only — no fill, same as the selected state
     expect(await tile.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgb(255, 255, 255)');
 
-    // A selected tile must NOT fall back to the neutral hover border
+    // A selected tile must NOT fall back to the neutral hover edge
     await tile.locator('button').first().click();
     await tile.hover();
     await expect
-      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
-      .toBe('rgb(2, 97, 62)'); // primary, still
+      .poll(() => tile.evaluate(n => getComputedStyle(n).boxShadow))
+      .toContain('rgb(2, 97, 62) 0px 0px 0px 1px inset'); // primary, still
   });
 
   // Both buttons must hover identically — same fill, same shape, same size.
@@ -532,27 +534,28 @@ test.describe('Element tile – selection model', () => {
     expect(Number.isInteger(geo.columnGap)).toBe(true);
   });
 
-  test('selected state is border-only — background does not change', async ({ page }) => {
+  test('selected state is edge-only — background does not change', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
 
+    // Edge is box-shadow:inset, not border (see DESIGN.md) — assert on boxShadow.
     const tile = hTile(page);
     const bgBefore = await tile.evaluate(n => getComputedStyle(n).backgroundColor);
-    const borderBefore = await tile.evaluate(n => getComputedStyle(n).borderTopColor);
+    const edgeBefore = await tile.evaluate(n => getComputedStyle(n).boxShadow);
 
     await tile.locator('button').first().click();
 
-    // Poll past the 150ms border-color transition
+    // Poll past the 150ms color transition
     await expect
-      .poll(() => tile.evaluate(n => getComputedStyle(n).borderTopColor))
-      .toBe('rgb(2, 97, 62)');
+      .poll(() => tile.evaluate(n => getComputedStyle(n).boxShadow))
+      .toContain('rgb(2, 97, 62) 0px 0px 0px 1px inset');
     const bgAfter = await tile.evaluate(n => getComputedStyle(n).backgroundColor);
 
     // Background is untouched white in both states
     expect(bgBefore).toBe('rgb(255, 255, 255)');
     expect(bgAfter).toBe('rgb(255, 255, 255)');
-    // Only the border moves, hairline -> primary green
-    expect(borderBefore).toBe('rgb(229, 226, 218)');
+    // Only the edge moves, hairline -> primary green
+    expect(edgeBefore).toContain('rgb(229, 226, 218) 0px 0px 0px 1px inset');
   });
 });
 

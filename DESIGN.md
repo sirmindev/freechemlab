@@ -162,18 +162,18 @@ components:
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     padding: "8px 12px"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
   pill-inactive-hover:
     backgroundColor: "{colors.surface-2}"
     textColor: "{colors.ink}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     padding: "8px 12px"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
 
   toggle-direction:
     backgroundColor: "transparent"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
     rounded: "{rounded.pill}"
     padding: "4px"
   toggle-direction-segment-active:
@@ -220,35 +220,35 @@ components:
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     padding: "10px 20px"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
   button-icon:
     backgroundColor: "{colors.surface-2}"
     textColor: "{colors.ink-subtle}"
     rounded: "{rounded.full}"
     size: "32px"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
 
   card-calculator:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.xl}"
     padding: "{spacing.lg}"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
   card-field:
     backgroundColor: "{colors.surface-2}"
     rounded: "{rounded.lg}"
     padding: "{spacing.lg}"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
   card-result:
     backgroundColor: "{colors.surface-2}"
     rounded: "{rounded.lg}"
     padding: "{spacing.lg}"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
 
   panel-browse-elements:
     backgroundColor: "{colors.surface-2}"
     rounded: "{rounded.lg}"
     padding: "{spacing.md}"
-    border: "0.5px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
 
   element-tile:
     backgroundColor: "{colors.surface-1}"
@@ -256,21 +256,21 @@ components:
     padding: "{spacing.xs}"
     gap: "{spacing.xs}"
     minHeight: "52px"
-    border: "1px solid {colors.hairline}"
+    boxShadow: "inset 0 0 0 1px {colors.hairline}"
   element-tile-hover:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
     padding: "{spacing.xs}"
     gap: "{spacing.xs}"
     minHeight: "52px"
-    border: "1px solid {colors.hairline-tertiary}"
+    boxShadow: "inset 0 0 0 1px {colors.hairline-tertiary}"
   element-tile-selected:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
     padding: "{spacing.xs}"
     gap: "{spacing.xs}"
     minHeight: "52px"
-    border: "1px solid {colors.primary}"
+    boxShadow: "inset 0 0 0 1px {colors.primary}"
   element-tile-symbol:
     backgroundColor: "{colors.surface-4}"
     textColor: "{colors.ink}"
@@ -300,23 +300,23 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.input-value}"
     rounded: "{rounded.md}"
-    padding: "Vertical padding is now state-dependent, on top of the existing per-breakpoint split — FOUR values total, not two. Resting: 11px vertical below 520px, 9px at `mobile:` (≥520px) and up. Focus/error: 10px vertical below 520px, 8px at `mobile:` and up — i.e. 1px less per side than resting, at each breakpoint. Left padding stays 12px in every state. Right padding is unrelated to this and still reserves the stepper capsule: 80px below 520px, 72px at `mobile:` and up."
-    height: "48px below 520px, 44px at `mobile:` (≥520px) and up — IDENTICAL in every state (rest/focus/error). There is no `height` declaration; height is emergent from line-height 24px + vertical padding×2 + border×2, and the padding numbers above are deliberately the border-width delta (1px vs 2px) inverted, so the two sums cancel: 24+22+2=48 at rest equals 24+20+4=48 at focus/error (below 520px); 24+18+2=44 equals 24+16+4=44 at/above it. Verified with real computed-style measurements (not just arithmetic) at both breakpoints, all three fields, all three states — see the Don't below for the mechanism and why it replaced an earlier reopened trade-off."
-    border: "1px solid {colors.hairline} at rest, 2px at focus/error — see text-input-focused/text-input-error"
+    padding: "ONE value per breakpoint, identical in every state (rest/focus/error) — 12px vertical below 520px, 10px at `mobile:` (≥520px) and up. Left padding stays 12px in every state. Right padding is unrelated to this and still reserves the stepper capsule: 80px below 520px, 72px at `mobile:` and up. No state-based split: box-shadow:inset doesn't participate in box sizing, so the edge can grow from 1px to 2px on focus/error without padding needing to move opposite it — see the Do below."
+    height: "48px below 520px, 44px at `mobile:` (≥520px) and up — IDENTICAL in every state (rest/focus/error), and now automatically so. There is no `height` declaration; height is emergent from line-height 24px + vertical padding×2, full stop — the inset box-shadow paints inside the padding box and adds nothing to it, so there is no border term left in the sum. 24+24=48 at every state (below 520px); 24+20=44 at every state (at/above it). Verified with real computed-style measurements (not just arithmetic) at both breakpoints, all three fields, all three states."
+    boxShadow: "inset 0 0 0 1px {colors.hairline} at rest, 2px at focus/error — see text-input-focused/text-input-error"
   text-input-focused:
     backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
     typography: "{typography.input-value}"
     rounded: "{rounded.md}"
-    padding: "10px vertical below 520px, 8px at `mobile:` and up — 1px less per side than resting, exactly offsetting the border growing by 1px per side"
-    border: "2px solid {colors.primary}"
+    padding: "Same as text-input — the value never changes across states"
+    boxShadow: "inset 0 0 0 2px {colors.primary}"
   text-input-error:
     backgroundColor: "{colors.surface-1}"
     textColor: "{colors.ink}"
     typography: "{typography.input-value}"
     rounded: "{rounded.md}"
-    padding: "Same as text-input-focused: 10px vertical below 520px, 8px at `mobile:` and up"
-    border: "2px solid {colors.error}"
+    padding: "Same as text-input — the value never changes across states"
+    boxShadow: "inset 0 0 0 2px {colors.error}"
 
   field-stepper-pill:
     backgroundColor: "none — the shape is two adjacent same-fill buttons forming ONE capsule silhouette, not a shared pill-shaped background element"
@@ -484,7 +484,7 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
   4. Search `colW` **downward in steps of 4** from the largest 4pt-aligned candidate for the largest pair where `colW` and `gap` are **both multiples of 4**, `gap ≥ minGap`, and `n·colW + (n−1)·gap = W` exactly.
   5. If no such pair exists, **fall back to integer-exact**: walk `colW` down by 1 until the leftover divides evenly across the `n−1` gaps. **The slack lands in the gaps; the columns stay uniform integers.**
 - The grid's `width` is then **set explicitly** to `W`. It is not left to stretch, so the result is the computed value rather than whatever the parent happens to offer once a scrollbar appears.
-- At desktop the grid is **756px**, giving **3 × 244px with a 12px gap** — `3 × 244 + 2 × 12 = 756` exactly, remainder 0, and every one of 756, 244 and 12 is divisible by 4. Verified identical in **headed** Chromium, headless Chromium **and** Firefox at both 1280 and 1920.
+- At desktop the grid is **760px**, giving **3 × 248px with an 8px gap** — `3 × 248 + 2 × 8 = 760` exactly, remainder 0, and every one of 760, 248 and 8 is divisible by 4. Verified identical in **headed** Chromium, headless Chromium **and** Firefox at both 1280 and 1920. (These numbers moved from the previously-documented 756 / 244 / 12 when `card-calculator` and `panel-browse-elements`'s borders converted to `box-shadow: inset` — a border consumes 2px of box-model width per side that it outlines, an inset box-shadow consumes none, so removing 4px of border across those two ancestors freed 4px for this grid. The column algorithm is a live `getBoundingClientRect()` measurement re-run by a `ResizeObserver`, not a hardcoded constant, so it re-solved for a different — still valid, still 4pt-aligned — column/gap pair on its own. See "What 760 depends on" below.)
 
 #### The scrollbar reserve
 
@@ -510,17 +510,17 @@ Hiding the scrollbar outright was tried and **rejected**: with it hidden there i
 
 Scrolling verified in headed Chromium: wheel (0 → 240), Tab (focused tile scrolled into view, `scrollTop` 226), PageDown (226 → 506) and ArrowDown (506 → 546).
 
-#### What 756 depends on
+#### What 760 depends on
 
-The deduction chain from `main` is: `896 − 32 (main px-4) − 2 (card border) − 48 (card p-6) − 2 (panel border) − 40 (panel-custom p-5) − 0 (wrapper padding) = 772` for the wrapper's border box, then `− 16 (scrollbar reserve) = 756` for the grid.
+The deduction chain from `main` is: `896 − 32 (main px-4) − 0 (card edge, box-shadow:inset) − 48 (card p-6) − 0 (panel edge, box-shadow:inset) − 40 (panel-custom p-5) − 0 (wrapper padding) = 776` for the wrapper's border box, then `− 16 (scrollbar reserve) = 760` for the grid.
 
-- **The card's 1px border and the browse-panel's 1px border net to a clean 4px only by coincidence.** Two borders × 2 sides = 4px, which happens to be 4pt-aligned. Changing **either** border independently — to 0.5px, to 2px, or removing one — breaks the alignment for everything below it. They must be changed together or not at all.
-- **The 375px viewport cannot be 4pt-aligned**, because 375 is itself odd and `main` is viewport-driven below the `max-w-4xl` cap. Measured: 375 − 32 = 343 (odd), and the odd parity propagates the whole way down to a 251px grid (251 % 4 = 3). This is inherent to the viewport width and is not corrected. Below 520 the 4pt search is expected to take the fallback and there is no attempt to force it.
-- **`1fr` is not acceptable here and must not be reintroduced.** It resolved to 251.328125px, and each column inherited a *different* sub-pixel remainder — .3281, .6563, .9844 — so identical controls antialiased differently from column to column. The plus glyph's 1.5px vertical stroke measured a full **1px** apart between column 1 and columns 2–3. This is visible at normal viewing distance, not just under zoom; it was once dismissed as a low-priority sub-pixel artifact, and that call was wrong because it had been measured on a single tile rather than across columns. Always compare across columns.
-- The 222px floor is set by the widest *selected* tile, not by taste. Measured empirically rather than derived: with "Molybdenum" (the longest name in the 63-element dataset) selected, the name begins to truncate once the column falls **to 222px or below**. The computed layout delivers 244px, leaving **22px of headroom**.
-- **`GRID_MIN_COL` is non-binding at the 244 target and should stay anyway.** Because `n = floor((W + 8) / 252)` implies `W ≥ 252n − 8`, the largest candidate column is `floor((W − 8(n−1)) / n) ≥ 244`, which can never fall below 222 — so the `while` guard cannot fire. Confirmed against the measurements: the narrowest multi-column result anywhere was 244. It is kept as a documented safety net, and it still bounds how far the 4pt search may walk down. It is the real measured truncation threshold, and it becomes load-bearing again the moment the target is lowered below 222. Do not delete it because it looks unused, and do not raise it to match the target — those are two different numbers measuring two different things. The unselected tile needs far less, but sizing to that would make every tile truncate the moment it is selected, so the floor is set by the selected case.
+- **The card's edge and the browse-panel's edge no longer consume any of this chain.** Before the sitewide border → box-shadow conversion (see Elevation & Depth), both were a real 1px `border`, and two borders × 2 sides netted a clean 4px that happened to be 4pt-aligned — the chain below used to read `896 − 32 − 2 (card border) − 48 − 2 (panel border) − 40 − 0 = 772`, then `− 16 = 756`. `box-shadow: inset` paints inside the existing box instead of adding to it, so both terms dropped to 0 and the chain gained the 4px back: 772 → 776, and the grid's resolved width moved from 756 to **760**. The column algorithm re-solves from a live `getBoundingClientRect()` measurement (re-run by a `ResizeObserver`), not a hardcoded constant, so it found a new valid 4pt-aligned column/gap pair — **3 × 248px, 8px gap** — on its own; nothing in the JS changed. Verified empirically (headed/headless Chromium and Firefox, 1280 and 1920), not derived from this arithmetic alone.
+- **The 375px viewport cannot be 4pt-aligned**, because 375 is itself odd and `main` is viewport-driven below the `max-w-4xl` cap. This is inherent to the viewport width, unaffected by the border → box-shadow conversion, and is not corrected. Below 520 the 4pt search is expected to take the fallback and there is no attempt to force it.
+- **`1fr` is not acceptable here and must not be reintroduced.** It resolved to a fractional per-column remainder in the pre-conversion layout, and each column inherited a *different* sub-pixel remainder, so identical controls antialiased differently from column to column. The plus glyph's 1.5px vertical stroke measured a full **1px** apart between column 1 and columns 2–3. This is visible at normal viewing distance, not just under zoom; it was once dismissed as a low-priority sub-pixel artifact, and that call was wrong because it had been measured on a single tile rather than across columns. Always compare across columns.
+- The 222px floor is set by the widest *selected* tile, not by taste. Measured empirically rather than derived: with "Molybdenum" (the longest name in the 63-element dataset) selected, the name begins to truncate once the column falls **to 222px or below**. The computed layout now delivers 248px, leaving **26px of headroom** (was 244px / 22px before the border → box-shadow conversion moved the resolved column width).
+- **`GRID_MIN_COL` is non-binding at the 244 target and should stay anyway.** `GRID_TARGET_COL` is still 244 in the JS — a design intent, not a promise of what any given width resolves to — so this reasoning is unchanged by the conversion; only the *resolved* column width (248 now, was 244) moved. Because `n = floor((W + 8) / 252)` implies `W ≥ 252n − 8`, the largest candidate column is `floor((W − 8(n−1)) / n) ≥ 244`, which can never fall below 222 — so the `while` guard cannot fire at this target. It is kept as a documented safety net, and it still bounds how far the 4pt search may walk down. It is the real measured truncation threshold, and it becomes load-bearing again the moment the target is lowered below 222. Do not delete it because it looks unused, and do not raise it to match the target — those are two different numbers measuring two different things. The unselected tile needs far less, but sizing to that would make every tile truncate the moment it is selected, so the floor is set by the selected case. **The "narrowest multi-column result anywhere was 244" empirical claim predates the border → box-shadow conversion and was not re-swept across every breakpoint as part of this change** — only the desktop (1280/1920) figure above was directly re-measured. Tablet/mobile-lg column outcomes plausibly moved by the same ~4px this conversion added everywhere, but that is flagged here rather than asserted.
 - Measure this by narrowing the column until `scrollWidth > clientWidth` on the name, not by summing the parts. The name span reports its *content* width whenever there is room to spare, so reading its rendered width tells you nothing about remaining headroom — that mistake made an 8px gain look like no gain at all.
-- **4-up does not fit and cannot be made to fit by shrinking type.** At 4-up the panel yields 183px columns, of which the fixed furniture (chip, stepper, padding, gaps) consumes 152px, leaving **31px** for the name against the 85px it needs. Fitting "Molybdenum" into 31px requires roughly a 5.1px font — well under half the system's 12px floor. Even deleting the stepper's border and shrinking it to 60px only buys a 8.6px font. 4-up needs a grid about **924px** wide; this grid is **756px**. The 4-column mockup is drawn on a wider canvas than the app's actual panel and only ever shows "Hydrogen", which is 62px — comfortably inside a width that "Molybdenum" overruns by 23px.
+- **4-up does not fit and cannot be made to fit by shrinking type.** At 4-up the panel yields 183px columns, of which the fixed furniture (chip, stepper, padding, gaps) consumes 152px, leaving **31px** for the name against the 85px it needs. Fitting "Molybdenum" into 31px requires roughly a 5.1px font — well under half the system's 12px floor. Even deleting the stepper's border and shrinking it to 60px only buys a 8.6px font. 4-up needs a grid about **924px** wide; this grid is **760px**. The 4-column mockup is drawn on a wider canvas than the app's actual panel and only ever shows "Hydrogen", which is 62px — comfortably inside a width that "Molybdenum" overruns by 23px. (These 183px/924px figures predate the conversion and were not re-measured — the conclusion "4-up does not fit" is unaffected by a 4px shift of this size, but the exact numbers are not re-verified.)
 - If the column rule is ever revisited, measure against **"Molybdenum" with the stepper mounted**, not against "Hydrogen" and not against the unselected tile. Sizing to either of those is exactly the error that produced a 5-up, then a 3-up, then a 4-up estimate that each failed on contact with real content.
 
 ### Whitespace Philosophy
@@ -530,17 +530,25 @@ The warm canvas is the whitespace. Sections separate by lifting onto a surface, 
 
 | Level | Treatment | Use |
 |---|---|---|
-| 0 (flat) | No border, no shadow | Page background, breadcrumb, footer |
-| 1 (card lift) | `{colors.surface-1}` on canvas, 0.5px `{colors.hairline}` | Calculator card, input interiors |
-| 1 (card lift) | `{colors.surface-1}`, 1px `{colors.hairline}` | Element tiles and their steppers — 1px, not 0.5px, per the source design |
-| 2 (nested lift) | `{colors.surface-2}`, 0.5px `{colors.hairline}` | Field containers, Browse Elements panel |
-| 3 (sub-panel lift) | `{colors.surface-3}`, 0.5px `{colors.hairline}` | Reserved — currently unused |
-| 4 (focus) | 2px `{colors.primary}` border | Focused input |
-| 4 (error) | 2px `{colors.error}` border | Errored input |
+| 0 (flat) | No edge, no shadow | Page background, breadcrumb, footer |
+| 1 (card lift) | `{colors.surface-1}` on canvas, `box-shadow: inset 0 0 0 0.5px {colors.hairline}` | Calculator card, input interiors |
+| 1 (card lift) | `{colors.surface-1}`, `box-shadow: inset 0 0 0 1px {colors.hairline}` | Element tiles and their steppers — 1px, not 0.5px, per the source design |
+| 2 (nested lift) | `{colors.surface-2}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}` | Field containers, Browse Elements panel |
+| 3 (sub-panel lift) | `{colors.surface-3}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}` | Reserved — currently unused |
+| 4 (focus) | `box-shadow: inset 0 0 0 2px {colors.primary}` | Focused input |
+| 4 (error) | `box-shadow: inset 0 0 0 2px {colors.error}` | Errored input |
 
-**There are no drop shadows in this system.** Depth is carried entirely by the surface ladder plus hairline borders. If something needs to feel raised, it moves up a surface step — it does not gain a shadow.
+**There are no drop shadows in this system.** Depth is carried entirely by the surface ladder plus hairline edges. If something needs to feel raised, it moves up a surface step — it does not gain a shadow.
 
-Focus and error use a border-color change plus a border-*width* change (1px at rest, 2px on focus/error) — color moves (hairline → primary → error) and width grows together. An earlier build changed width alone on focus (0.5px → 2px) and that shifted the input's content by a couple of pixels on every focus/blur, which was fixed at the time by holding width constant at 2px everywhere. That constant-width rule was later dropped in favor of the current 1px/2px split, which reopened the same content-shift risk — and was closed again the same way box-model shifts always get closed: not by refusing to change border width, but by pairing it with an equal-and-opposite padding change. Vertical padding is 1px per side larger at rest than at focus/error (11px/9px vs 10px/8px, see `text-input`/`text-input-focused` below), so `border + padding` sums to the same total at every state and the input's total height (48px / 44px per breakpoint) never moves. Verified with real computed-height measurements, not just arithmetic — see the Don't below.
+**Every edge in this system is `box-shadow: inset`, not `border`.** This was a deliberate sitewide conversion — a real `border` was the original mechanism, but a border participates in box sizing (it adds to the element's rendered box), while an inset box-shadow paints inside the existing padding box and adds nothing to it. Focus and error still change both color (hairline → primary → error) and width (1px at rest, 2px on focus/error) exactly as before, but because the shadow contributes zero box-model pixels in any state, the width change no longer shifts anything else. An earlier build had to chase this same problem twice as a real *border*: once when focus alone changed width (0.5px → 2px) and shifted the input's content on every focus/blur, and again when a later 1px/2px resting/focus split reopened it — both times the fix was a compensating padding change, paired and inverted against the border delta so `border + padding` summed to a constant total. That compensation (11px/9px resting vs 10px/8px focus/error, see the retired text-input note in `git log`) is now **removed**, not extended: since box-shadow doesn't participate in box sizing in the first place, there is nothing for padding to compensate for, at any width. Padding is a single value per breakpoint in every state — see `text-input`. Verified with real computed-height measurements, not just arithmetic — see the Do below.
+
+**One exception: `segmented-tab`/`segmented-tab-active` were deliberately left as a real `border-bottom`, not converted.** Every other border in the app outlines a *container* — a card, pill, panel, input, or tile — where box-shadow:inset is a clean substitute for an edge. The tab underline is different: it's a single-side state indicator co-located with the tab's own text, not a container boundary, and its two states already share one width (`border-bottom: 2px solid`, only the color toggles transparent ↔ `{colors.primary}`) — so it was never subject to the box-model-shift bug this conversion exists to fix, and converting it would only add risk (forced-colors visibility, position of the colored line relative to the text baseline) for no benefit. Flagged here rather than converted silently.
+
+**Also left alone: the structural dividers.** `border-b`/`border-t` hairlines that separate stacked page regions rather than outline a container — the top-nav's bottom rule, the calculator card's internal header rule, the formula bar's top rule, the particle-count row's top rule (already called out below as the one intentional divider in the result block), the footer's top rule, and the mobile field-half divider — are layout dividers, not edges/outlines, and are out of scope for this conversion. They stay real `border-t`/`border-b`.
+
+**Implementation: Tailwind's `inset-ring-*` utilities, not a hand-rolled `shadow-[inset_...]` class.** Tailwind v4 composes `inset-ring-*` into the element's `box-shadow` via its own `--tw-inset-ring-shadow` variable, alongside (not overwriting) `shadow-*` and `ring-*`'s variables — confirmed by inspecting the compiled CSS, not assumed. This matters concretely on `preset-select` and `element-search`: both already carry a focus `ring-1 ring-brand-green` (Tailwind's outset ring, a different box-shadow layer), and `inset-ring-1 inset-ring-hairline` → `focus:inset-ring-primary` composes with that ring cleanly. A hand-written `shadow-[inset_0_0_0_1px_...]` would instead have silently overwritten (or been overwritten by) the ring's own `box-shadow` declaration, since both would target the same CSS property directly with no shared variable to compose through. Width is `inset-ring-1`/`inset-ring-2`; color is `inset-ring-{hairline|hairline-tertiary|primary|error}`, reusing this file's existing color tokens (already wired into `@theme` in `global.css`, the same way `border-hairline` etc. worked before).
+
+**Windows High Contrast Mode (`forced-colors: active`).** `box-shadow` is treated as decorative and computes to `none` in this mode; `border` is treated as structural and is preserved. Every element converted above would lose its visible edge here — and since forced-colors mode also collapses this app's surface ladder (canvas/surface-1/surface-2/etc. all resolve toward the same system background), the edge is doing double duty as the only remaining cue that a container boundary exists at all. **All of them needed the fallback; none were safe to skip.** `global.css` adds one rule, `[class*="inset-ring-"] { box-shadow: none; border: 1px solid CanvasText; }`, scoped to `@media (forced-colors: active)` only — a flat 1px `CanvasText` border regardless of which width/color state was active, since state no longer needs to reserve box-model space and there's nothing to gain from reproducing the 1px/2px distinction in a mode where colors are already system-controlled. The excluded elements (`segmented-tab`'s real `border-bottom`, and the structural dividers) need no fallback — they were never touched by the conversion, so forced-colors already renders their real border natively, same as before.
 
 ## Shapes
 
@@ -568,11 +576,11 @@ Focus and error use a border-color change plus a border-*width* change (1px at r
 - Pressed state `pill-active-pressed` darkens to `{colors.primary-pressed}`.
 
 **`pill-inactive`** — Unselected state.
-- Transparent background, text `{colors.ink-muted}`, 0.5px `{colors.hairline}` border, same padding and radius.
+- Transparent background, text `{colors.ink-muted}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, same padding and radius.
 - Hover state `pill-inactive-hover` fills to `{colors.surface-2}` and text darkens to `{colors.ink}`.
 
 **`toggle-direction`** — The g→mol / mol→g mode switch in the card header. This is a distinct component, not a reuse of `pill-active`/`pill-inactive` — those toggle a single value (a unit); this toggles calculation direction and each segment always shows both units of that direction, joined by a chevron (e.g. "g › mol").
-- Container: transparent, 0.5px `{colors.hairline}` border, rounded `{rounded.pill}`, 4px padding, 4px gap between the two segments.
+- Container: transparent, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, rounded `{rounded.pill}`, 4px padding, 4px gap between the two segments.
 - `toggle-direction-segment-active`: background `{colors.primary}`, text `{colors.on-primary}`, padding 8px 12px, rounded `{rounded.pill}`.
 - `toggle-direction-segment-inactive`: transparent background, text `{colors.ink-muted}`, same padding and radius.
 - Icon: chevron-right, 16px box, between the two unit words. Its stroke inherits the segment's text color — white on the active segment, `{colors.ink-muted}` on the inactive one. It is not a separate color token.
@@ -585,6 +593,8 @@ Focus and error use a border-color change plus a border-*width* change (1px at r
 
 Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal "switch a view." The distinction matters because both appear in the same panel.
 
+**This is a real `border-bottom`, deliberately not converted to `box-shadow: inset`** as part of the sitewide border → box-shadow conversion. It's a single-side state indicator, not a container edge, and both its states already share one width (only the color toggles), so it was never exposed to the box-model-shift bug the conversion exists to fix — see the note under Elevation & Depth.
+
 ### Buttons
 
 **`button-primary`** — Green pill. Used for "Use this molar mass."
@@ -592,10 +602,10 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 - Pressed state darkens to `{colors.primary-pressed}`.
 
 **`button-secondary`** — Outlined pill for secondary actions (Clear, Reset).
-- Transparent background, text `{colors.ink}`, 0.5px `{colors.hairline}` border.
+- Transparent background, text `{colors.ink}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
 
 **`button-icon`** — 32×32px circular utility button (collapse, close).
-- Background `{colors.surface-2}`, icon `{colors.ink-subtle}`, 0.5px `{colors.hairline}` border, rounded `{rounded.full}`.
+- Background `{colors.surface-2}`, icon `{colors.ink-subtle}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, rounded `{rounded.full}`.
 
 **`button-copy`** — Bare icon button aligned with the result *value* row, vertically centered on the big number — not the label row above it. Figma's exact node position confirms this (the icon sits centered on the value line's height, not the label's). No background, no border, no fill, and no badge or lock icon beside it — see the read-only signal Don't below.
 - Icon: copy/duplicate glyph, outline style, matching the app's existing stroke-based icon set (`stroke="currentColor"`).
@@ -606,10 +616,10 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 ### Cards & Panels
 
 **`card-calculator`** — The outer card. Everything lives inside it.
-- Background `{colors.surface-1}`, rounded `{rounded.xl}`, padding `{spacing.lg}`, 0.5px `{colors.hairline}` border.
+- Background `{colors.surface-1}`, rounded `{rounded.xl}`, padding `{spacing.lg}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
 
 **`card-field`** — Two inputs share a single card, side by side. There is no gap and no divider between them — the split is entirely padding: 24px on the outer edges and top/bottom, 12px on the two sides facing the shared midline.
-- Background `{colors.surface-2}`, rounded `{rounded.lg}`, 0.5px `{colors.hairline}` border.
+- Background `{colors.surface-2}`, rounded `{rounded.lg}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
 - The first slot is permanent: Molar Mass. It's an input in both calculation directions and never moves, never changes card. The second slot is role-assigned, not field-assigned — it holds whichever of Mass/Moles is currently the *input* for the active direction (Mass in g→mol, Moles in mol→g). Card membership follows input/output role, not field identity — don't hardcode "Molar Mass and Mass" as a fixed pair; the second field genuinely changes.
 
 **`card-result`** — The calculated-output container.
@@ -630,11 +640,11 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 - **No touch-target floor.** This row has no `min-height` and no breakpoint-keyed padding; it renders at its natural **20px** on one line and **40px** on two, at every width. See Touch Targets.
 
 **`panel-browse-elements`** — The expandable element/preset picker.
-- Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, 0.5px `{colors.hairline}` border.
+- Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
 
 **`element-tile`** / **`element-tile-selected`** — Individual elements in the Build custom grid.
 
-The tile is a **horizontal** row, not a centered stack. Left to right: symbol chip → name/mass block → stepper, with the stepper pushed to the right edge. Container is `{colors.surface-1}`, rounded `{rounded.md}`, 1px `{colors.hairline}`, `{spacing.xs}` padding, `{spacing.xs}` gap between the left group and the stepper, and a fixed 56px `min-height`.
+The tile is a **horizontal** row, not a centered stack. Left to right: symbol chip → name/mass block → stepper, with the stepper pushed to the right edge. Container is `{colors.surface-1}`, rounded `{rounded.md}`, `box-shadow: inset 0 0 0 1px {colors.hairline}`, `{spacing.xs}` padding, `{spacing.xs}` gap between the left group and the stepper, and a fixed 56px `min-height`.
 
 - **`element-tile-symbol`** — a 32×32px chip, not bare bold text on the card. Background `{colors.surface-4}`, rounded `{rounded.xs}`, symbol centered in `{typography.element-symbol}` / `{colors.ink}`.
   - **Never apply `text-transform: uppercase` to the symbol.** The source design marks it uppercase, but only ever renders `H` — a single-letter symbol where the transform is invisible. Applied to the real dataset it produces `HE`, `NA`, `MG`, which are not chemical symbols; the case of the second letter is meaningful notation, not styling. Symbols render exactly as stored.
@@ -644,13 +654,13 @@ The tile is a **horizontal** row, not a centered stack. Left to right: symbol ch
   - **The count span has a fixed width per digit count — 12 / 20 / 28px at 1 / 2 / 3 digits — and this is load-bearing, not cosmetic.** It is set from `String(qty).length` when the count is written, capped at the 3-digit width. Each value is a multiple of 4 and clears the 8.4px monospace advance per digit (8.4 / 16.8 / 25.2 of text).
   - **Do not revert it to `min-width` with content sizing above it.** A content-sized count measures 12.00 / **16.81** / **25.20**, so above nine it is fractional — and it sits *in front of* the **+** button, putting + at a fractional x. That is the exact condition that produced the original plus-glyph subpixel defect, and it would reappear silently at quantity 10 with nothing in the markup to hint at why. The fixed widths are what keep + on a whole pixel at every quantity; the scale-1 glyph geometry below only holds because of them.
   - **Above 999 the digits overflow the box rather than widening it.** Quantity is uncapped (+ has no ceiling), so four digits is reachable by clicking. At 1000 the 33.6px of text overflows the 28px span by 6px total, 3px each side, spilling into the 4px gaps without reaching either button; the stepper stays 84px and + stays whole-pixel. This is a deliberate trade — layout stability over a legible 4-digit count — on the grounds that a 4-digit subscript is not a real formula. If it ever needs to read correctly, add a 4-digit width (36px) rather than restoring content sizing.
-- **Hover (unselected only)**: border shifts from `{colors.hairline}` to `{colors.hairline-tertiary}`. No fill, no shadow, width stays 1px so nothing reflows. It signals "clickable", not "selected" — which is why it is neutral rather than a lighter green. Three border states coexist and stay distinguishable: `hairline` #E5E2DA resting → `hairline-tertiary` #C4C0B2 hover → `primary` #02613E selected. The first two differ by value, the third by hue.
-- **Selected**: border only. The background stays `{colors.surface-1}` and the border changes to 1px `{colors.primary}`. Nothing else moves — no fill, no text-color shift.
-- The hover border applies to **unselected tiles only**. A hover variant outranks the resting border-color class, so if it is left active on a selected tile it will grey out the green border on hover — mount and unmount it with the selected state, don't declare it once and forget it.
+- **Hover (unselected only)**: edge color shifts from `{colors.hairline}` to `{colors.hairline-tertiary}`. No fill, no drop shadow, width stays 1px so nothing reflows — it's a `box-shadow: inset` color swap, not a width change, so this was already reflow-free even before the border → box-shadow conversion. It signals "clickable", not "selected" — which is why it is neutral rather than a lighter green. Three edge states coexist and stay distinguishable: `hairline` #E5E2DA resting → `hairline-tertiary` #C4C0B2 hover → `primary` #02613E selected. The first two differ by value, the third by hue.
+- **Selected**: edge only. The background stays `{colors.surface-1}` and the edge changes to `box-shadow: inset 0 0 0 1px {colors.primary}`. Nothing else moves — no fill, no text-color shift.
+- The hover edge applies to **unselected tiles only**. A hover variant outranks the resting edge-color class, so if it is left active on a selected tile it will grey out the green edge on hover — mount and unmount it with the selected state, don't declare it once and forget it.
 
-The selected state is carried by the border alone. This is a deliberate lightening: the previous `{colors.primary-soft}` fill plus recolored text was too heavy for a control that can appear 63 times at once on screen, and it competed with the result value for the eye's attention. Green stays scarce.
+The selected state is carried by the edge alone. This is a deliberate lightening: the previous `{colors.primary-soft}` fill plus recolored text was too heavy for a control that can appear 63 times at once on screen, and it competed with the result value for the eye's attention. Green stays scarce.
 
-The stepper **appears on selection** and unmounts on deselection. It is therefore a second, redundant signal alongside the border — an unselected tile is distinguishable both by its hairline border and by having no stepper at all.
+The stepper **appears on selection** and unmounts on deselection. It is therefore a second, redundant signal alongside the edge — an unselected tile is distinguishable both by its hairline edge and by having no stepper at all.
 
 **`element-tile-stepper-button`** — the − and + controls.
 - 24×24px box, rounded `{rounded.xxs}`, transparent at rest, holding a 20×20px icon box with a **14px** stroke glyph (1.5px stroke, round caps) in `{colors.ink-muted}`.
@@ -666,8 +676,8 @@ The stepper **appears on selection** and unmounts on deselection. It is therefor
 
 **Selection model.** The stepper is **not** rendered until the tile is selected. There is no state in which a stepper is visible on a tile that is not in the formula, so "shows a count" and "is in the formula" are the same condition:
 
-- An unselected tile shows the symbol chip, name, and mass only — no stepper, no green border, no fill change.
-- Clicking the tile body **is** the select action: it mounts the stepper at a count of 1, applies the selected border, and adds the element to the formula.
+- An unselected tile shows the symbol chip, name, and mass only — no stepper, no green edge, no fill change.
+- Clicking the tile body **is** the select action: it mounts the stepper at a count of 1, applies the selected edge, and adds the element to the formula.
 - Clicking **+** increments. It is only reachable on a selected tile, since the stepper does not exist otherwise.
 - Clicking **−** at a count of 1 deselects: the stepper unmounts, the tile returns to its default appearance, and the element leaves the formula. This is cart behavior — decrementing the last unit removes the line item. There is no separate remove affordance.
 - Clicking **−** at 2 or above decrements and stays selected.
@@ -676,19 +686,19 @@ Because the count only ever renders on a selected tile, it is always a live quan
 
 The tile holds a fixed **52px** `min-height`, so mounting the stepper does not change the tile's height or reflow its grid row. As of the 24px stepper buttons and the unboxed stepper, the tile's *natural* height is 52px in **both** states — the selected and unselected cases converged, so the min-height is currently sitting exactly at natural height rather than above it. It still guards against content shrinking, but it no longer provides headroom: anything that makes the selected state taller than 52px will grow the row. Re-measure both natural heights before changing the chip size, the button size, or the tile's padding.
 
-Selected state is carried by **`aria-current="true"`** on the tile body, present only while selected and removed otherwise — the green border is not a signal a screen reader can see.
+Selected state is carried by **`aria-current="true"`** on the tile body, present only while selected and removed otherwise — the green edge is not a signal a screen reader can see.
 
 **Do not use `aria-pressed` here, and do not "fix" the tile to justify it.** `aria-pressed` declares a toggle button: repeated activation is expected to alternate state. The tile body's behavior is one-directional — clicking it only ever selects, and the *only* way back out is the stepper's − at a count of 1 (the cart pattern above). `aria-pressed="true"` on a control that never un-presses on re-activation misdescribes the interaction to anyone navigating by assistive tech. `aria-current` states "this is in the current selection" without promising togglability, which is what the tile actually offers. The page's other `aria-current` uses carry the value `page` inside navigation landmarks; the grid's use of `true` is a separate set and does not collide with them.
 
 ### Inputs & Validation
 
 **`text-input`** — Molar mass and mass fields.
-- Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, left padding 12px, 1px `{colors.hairline}` border at rest. Vertical padding is 11px below 520px / 9px at `mobile:` and up — 1px more per side than focus/error carries, which is what keeps the field's total height fixed when the border grows. See `text-input`'s `padding`/`height` entries above for the exact numbers and the Don't below for why this pairing exists.
+- Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, left padding 12px, `box-shadow: inset 0 0 0 1px {colors.hairline}` at rest. Vertical padding is a single value per breakpoint — 12px below 520px / 10px at `mobile:` and up — identical in every state. See `text-input`'s `padding`/`height` entries above for the exact numbers and the Do below for why no state-based split is needed.
 - Trailing chevron-selector-vertical icon, 24px box (two 10×6px chevrons stacked), right-aligned. It is a functional stepper, not decorative: the up chevron is always active (`{colors.ink-muted}`); the down chevron mutes to `{colors.ink-tertiary}` and disables once the value is at its floor (0 for all three fields), active (`{colors.ink-muted}`) otherwise. Each field steps by 1 (whole numbers).
 
-**`text-input-focused`** — Border color changes to `{colors.primary}` and width steps from the 1px resting border to 2px. Vertical padding steps down by 1px per side in the same instant (11px→10px / 9px→8px), so the border's growth and the padding's shrink cancel and the field's total height never moves.
+**`text-input-focused`** — Edge color changes to `{colors.primary}` and width steps from the 1px resting shadow to 2px. Padding does not change — `box-shadow: inset` paints inside the padding box rather than adding to it, so the width step never touches the field's total height.
 
-**`text-input-error`** — Border color changes to `{colors.error}`, same width and padding trade as focus (1px→2px border, 1px/side padding reduction). Paired with an `error-message` directly below the field.
+**`text-input-error`** — Edge color changes to `{colors.error}`, same 1px→2px width step as focus, same non-event for padding and height. Paired with an `error-message` directly below the field.
 
 **`result-value`** — The calculated result. Not a boxed input — bare typography sitting directly on `card-result`'s background, with no white box, no border, and no badge or lock icon. That absence is the only read-only signal; see the Don't below.
 - Text `{colors.ink-tertiary}` when empty, `{colors.primary}` once a value exists. Type `{typography.result-value}`.
@@ -721,7 +731,8 @@ The particle-count row is the one place in the result block with a visible divid
 ### Do
 - Use the surface ladder for hierarchy. If two containers sit at the same level, one of them is probably wrong.
 - Reserve `{colors.primary}` for active states, focus, and calculated result text.
-- Signal "selected" with a `{colors.primary}` border and nothing else. No tint, no recolored text, no adjacent badge.
+- Signal "selected" with a `{colors.primary}` edge (`box-shadow: inset`) and nothing else. No tint, no recolored text, no adjacent badge.
+- Every edge in the system is `box-shadow: inset`, not `border` — see Elevation & Depth. This means a state that changes edge width (`text-input`'s 1px→2px on focus/error) never needs a compensating padding change: box-shadow doesn't participate in box sizing, so there is nothing for padding to offset. Don't reintroduce a padding trade "to be safe" — it isn't needed, and re-adding one would just make the box taller than its neighbors. The one deliberate exception is `segmented-tab`'s underline, which stayed a real `border-bottom` — see the note under Elevation & Depth for why.
 - Put every number in DM Mono and every word in Public Sans.
 - Apply `{rounded.pill}` only to the direction toggle, unit selectors, and buttons.
 - Keep the calculator above the fold. It is the product.
@@ -738,7 +749,7 @@ The particle-count row is the one place in the result block with a visible divid
 - Don't add a marketing hero, a promotional CTA, or footer cross-links.
 - Don't add a white input box, a badge, or a lock icon to the calculated result field. Whichever two fields are currently inputs have a white `text-input` box; the result field does not — that absence is now the only structural signal that it is read-only. Adding one back silently breaks it.
 - Don't pill-round the element tiles or the calculator card.
-- **Don't change `text-input`'s border-width without also compensating padding.** The field's total height (48px / 44px per breakpoint) has no `height` declaration behind it — it's purely line-height + padding×2 + border×2, so any border-width change that isn't offset elsewhere WILL shift height on every focus/blur or error/clear. This shipped as a real defect twice already: once when focus alone changed width (0.5px → 2px) with nothing offsetting it, and once when the resting border was dropped to 1px while focus/error stayed 2px with nothing offsetting it either. The current, closed form: resting vertical padding is 1px/side larger than focus/error's (11px/9px vs 10px/8px — see `text-input`), so the border's ±1px/side and the padding's ∓1px/side always cancel. If the border width ever changes again, the padding pair above has to move with it, by the same amount, in the opposite direction — verify with real computed-height measurements at both breakpoints and all three fields, not just arithmetic, since a `transition-all` is in play and a synchronous read immediately after a focus/error trigger will report the pre-transition value.
+- **Don't add a real `border` back to any element documented here as `box-shadow: inset`.** This shipped as a real defect twice while `text-input`'s edge was still a `border`: once when focus alone changed width (0.5px → 2px) with nothing offsetting it, and once when a later 1px/2px resting/focus split reopened the same shift with nothing offsetting it either — both times because a real border's width adds directly to the box. Reintroducing `border` on any of these elements (even at a fixed width, even "just for one state") brings that box-model coupling back with it. If an element genuinely needs a real border again — e.g. because a forced-colors concern turns out to need more than the sitewide `[class*="inset-ring-"]` fallback in `global.css` — treat that as a fresh decision requiring its own padding math, not a quick swap back.
 - Don't add a divider between a field's input/value block and its unit-pill row, or between the Molar Mass/Mass/Moles blocks and their pills. A plain 16px gap is correct there; the only intentional divider in the result block is above the particle-count row.
 - Don't fix `card-field`'s second slot or `card-result`'s content to a specific field (e.g. "Mass is always the input, Moles is always the result"). Both cards are role-assigned and swap contents with the direction toggle — hardcoding by field identity instead of role is exactly the bug that shipped once already.
 
@@ -815,6 +826,8 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 - `{colors.primary-soft}` is unused. It lost its last consumer when the element tile's selected state went border-only, briefly regained one as the **+** hover circle, and lost it again when both stepper buttons were matched. Kept as a token rather than deleted, since a selected-surface fill is a plausible future need — but do not reach for it to "balance" the tile's selected state, and do not reintroduce it on a single stepper button.
 - **Closed: the old `text-input` chevron stepper's sub-44px exception.** It was flagged here as "revisit if usage data shows it's hard to hit on touch devices" — that data came in, and it was replaced by `field-stepper-pill` (24×24px desktop / 32×32px mobile painted buttons on a 44px-tall desktop / 48px-tall mobile hit area, see Touch Targets). Not extended, not re-scoped: the old component and its exception no longer exist.
 - **Element tile names truncate on narrow phones. This is an accepted trade-off, not an open gap.**
+
+  **Flag: not re-verified against the border → box-shadow conversion.** `card-calculator` and `panel-browse-elements` lost ~4px of border that used to eat into the width available to every descendant, including these narrow-viewport tiles (see "What 760 depends on" above, where the same chain moved the desktop grid from 756 to 760). The whole band below — the 375–415/375–395 thresholds, the 221px tile width, the 43px name budget — was measured before that conversion and was not re-swept afterward. The 4px gain plausibly nudges every threshold down slightly (more headroom, not less), but that is flagged rather than assumed; re-measure before relying on the exact numbers below.
 
   **The band.** "Molybdenum" truncates from **375 to 415px** and is clean from **416** up; "Hydrogen" truncates 375–395 and is clean from 396. Nothing truncates at any viewport from 416 to 1920. These are **headed Chromium** numbers — **iOS Safari measured roughly 2px more forgiving**, so treat 416 as the Chromium threshold rather than a universal one.
 
