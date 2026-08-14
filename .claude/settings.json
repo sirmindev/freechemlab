@@ -8,7 +8,9 @@
       "Bash(git commit -m 'fix: render a computed zero particle count as '\\\\''0 particles'\\\\'' \\(F3\\) *)",
       "Bash(git commit -m 'refactor: convert borders to box-shadow:inset site-wide \\(WCAG forced-colors fallback included\\) *)",
       "Bash(node -e ' *)",
-      "Bash(git commit -m '@ *)"
+      "Bash(git commit -m '@ *)",
+      "Bash(cp \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\8523dbdf-7785-4eb7-83dd-b3dd5cfcd94f\\\\scratchpad\\\\diag-chevron.spec.ts\" tests/diag-chevron.spec.ts)",
+      "Bash(cp \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\8523dbdf-7785-4eb7-83dd-b3dd5cfcd94f\\\\scratchpad\\\\diag-chevron2.spec.ts\" tests/diag-chevron2.spec.ts)"
     ],
     "additionalDirectories": [
       "\\tmp"

@@ -351,38 +351,48 @@ import Layout from '../layouts/Layout.astro';
 							<label for="preset-select" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">
 								Common Compounds
 							</label>
-							<select
-								id="preset-select"
-								class="w-full bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] px-3.5 py-2.5 focus:outline-none focus:inset-ring-primary focus:ring-1 focus:ring-brand-green transition-all"
-							>
-								<option value="">Select a compound…</option>
-								<optgroup label="Common">
-									<option value="18.015">Water (H₂O) — 18.015 g/mol</option>
-									<option value="58.44">Table Salt (NaCl) — 58.44 g/mol</option>
-									<option value="44.01">Carbon Dioxide (CO₂) — 44.01 g/mol</option>
-									<option value="180.16">Glucose (C₆H₁₂O₆) — 180.16 g/mol</option>
-									<option value="46.07">Ethanol (C₂H₅OH) — 46.07 g/mol</option>
-									<option value="17.031">Ammonia (NH₃) — 17.031 g/mol</option>
-									<option value="16.043">Methane (CH₄) — 16.043 g/mol</option>
-								</optgroup>
-								<optgroup label="Acids &amp; Bases">
-									<option value="98.072">Sulfuric Acid (H₂SO₄) — 98.072 g/mol</option>
-									<option value="39.997">Sodium Hydroxide (NaOH) — 39.997 g/mol</option>
-									<option value="36.458">Hydrochloric Acid (HCl) — 36.458 g/mol</option>
-									<option value="60.052">Acetic Acid (CH₃COOH) — 60.052 g/mol</option>
-									<option value="63.012">Nitric Acid (HNO₃) — 63.012 g/mol</option>
-								</optgroup>
-								<optgroup label="Salts &amp; Oxides">
-									<option value="84.006">Sodium Bicarbonate (NaHCO₃) — 84.006 g/mol</option>
-									<option value="100.086">Calcium Carbonate (CaCO₃) — 100.086 g/mol</option>
-									<option value="158.032">Potassium Permanganate (KMnO₄) — 158.032 g/mol</option>
-									<option value="120.361">Magnesium Sulfate (MgSO₄) — 120.361 g/mol</option>
-									<option value="80.043">Ammonium Nitrate (NH₄NO₃) — 80.043 g/mol</option>
-									<option value="101.961">Aluminum Oxide (Al₂O₃) — 101.961 g/mol</option>
-									<option value="159.687">Iron(III) Oxide (Fe₂O₃) — 159.687 g/mol</option>
-									<option value="159.602">Copper(II) Sulfate (CuSO₄) — 159.602 g/mol</option>
-								</optgroup>
-							</select>
+							<div class="relative">
+								<select
+									id="preset-select"
+									class="w-full appearance-none [-webkit-appearance:none] [-moz-appearance:none] bg-surface-soft border border-hairline inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] pl-3.5 pr-8 py-2.5 focus:outline-none focus:border-primary focus:inset-ring-primary focus:ring-1 focus:ring-brand-green transition-all"
+								>
+									<option value="">Select a compound…</option>
+									<optgroup label="Common">
+										<option value="18.015">Water (H₂O) — 18.015 g/mol</option>
+										<option value="58.44">Table Salt (NaCl) — 58.44 g/mol</option>
+										<option value="44.01">Carbon Dioxide (CO₂) — 44.01 g/mol</option>
+										<option value="180.16">Glucose (C₆H₁₂O₆) — 180.16 g/mol</option>
+										<option value="46.07">Ethanol (C₂H₅OH) — 46.07 g/mol</option>
+										<option value="17.031">Ammonia (NH₃) — 17.031 g/mol</option>
+										<option value="16.043">Methane (CH₄) — 16.043 g/mol</option>
+									</optgroup>
+									<optgroup label="Acids &amp; Bases">
+										<option value="98.072">Sulfuric Acid (H₂SO₄) — 98.072 g/mol</option>
+										<option value="39.997">Sodium Hydroxide (NaOH) — 39.997 g/mol</option>
+										<option value="36.458">Hydrochloric Acid (HCl) — 36.458 g/mol</option>
+										<option value="60.052">Acetic Acid (CH₃COOH) — 60.052 g/mol</option>
+										<option value="63.012">Nitric Acid (HNO₃) — 63.012 g/mol</option>
+									</optgroup>
+									<optgroup label="Salts &amp; Oxides">
+										<option value="84.006">Sodium Bicarbonate (NaHCO₃) — 84.006 g/mol</option>
+										<option value="100.086">Calcium Carbonate (CaCO₃) — 100.086 g/mol</option>
+										<option value="158.032">Potassium Permanganate (KMnO₄) — 158.032 g/mol</option>
+										<option value="120.361">Magnesium Sulfate (MgSO₄) — 120.361 g/mol</option>
+										<option value="80.043">Ammonium Nitrate (NH₄NO₃) — 80.043 g/mol</option>
+										<option value="101.961">Aluminum Oxide (Al₂O₃) — 101.961 g/mol</option>
+										<option value="159.687">Iron(III) Oxide (Fe₂O₃) — 159.687 g/mol</option>
+										<option value="159.602">Copper(II) Sulfate (CuSO₄) — 159.602 g/mol</option>
+									</optgroup>
+								</select>
+								<!-- Custom chevron replaces the native select arrow (appearance-none above
+								     removes it entirely). Same glyph/spec as #browse-chevron: 6x10.5
+								     viewBox, 1.5px stroke, round caps/joins — rotated 90° permanently
+								     (browse-chevron uses the identical rotate-90 class to become a down
+								     arrow on open; here it's baked in since this chevron never animates). -->
+								<svg class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 rotate-90 text-ink-muted" width="6" height="10.5" viewBox="0 0 6 10.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M0.75 9.75L5.25 5.25L0.75 0.75" />
+								</svg>
+							</div>
 							<button
 								id="use-preset"
 								type="button"
