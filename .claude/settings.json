@@ -10,7 +10,11 @@
       "Bash(node -e ' *)",
       "Bash(git commit -m '@ *)",
       "Bash(cp \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\8523dbdf-7785-4eb7-83dd-b3dd5cfcd94f\\\\scratchpad\\\\diag-chevron.spec.ts\" tests/diag-chevron.spec.ts)",
-      "Bash(cp \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\8523dbdf-7785-4eb7-83dd-b3dd5cfcd94f\\\\scratchpad\\\\diag-chevron2.spec.ts\" tests/diag-chevron2.spec.ts)"
+      "Bash(cp \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\8523dbdf-7785-4eb7-83dd-b3dd5cfcd94f\\\\scratchpad\\\\diag-chevron2.spec.ts\" tests/diag-chevron2.spec.ts)",
+      "Bash(rm -f check-a3-padding.mjs)",
+      "Bash(rm -f \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\fd257cd0-3415-4445-aa73-38d2fb307916\\\\scratchpad\\\\a3-320-\"*.png)",
+      "Bash(rm -f check-select-border.mjs check-select-focus.mjs)",
+      "Bash(rm -f \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\fd257cd0-3415-4445-aa73-38d2fb307916\\\\scratchpad\\\\select-\"*.png \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\fd257cd0-3415-4445-aa73-38d2fb307916\\\\scratchpad\\\\input-crop-375.png\")"
     ],
     "additionalDirectories": [
       "\\tmp"
