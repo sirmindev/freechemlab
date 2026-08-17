@@ -2,7 +2,11 @@ export interface Preset {
   name: string;
   formula: string;
   molarMass: number; // g/mol, verified IUPAC values
+  group: string; // section heading in the Presets picker (display order below)
 }
+
+/** Section order for the Presets picker. Not alphabetical — matches the original optgroup order. */
+export const PRESET_GROUP_ORDER = ['Common', 'Acids & Bases', 'Salts & Oxides'];
 
 export interface Element {
   z: number;         // atomic number
@@ -14,27 +18,27 @@ export interface Element {
 /** Twenty common compound presets with exact molar masses (g/mol). */
 export const PRESETS: Preset[] = [
   // ── Original 5 (unchanged) ──────────────────────────────────────────────
-  { name: 'Water',            formula: 'H₂O',       molarMass: 18.015  },
-  { name: 'Table Salt',       formula: 'NaCl',       molarMass: 58.44   },
-  { name: 'Carbon Dioxide',   formula: 'CO₂',        molarMass: 44.01   },
-  { name: 'Glucose',          formula: 'C₆H₁₂O₆',   molarMass: 180.16  },
-  { name: 'Ethanol',          formula: 'C₂H₅OH',     molarMass: 46.07   },
+  { name: 'Water',            formula: 'H₂O',       molarMass: 18.015 , group: 'Common' },
+  { name: 'Table Salt',       formula: 'NaCl',       molarMass: 58.44  , group: 'Common' },
+  { name: 'Carbon Dioxide',   formula: 'CO₂',        molarMass: 44.01  , group: 'Common' },
+  { name: 'Glucose',          formula: 'C₆H₁₂O₆',   molarMass: 180.16 , group: 'Common' },
+  { name: 'Ethanol',          formula: 'C₂H₅OH',     molarMass: 46.07  , group: 'Common' },
   // ── 15 additions ────────────────────────────────────────────────────────
-  { name: 'Ammonia',                   formula: 'NH₃',       molarMass: 17.031  },
-  { name: 'Methane',                   formula: 'CH₄',       molarMass: 16.043  },
-  { name: 'Sulfuric Acid',             formula: 'H₂SO₄',     molarMass: 98.072  },
-  { name: 'Sodium Bicarbonate',        formula: 'NaHCO₃',    molarMass: 84.006  },
-  { name: 'Calcium Carbonate',         formula: 'CaCO₃',     molarMass: 100.086 },
-  { name: 'Sodium Hydroxide',          formula: 'NaOH',      molarMass: 39.997  },
-  { name: 'Hydrochloric Acid',         formula: 'HCl',       molarMass: 36.458  },
-  { name: 'Acetic Acid',               formula: 'CH₃COOH',   molarMass: 60.052  },
-  { name: 'Potassium Permanganate',    formula: 'KMnO₄',     molarMass: 158.032 },
-  { name: 'Magnesium Sulfate',         formula: 'MgSO₄',     molarMass: 120.361 },
-  { name: 'Nitric Acid',               formula: 'HNO₃',      molarMass: 63.012  },
-  { name: 'Ammonium Nitrate',          formula: 'NH₄NO₃',    molarMass: 80.043  },
-  { name: 'Aluminum Oxide',            formula: 'Al₂O₃',     molarMass: 101.961 },
-  { name: 'Iron(III) Oxide',           formula: 'Fe₂O₃',     molarMass: 159.687 },
-  { name: 'Copper(II) Sulfate',        formula: 'CuSO₄',     molarMass: 159.602 },
+  { name: 'Ammonia',                   formula: 'NH₃',       molarMass: 17.031 , group: 'Common' },
+  { name: 'Methane',                   formula: 'CH₄',       molarMass: 16.043 , group: 'Common' },
+  { name: 'Sulfuric Acid',             formula: 'H₂SO₄',     molarMass: 98.072 , group: 'Acids & Bases' },
+  { name: 'Sodium Bicarbonate',        formula: 'NaHCO₃',    molarMass: 84.006 , group: 'Salts & Oxides' },
+  { name: 'Calcium Carbonate',         formula: 'CaCO₃',     molarMass: 100.086, group: 'Salts & Oxides' },
+  { name: 'Sodium Hydroxide',          formula: 'NaOH',      molarMass: 39.997 , group: 'Acids & Bases' },
+  { name: 'Hydrochloric Acid',         formula: 'HCl',       molarMass: 36.458 , group: 'Acids & Bases' },
+  { name: 'Acetic Acid',               formula: 'CH₃COOH',   molarMass: 60.052 , group: 'Acids & Bases' },
+  { name: 'Potassium Permanganate',    formula: 'KMnO₄',     molarMass: 158.032, group: 'Salts & Oxides' },
+  { name: 'Magnesium Sulfate',         formula: 'MgSO₄',     molarMass: 120.361, group: 'Salts & Oxides' },
+  { name: 'Nitric Acid',               formula: 'HNO₃',      molarMass: 63.012 , group: 'Acids & Bases' },
+  { name: 'Ammonium Nitrate',          formula: 'NH₄NO₃',    molarMass: 80.043 , group: 'Salts & Oxides' },
+  { name: 'Aluminum Oxide',            formula: 'Al₂O₃',     molarMass: 101.961, group: 'Salts & Oxides' },
+  { name: 'Iron(III) Oxide',           formula: 'Fe₂O₃',     molarMass: 159.687, group: 'Salts & Oxides' },
+  { name: 'Copper(II) Sulfate',        formula: 'CuSO₄',     molarMass: 159.602, group: 'Salts & Oxides' },
 ];
 
 

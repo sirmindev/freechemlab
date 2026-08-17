@@ -387,58 +387,73 @@ import Layout from '../layouts/Layout.astro';
 
 						<!-- Presets Tab Content -->
 						<div id="panel-presets" class="hidden p-[16px] mobile:p-5">
-							<label for="preset-select" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">
+							<label id="preset-label" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">
 								Common Compounds
 							</label>
+							<!--
+								Custom listbox replacing the native <select>. On mobile a native
+								<select> with <optgroup>s hands off to the OS's own picker (wheel
+								or full-screen overlay depending on platform), which can't be
+								restyled and doesn't respect the page's width — this reimplements
+								the same "pick one grouped value" interaction as an in-page
+								combobox, per the ARIA APG "Collapsible Dropdown Listbox"
+								(select-only combobox) pattern: focus stays on the trigger the
+								whole time, aria-activedescendant tracks the highlighted option
+								instead of DOM focus moving into the listbox.
+
+								Selecting an option (click, or Enter/Space while highlighted)
+								fills Molar Mass immediately and collapses the whole Browse
+								Elements panel — the same end effect the old
+								select-then-"Use this molar mass" flow had, just triggered
+								directly by the selection. There is no confirm button on this
+								tab; see #use-custom on the sibling Build-custom tab, unrelated
+								to this control.
+							-->
 							<div class="relative">
-								<select
-									id="preset-select"
-									class="w-full appearance-none [-webkit-appearance:none] [-moz-appearance:none] bg-surface-soft border border-hairline text-ink text-sm font-sans rounded-[8px] pl-3 pr-8 py-[12px] mobile:py-[10px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-brand-green transition-all"
+								<button
+									type="button"
+									id="preset-trigger"
+									role="combobox"
+									aria-haspopup="listbox"
+									aria-expanded="false"
+									aria-controls="preset-listbox"
+									aria-labelledby="preset-label preset-trigger-label"
+									class="w-full flex items-center justify-between gap-2 bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans text-left rounded-[8px] pl-3 pr-8 py-[12px] mobile:py-[10px] cursor-pointer focus:outline-none focus:inset-ring-2 focus:inset-ring-primary transition-all"
 								>
-									<option value="">Select a compound…</option>
-									<optgroup label="Common">
-										<option value="18.015">Water (H₂O) — 18.015 g/mol</option>
-										<option value="58.44">Table Salt (NaCl) — 58.44 g/mol</option>
-										<option value="44.01">Carbon Dioxide (CO₂) — 44.01 g/mol</option>
-										<option value="180.16">Glucose (C₆H₁₂O₆) — 180.16 g/mol</option>
-										<option value="46.07">Ethanol (C₂H₅OH) — 46.07 g/mol</option>
-										<option value="17.031">Ammonia (NH₃) — 17.031 g/mol</option>
-										<option value="16.043">Methane (CH₄) — 16.043 g/mol</option>
-									</optgroup>
-									<optgroup label="Acids &amp; Bases">
-										<option value="98.072">Sulfuric Acid (H₂SO₄) — 98.072 g/mol</option>
-										<option value="39.997">Sodium Hydroxide (NaOH) — 39.997 g/mol</option>
-										<option value="36.458">Hydrochloric Acid (HCl) — 36.458 g/mol</option>
-										<option value="60.052">Acetic Acid (CH₃COOH) — 60.052 g/mol</option>
-										<option value="63.012">Nitric Acid (HNO₃) — 63.012 g/mol</option>
-									</optgroup>
-									<optgroup label="Salts &amp; Oxides">
-										<option value="84.006">Sodium Bicarbonate (NaHCO₃) — 84.006 g/mol</option>
-										<option value="100.086">Calcium Carbonate (CaCO₃) — 100.086 g/mol</option>
-										<option value="158.032">Potassium Permanganate (KMnO₄) — 158.032 g/mol</option>
-										<option value="120.361">Magnesium Sulfate (MgSO₄) — 120.361 g/mol</option>
-										<option value="80.043">Ammonium Nitrate (NH₄NO₃) — 80.043 g/mol</option>
-										<option value="101.961">Aluminum Oxide (Al₂O₃) — 101.961 g/mol</option>
-										<option value="159.687">Iron(III) Oxide (Fe₂O₃) — 159.687 g/mol</option>
-										<option value="159.602">Copper(II) Sulfate (CuSO₄) — 159.602 g/mol</option>
-									</optgroup>
-								</select>
-								<!-- Custom chevron replaces the native select arrow (appearance-none above
-								     removes it entirely). Same glyph/spec as #browse-chevron: 6x10.5
-								     viewBox, 1.5px stroke, round caps/joins — rotated 90° permanently
-								     (browse-chevron uses the identical rotate-90 class to become a down
-								     arrow on open; here it's baked in since this chevron never animates). -->
+									<span id="preset-trigger-label" class="truncate text-ink-tertiary">Select a compound…</span>
+								</button>
+								<!-- Same glyph/spec as #browse-chevron: 6x10.5 viewBox, 1.5px
+								     stroke, round caps/joins — rotated 90° permanently, since
+								     this chevron never animates (unlike #browse-chevron). -->
 								<svg class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 rotate-90 text-ink-muted" width="6" height="10.5" viewBox="0 0 6 10.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M0.75 9.75L5.25 5.25L0.75 0.75" />
 								</svg>
+								<!-- Populated by JS from PRESETS (src/utils/browseElements.ts) —
+								     see the note above the script's Presets section for why the
+								     data isn't duplicated here.
+
+								     position:fixed, not absolute: #browse-panel (an ancestor,
+								     several levels up) carries overflow-hidden to keep its own
+								     rounded corners clean, and an absolutely-positioned popup's
+								     containing block (this element's nearest positioned ancestor,
+								     the .relative wrapper above) still sits *inside* that clipping
+								     box — so `absolute` got clipped flush with #browse-panel's
+								     bottom edge, cutting the list off after ~1 row. Fixed
+								     positioning's containing block is the viewport itself (no
+								     ancestor here sets transform/filter/perspective/contain, any
+								     of which would pull it back into a local containing block), so
+								     it escapes that clip entirely. top/left/width are computed from
+								     #preset-trigger's own bounding rect in JS on open, since fixed
+								     has no positioned-ancestor offset to lean on the way absolute
+								     did. -->
+								<div
+									id="preset-listbox"
+									role="listbox"
+									aria-labelledby="preset-label"
+									tabindex="-1"
+									class="hidden fixed z-20 max-h-72 overflow-y-auto bg-surface-1 inset-ring-1 inset-ring-hairline rounded-[8px] py-1"
+								></div>
 							</div>
-							<button
-								id="use-preset"
-								type="button"
-								class="hidden mt-3 min-h-[44px] px-5 py-3 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep flex items-center justify-center"
-							>
-								Use this molar mass
-							</button>
 						</div>
 					</div>
 				</div>
@@ -1108,7 +1123,7 @@ import Layout from '../layouts/Layout.astro';
 </script>
 
 <script>
-	import { SEED_ELEMENTS, buildFormula, computeCustomMolarMass } from '../utils/browseElements';
+	import { SEED_ELEMENTS, buildFormula, computeCustomMolarMass, PRESETS, PRESET_GROUP_ORDER } from '../utils/browseElements';
 
 	// --- DOM refs ---
 	const molarMassInput = document.getElementById('molar-mass') as HTMLInputElement | null;
@@ -1121,8 +1136,9 @@ import Layout from '../layouts/Layout.astro';
 	const panelPresets = document.getElementById('panel-presets');
 	const panelCustom = document.getElementById('panel-custom');
 
-	const presetSelect = document.getElementById('preset-select') as HTMLSelectElement | null;
-	const usePresetBtn = document.getElementById('use-preset');
+	const presetTrigger = document.getElementById('preset-trigger');
+	const presetTriggerLabel = document.getElementById('preset-trigger-label');
+	const presetListbox = document.getElementById('preset-listbox');
 
 	const elementSearch = document.getElementById('element-search') as HTMLInputElement | null;
 	const elementGrid = document.getElementById('element-grid');
@@ -1156,16 +1172,21 @@ import Layout from '../layouts/Layout.astro';
 			// Below the 520px breakpoint this uses a 'nearest'-style scroll
 			// instead of desktop's full 'start' alignment — see DESIGN.md for
 			// why — but computed manually rather than via scrollIntoView's own
-			// 'nearest' so a reserve can be folded in for the tab's "Use this
-			// molar mass" button. That button is still `hidden` at scroll time
-			// (nothing is selected yet), so it contributes zero height to the
-			// panel this measures against; native 'nearest' would happily zero
-			// out the gap below the panel, and the button — appearing later,
-			// after a selection, with no scroll of its own — would render
-			// partly or fully below the fold. The reserve is measured live
-			// (toggle the button's `hidden` class off, diff the panel height,
-			// toggle back) rather than hardcoded, so it can't go stale if the
-			// button's own size ever changes.
+			// 'nearest' so a reserve can be folded in for the Build-custom
+			// tab's "Use this molar mass" button. That button is still
+			// `hidden` at scroll time (nothing is selected yet), so it
+			// contributes zero height to the panel this measures against;
+			// native 'nearest' would happily zero out the gap below the
+			// panel, and the button — appearing later, after a selection,
+			// with no scroll of its own — would render partly or fully below
+			// the fold. The reserve is measured live (toggle the button's
+			// `hidden` class off, diff the panel height, toggle back) rather
+			// than hardcoded, so it can't go stale if the button's own size
+			// ever changes. The Presets tab has no equivalent button —
+			// selecting a compound there fills Molar Mass and collapses the
+			// whole panel immediately, so there's nothing that can land below
+			// the fold after the fact — so `btn` is only ever looked up for
+			// 'custom'.
 			requestAnimationFrame(() => {
 				const mobile = !window.matchMedia('(min-width: 520px)').matches;
 				if (!mobile) {
@@ -1173,7 +1194,7 @@ import Layout from '../layouts/Layout.astro';
 					return;
 				}
 				if (!browsePanel) return;
-				const btn = activeTab === 'custom' ? useCustomBtn : usePresetBtn;
+				const btn = activeTab === 'custom' ? useCustomBtn : null;
 				let reserve = 0;
 				if (btn?.classList.contains('hidden')) {
 					const heightBefore = browsePanel.getBoundingClientRect().height;
@@ -1198,6 +1219,7 @@ import Layout from '../layouts/Layout.astro';
 		panelOpen = false;
 		browsePanel?.classList.add('hidden');
 		browseChevron?.classList.remove('rotate-90');
+		closePresetListbox();
 	}
 
 	// --- Tab switching ---
@@ -1206,6 +1228,7 @@ import Layout from '../layouts/Layout.astro';
 		const presetActive = tab === 'presets';
 		panelPresets?.classList.toggle('hidden', !presetActive);
 		panelCustom?.classList.toggle('hidden', presetActive);
+		closePresetListbox();
 
 		const activeClass = 'py-2 px-4 text-sm font-medium text-brand-green border-b-2 border-brand-green -mb-px transition-colors cursor-pointer';
 		const inactiveClass = 'py-2 px-4 text-sm font-medium text-stone border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer';
@@ -1218,21 +1241,240 @@ import Layout from '../layouts/Layout.astro';
 	tabPresets?.addEventListener('click', () => setTab('presets'));
 	tabCustom?.addEventListener('click', () => setTab('custom'));
 
-	// --- Presets ---
-	presetSelect?.addEventListener('change', () => {
-		if (usePresetBtn) {
-			usePresetBtn.classList.toggle('hidden', !presetSelect.value);
+	// --- Presets: custom listbox ---
+	//
+	// Replaces the native <select> (see the markup comment above
+	// #preset-listbox). Follows the ARIA APG "Collapsible Dropdown Listbox"
+	// (select-only combobox) pattern: DOM focus stays on #preset-trigger the
+	// whole time the popup is open — it never moves into the listbox — and
+	// aria-activedescendant tracks whichever option is currently highlighted.
+	// Reads PRESETS/PRESET_GROUP_ORDER from browseElements.ts rather than
+	// hardcoding a second copy of the compound list.
+	type PresetOption = { preset: (typeof PRESETS)[number]; el: HTMLElement };
+	const presetOptions: PresetOption[] = [];
+	let presetOpen = false;
+	let presetActiveIndex = -1; // keyboard/hover-highlighted option
+	let presetSelectedIndex = -1; // committed selection
+	let presetTypeahead = '';
+	let presetTypeaheadTimer: number | undefined;
+
+	function buildPresetListbox() {
+		if (!presetListbox) return;
+		let i = 0;
+		for (const groupName of PRESET_GROUP_ORDER) {
+			const groupPresets = PRESETS.filter(p => p.group === groupName);
+			if (groupPresets.length === 0) continue;
+
+			const group = document.createElement('div');
+			group.setAttribute('role', 'group');
+			group.setAttribute('aria-label', groupName);
+
+			// Decorative heading only — the group's accessible name already
+			// comes from aria-label above, so this is hidden from AT to
+			// avoid announcing it twice.
+			const heading = document.createElement('div');
+			heading.textContent = groupName;
+			heading.setAttribute('aria-hidden', 'true');
+			heading.className = 'px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle';
+			group.appendChild(heading);
+
+			for (const preset of groupPresets) {
+				const el = document.createElement('div');
+				el.id = `preset-option-${i}`;
+				el.setAttribute('role', 'option');
+				el.setAttribute('aria-selected', 'false');
+				el.className = 'px-3 py-2 text-sm font-sans text-ink cursor-pointer';
+				el.textContent = `${preset.name} (${preset.formula}) — ${preset.molarMass} g/mol`;
+				group.appendChild(el);
+				presetOptions.push({ preset, el });
+				i++;
+			}
+			presetListbox.appendChild(group);
+		}
+	}
+	buildPresetListbox();
+
+	function updatePresetOptionStates() {
+		presetOptions.forEach(({ el }, idx) => {
+			const isActive = idx === presetActiveIndex;
+			const isSelected = idx === presetSelectedIndex;
+			el.setAttribute('aria-selected', String(isSelected));
+			el.classList.toggle('bg-surface-2', isActive && !isSelected);
+			el.classList.toggle('bg-primary-soft', isSelected);
+			el.classList.toggle('text-primary-pressed', isSelected);
+		});
+		if (presetActiveIndex >= 0) {
+			presetTrigger?.setAttribute('aria-activedescendant', presetOptions[presetActiveIndex].el.id);
+		} else {
+			presetTrigger?.removeAttribute('aria-activedescendant');
+		}
+	}
+
+	function setPresetActive(index: number) {
+		if (presetOptions.length === 0) return;
+		presetActiveIndex = Math.max(0, Math.min(index, presetOptions.length - 1));
+		updatePresetOptionStates();
+		presetOptions[presetActiveIndex].el.scrollIntoView({ block: 'nearest' });
+	}
+
+	// #preset-listbox is `position: fixed`, positioned off #preset-trigger's
+	// own bounding rect (getBoundingClientRect() is already viewport-relative,
+	// same coordinate space `fixed` uses — no scrollX/scrollY offset needed,
+	// unlike positioning an `absolute` element against document coordinates).
+	// Computed fresh on every open rather than left to CSS, since fixed has no
+	// positioned-ancestor offset to lean on. See the markup comment above
+	// #preset-listbox for why this can't be plain `absolute` inside a
+	// `.relative` wrapper: #browse-panel (several levels up) clips overflow,
+	// and `absolute`'s containing block is still inside that clip — only
+	// `fixed` (viewport-relative) escapes it, given no ancestor here sets
+	// transform/filter/perspective/contain to pull it back into a local one.
+	function positionPresetListbox() {
+		if (!presetTrigger || !presetListbox) return;
+		const rect = presetTrigger.getBoundingClientRect();
+		presetListbox.style.top = `${rect.bottom + 4}px`;
+		presetListbox.style.left = `${rect.left}px`;
+		presetListbox.style.width = `${rect.width}px`;
+	}
+
+	// A `fixed` popup doesn't track the page scrolling out from under it on
+	// its own — the position computed above is a one-time snapshot, not a
+	// live binding. Re-measure and re-anchor to the trigger on every
+	// scroll/resize tick while open, rather than closing: closing on scroll
+	// was tried first and reopened a race with the Browse Elements panel's
+	// own open-time smooth-scroll (see the browseTrigger click handler) —
+	// opening the listbox via keyboard while that unrelated scroll animation
+	// was still mid-flight let its very next scroll tick close the listbox
+	// the instant it opened. Repositioning has no such race (it's a no-op
+	// if the trigger hasn't actually moved) and is also just better UX than
+	// a dropdown that vanishes the moment the page scrolls at all. This also
+	// fires for the listbox's own internal `overflow-y-auto` scrolling
+	// (scroll events don't bubble, but capture-phase listeners on ancestors
+	// still see them) — harmless, since re-reading the trigger's rect while
+	// only the option list scrolled internally just recomputes the same
+	// coordinates.
+	function handlePresetViewportChange() {
+		if (!presetOpen) return;
+		positionPresetListbox();
+	}
+
+	function openPresetListbox() {
+		if (presetOpen || !presetListbox || presetOptions.length === 0) return;
+		presetOpen = true;
+		positionPresetListbox();
+		presetListbox.classList.remove('hidden');
+		presetTrigger?.setAttribute('aria-expanded', 'true');
+		setPresetActive(presetSelectedIndex >= 0 ? presetSelectedIndex : 0);
+		document.addEventListener('click', handlePresetOutsideClick, true);
+		window.addEventListener('scroll', handlePresetViewportChange, true);
+		window.addEventListener('resize', handlePresetViewportChange);
+	}
+
+	function closePresetListbox() {
+		if (!presetOpen) return;
+		presetOpen = false;
+		presetListbox?.classList.add('hidden');
+		presetTrigger?.setAttribute('aria-expanded', 'false');
+		presetActiveIndex = -1;
+		presetTrigger?.removeAttribute('aria-activedescendant');
+		document.removeEventListener('click', handlePresetOutsideClick, true);
+		window.removeEventListener('scroll', handlePresetViewportChange, true);
+		window.removeEventListener('resize', handlePresetViewportChange);
+	}
+
+	function handlePresetOutsideClick(e: MouseEvent) {
+		const target = e.target as Node;
+		if (presetTrigger?.contains(target) || presetListbox?.contains(target)) return;
+		closePresetListbox();
+	}
+
+	function selectPresetOption(index: number) {
+		const opt = presetOptions[index];
+		if (!opt || !molarMassInput) return;
+		presetSelectedIndex = index;
+		updatePresetOptionStates();
+		if (presetTriggerLabel) {
+			presetTriggerLabel.textContent = opt.el.textContent;
+			presetTriggerLabel.classList.remove('text-ink-tertiary');
+		}
+		molarMassInput.value = String(opt.preset.molarMass);
+		molarMassInput.dispatchEvent(new Event('input'));
+		// Same end effect the old select-then-"Use this molar mass" flow
+		// had: fill Molar Mass, then collapse the whole Browse Elements
+		// panel and reset the picker to its placeholder, ready to reopen
+		// fresh next time.
+		collapsePanel();
+		presetSelectedIndex = -1;
+		if (presetTriggerLabel) {
+			presetTriggerLabel.textContent = 'Select a compound…';
+			presetTriggerLabel.classList.add('text-ink-tertiary');
+		}
+		updatePresetOptionStates();
+	}
+
+	function presetTypeaheadSearch(char: string) {
+		if (presetOptions.length === 0) return;
+		window.clearTimeout(presetTypeaheadTimer);
+		presetTypeahead += char.toLowerCase();
+		presetTypeaheadTimer = window.setTimeout(() => { presetTypeahead = ''; }, 500);
+		const from = presetOpen ? presetActiveIndex : presetSelectedIndex;
+		const n = presetOptions.length;
+		for (let step = 1; step <= n; step++) {
+			const idx = (from + step + n) % n;
+			if (presetOptions[idx].preset.name.toLowerCase().startsWith(presetTypeahead)) {
+				if (!presetOpen) openPresetListbox();
+				setPresetActive(idx);
+				return;
+			}
+		}
+	}
+
+	presetTrigger?.addEventListener('click', () => {
+		if (presetOpen) closePresetListbox();
+		else openPresetListbox();
+	});
+
+	presetTrigger?.addEventListener('keydown', (e) => {
+		switch (e.key) {
+			case 'ArrowDown':
+				e.preventDefault();
+				if (!presetOpen) openPresetListbox();
+				else setPresetActive(presetActiveIndex + 1);
+				break;
+			case 'ArrowUp':
+				e.preventDefault();
+				if (!presetOpen) openPresetListbox();
+				else setPresetActive(presetActiveIndex - 1);
+				break;
+			case 'Home':
+				if (presetOpen) { e.preventDefault(); setPresetActive(0); }
+				break;
+			case 'End':
+				if (presetOpen) { e.preventDefault(); setPresetActive(presetOptions.length - 1); }
+				break;
+			case 'Enter':
+			case ' ':
+				e.preventDefault();
+				if (!presetOpen) { openPresetListbox(); break; }
+				if (presetActiveIndex >= 0) selectPresetOption(presetActiveIndex);
+				break;
+			case 'Escape':
+				if (presetOpen) { e.preventDefault(); closePresetListbox(); }
+				break;
+			case 'Tab':
+				closePresetListbox();
+				break;
+			default:
+				if (e.key.length === 1 && /\S/.test(e.key)) {
+					presetTypeaheadSearch(e.key);
+				}
 		}
 	});
 
-	usePresetBtn?.addEventListener('click', () => {
-		const val = presetSelect?.value;
-		if (!val || !molarMassInput) return;
-		molarMassInput.value = val;
-		molarMassInput.dispatchEvent(new Event('input'));
-		collapsePanel();
-		if (presetSelect) presetSelect.value = '';
-		usePresetBtn.classList.add('hidden');
+	presetListbox?.addEventListener('click', (e) => {
+		const optionEl = (e.target as HTMLElement).closest('[role="option"]');
+		if (!optionEl) return;
+		const idx = presetOptions.findIndex(({ el }) => el === optionEl);
+		if (idx >= 0) selectPresetOption(idx);
 	});
 
 	// --- Element Grid ---

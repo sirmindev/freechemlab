@@ -238,12 +238,13 @@ test.describe('Browse panel – Presets', () => {
     await expect(page.locator('#browse-panel')).toBeVisible();
   });
 
-  test('selecting Water and clicking "Use this molar mass" fills Molar Mass with 18.015 and collapses panel', async ({ page }) => {
+  test('selecting Water from the listbox fills Molar Mass with 18.015 and collapses panel', async ({ page }) => {
     await goto(page);
     await page.click('#browse-trigger');
     await page.click('#tab-presets');
-    await page.selectOption('#preset-select', '18.015');
-    await page.click('#use-preset');
+    await page.click('#preset-trigger');
+    await expect(page.locator('#preset-listbox')).toBeVisible();
+    await page.getByRole('option', { name: /^Water/ }).click();
     // Molar Mass field should now show 18.015
     const mmVal = await page.locator('#molar-mass').inputValue();
     expect(parseFloat(mmVal)).toBeCloseTo(18.015, 3);
@@ -255,19 +256,136 @@ test.describe('Browse panel – Presets', () => {
     await goto(page);
     await page.click('#browse-trigger');
     await page.click('#tab-presets');
-    await page.selectOption('#preset-select', '44.01');
-    await page.click('#use-preset');
+    await page.click('#preset-trigger');
+    await page.getByRole('option', { name: /^Carbon Dioxide/ }).click();
     const mmVal = await page.locator('#molar-mass').inputValue();
     expect(parseFloat(mmVal)).toBeCloseTo(44.01, 2);
   });
 
-  test('"Use this molar mass" button is hidden until a compound is selected', async ({ page }) => {
+  test('listbox is closed until the trigger is clicked, and shows a placeholder', async ({ page }) => {
     await goto(page);
     await page.click('#browse-trigger');
     await page.click('#tab-presets');
-    await expect(page.locator('#use-preset')).toBeHidden();
-    await page.selectOption('#preset-select', '18.015');
-    await expect(page.locator('#use-preset')).toBeVisible();
+    await expect(page.locator('#preset-listbox')).toBeHidden();
+    await expect(page.locator('#preset-trigger')).toHaveText('Select a compound…');
+    await page.click('#preset-trigger');
+    await expect(page.locator('#preset-listbox')).toBeVisible();
+  });
+
+  test('keyboard flow: Enter opens the listbox, arrows move, Enter selects', async ({ page }) => {
+    await goto(page);
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    await page.locator('#preset-trigger').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#preset-listbox')).toBeVisible();
+    // First option (Water) is highlighted on open
+    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-activedescendant', 'preset-option-0');
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-activedescendant', 'preset-option-1');
+    await page.keyboard.press('Enter');
+    // Table Salt (index 1) — 58.44 g/mol
+    const mmVal = await page.locator('#molar-mass').inputValue();
+    expect(parseFloat(mmVal)).toBeCloseTo(58.44, 2);
+    await expect(page.locator('#browse-panel')).toBeHidden();
+  });
+
+  test('Escape closes the listbox without selecting', async ({ page }) => {
+    await goto(page);
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    await page.click('#preset-trigger');
+    await expect(page.locator('#preset-listbox')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#preset-listbox')).toBeHidden();
+    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-expanded', 'false');
+    // Panel itself stays open — only the listbox closed
+    await expect(page.locator('#browse-panel')).toBeVisible();
+  });
+
+  test('clicking outside the listbox closes it', async ({ page }) => {
+    await goto(page);
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    await page.click('#preset-trigger');
+    await expect(page.locator('#preset-listbox')).toBeVisible();
+    await page.mouse.click(10, 10);
+    await expect(page.locator('#preset-listbox')).toBeHidden();
+  });
+
+  // Regression test for a real bug: #browse-panel (an ancestor of the
+  // listbox, several levels up) carries overflow-hidden for its own rounded
+  // corners. An earlier version of the listbox was `position: absolute`,
+  // whose containing block sat *inside* that clipping box, so the popup
+  // rendered but was cut off after ~1 option. `toBeVisible()`/`boundingBox()`
+  // on the listbox container itself did NOT catch this — Playwright's
+  // visibility check doesn't account for a clipping ancestor, only for the
+  // element's own display/visibility/opacity and whether it has a non-empty
+  // layout box. Catching it for real requires checking the popup renders at
+  // its intended full size, and that content far from the trigger is
+  // actually painted and hit-testable at its own coordinates — not just
+  // that it has a computed bounding box.
+  test('listbox is not clipped by an ancestor: it renders at full height and the last option is reachable and hit-testable', async ({ page }) => {
+    await goto(page);
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    await page.click('#preset-trigger');
+
+    const listbox = page.locator('#preset-listbox');
+    await expect(listbox).toBeVisible();
+    await expect(page.locator('#preset-listbox [role="option"]')).toHaveCount(20);
+
+    // Under the old bug the popup was clipped to ~1 row instead of its
+    // intended max-h-72 (288px) — a box height this close to that cap is
+    // direct evidence it's rendering at full size, not truncated by an
+    // ancestor's overflow:hidden.
+    const box = (await listbox.boundingBox())!;
+    expect(box.height).toBeGreaterThan(250);
+
+    // The definitive check: scroll to and hit-test the last option's own
+    // center point. If an ancestor were still clipping the popup, this
+    // coordinate would either paint whatever sits behind the clip (e.g.
+    // #browse-panel or the page background) or nothing at all — not the
+    // option itself.
+    const lastOption = page.getByRole('option', { name: /^Copper\(II\) Sulfate/ });
+    await lastOption.scrollIntoViewIfNeeded();
+    const optionId = await lastOption.getAttribute('id');
+    const optBox = (await lastOption.boundingBox())!;
+    const cx = optBox.x + optBox.width / 2;
+    const cy = optBox.y + optBox.height / 2;
+    const isHitTestable = await page.evaluate(
+      ({ x, y, id }) => {
+        const el = document.elementFromPoint(x, y);
+        return !!el && (el.id === id || !!el.closest(`#${CSS.escape(id!)}`));
+      },
+      { x: cx, y: cy, id: optionId }
+    );
+    expect(isHitTestable).toBe(true);
+
+    // Selecting that last, previously-clipped option still works end to end.
+    await lastOption.click();
+    const mmVal = await page.locator('#molar-mass').inputValue();
+    expect(parseFloat(mmVal)).toBeCloseTo(159.602, 2);
+  });
+
+  test('listbox stays open and repositions (rather than closing) when the page scrolls or resizes', async ({ page }) => {
+    await goto(page);
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    await page.click('#preset-trigger');
+    await expect(page.locator('#preset-listbox')).toBeVisible();
+
+    // Dispatched directly rather than relying on the page actually having
+    // scrollable overflow at this viewport size — what matters here is that
+    // a scroll/resize tick doesn't close the popup (it used to: closing on
+    // scroll raced with the Browse Elements panel's own open-time
+    // smooth-scroll animation and could close a listbox the instant it
+    // opened — see the handlePresetViewportChange comment).
+    await page.evaluate(() => window.dispatchEvent(new Event('scroll')));
+    await expect(page.locator('#preset-listbox')).toBeVisible();
+
+    await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+    await expect(page.locator('#preset-listbox')).toBeVisible();
   });
 });
 

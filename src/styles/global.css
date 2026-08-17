@@ -93,12 +93,9 @@ body {
    instead of registering as a click. `manipulation` disables double-tap-zoom
    on these elements while still allowing pan/pinch-zoom on the page itself,
    since touch-action is evaluated per touched element, not globally.
-   `select` is deliberately excluded: WebKit has a history of flaky native
-   picker behavior (dropdown opening/closing, missed selections) when
-   touch-action is applied to native `<select>` elements on iOS Safari, and
-   the reported bug (rapid double-tap swallowed as zoom) doesn't apply to
-   select's single-tap-to-open-picker interaction the way it does to
-   repeated-tap buttons like the steppers and unit pills. */
+   There is no `<select>` left anywhere in the app to carve an exception
+   for — the Presets picker (the last one) was rebuilt as a custom listbox
+   on a `<button>` trigger, which this rule already covers. */
 button, a {
   touch-action: manipulation;
 }
