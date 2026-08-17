@@ -474,6 +474,7 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 - Pill padding (touch viewports): 14px vertical · 16px horizontal, set explicitly — see Touch Targets.
 - Button padding: 10px vertical · 20px horizontal
 - Input padding: 8px vertical · 12px horizontal
+- Caption-above-value labels (e.g. "Molar Mass", "Mass", "Moles", "Common Compounds", the formula bar's "Formula"/"Molar Mass"): `{spacing.xs}` 8px between the caption and the value/control below it, at every breakpoint. Applies regardless of the container's own scale — the formula bar uses this same 8px even though its value text is smaller than a full field's, rather than a compressed value tuned to that one spot.
 
 ### Grid & Container
 - Single-column page, max content width ~880px. This is a calculator, not a dashboard — it should not sprawl.
@@ -525,7 +526,12 @@ The deduction chain from `main` is: `896 − 32 (main px-4) − 0 (card edge, bo
 - If the column rule is ever revisited, measure against **"Molybdenum" with the stepper mounted**, not against "Hydrogen" and not against the unselected tile. Sizing to either of those is exactly the error that produced a 5-up, then a 3-up, then a 4-up estimate that each failed on contact with real content.
 
 ### Whitespace Philosophy
-The warm canvas is the whitespace. Sections separate by lifting onto a surface, not by large gaps. Vertical rhythm inside the card stays at `{spacing.md}` 16px between blocks; the page keeps `{spacing.lg}` 24px between the breadcrumb and the card.
+The warm canvas is the whitespace. Sections separate by lifting onto a surface, not by large gaps. There are two separate rhythm tiers, and they are not interchangeable:
+
+- **Card-internal rhythm — `{spacing.lg}` 24px.** Governs the gap between *every* pair of adjacent blocks that live inside the calculator card: header row → first field block, field-row → Browse Elements, Browse Elements → result slot. All three are siblings doing the same job (separating one card-internal block from the next), so they share one value. The header row's own `pb-6` and the fields wrapper's `gap-6` are two different mechanisms producing the same 24px — new blocks added inside the card should use one of those two patterns, not a bespoke value.
+- **Page-level rhythm — `{spacing.md}` 16px.** Governs the gap between the breadcrumb and the card — content that sits *outside* the card, at the page's own flow level. This is a different tier from the card-internal rhythm above precisely because it sits outside the card; don't reach for 24px here just because it's also a "block separator."
+
+Prior to this being made consistent, the header row used a bespoke `pb-5` (20px) — a third value that matched neither tier and had no token backing it. New modules should pick one of the two tiers above rather than introduce a third.
 
 ## Elevation & Depth
 
@@ -591,7 +597,7 @@ The warm canvas is the whitespace. Sections separate by lifting onto a surface, 
 ### Tabs
 
 **`segmented-tab`** + **`segmented-tab-active`** — Presets / Build custom inside the Browse Elements panel.
-- Inactive: text `{colors.ink-subtle}`, transparent background, 2px transparent bottom border, padding 8px 4px.
+- Inactive: text `{colors.ink-subtle}`, transparent background, 2px transparent bottom border, padding 8px 16px.
 - Active: text `{colors.primary}`, 2px `{colors.primary}` bottom border.
 
 Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal "switch a view." The distinction matters because both appear in the same panel.
@@ -769,6 +775,8 @@ The particle-count row is the one place in the result block with a visible divid
 The element grid's column counts above are *observed outcomes* of the computed integer-column algorithm at each width, not breakpoints the grid itself declares. It has no media queries. The whole-pixel requirement applies at every column count, not just at desktop.
 
 **Two breakpoint keys are in play sitewide, not one.** Most layout/spacing switches above key off Tailwind's stock `md:` (768px); a smaller set — the field inputs, the field-stepper-pill, and (as of this pass) the unit pills and direction toggle — key off the project's own `mobile:` (520px, `--breakpoint-mobile`). This split across roughly 20 elements is deliberate, not drift, and is not being unified. Unit pills and the direction toggle are a **carved-out exception**: they used to sit on `md:` alongside most of the rest of the page, but that put them one breakpoint behind the inputs directly above them, visibly mismatched across 520–767px — so they moved to `mobile:` specifically to match the inputs they sit beside, not as a step toward collapsing the sitewide split. See Touch Targets below for the full before/after.
+
+**A third key, Tailwind's stock `sm:` (640px), was also in play** on the header row's and formula bar row's `flex-col`→`flex-row` switch (plus the `self-start`→`self-auto` alignment carried by the direction toggle and the "Use this molar mass" button inside those rows). Both rows contain content that already switches size at `mobile:` (520px) — the direction toggle segments and unit pills in the header row, nothing size-dependent in the formula bar itself but its row-wrap governs when its content lays out horizontally. That produced the same "split state" the unit-pill move above was meant to fix, one container level up: in the 520–639px range the toggle/pills inside the header were already desktop-sized while the row around them was still mobile-stacked. Both rows (and their `self-start`/`self-auto` dependents) were moved from `sm:` to `mobile:` to close this. If a new module wraps a `mobile:`-sized control in its own flex row, wrap the row at `mobile:` too — don't default to `sm:` or `md:` just because it's the more familiar Tailwind key.
 
 ### Touch Targets
 All interactive controls hold a minimum 44×44px tap target on touch viewports. This is a hard requirement, not a guideline — it was a defect in an earlier build. State the touch padding explicitly per control; do not leave it to inherit from desktop.

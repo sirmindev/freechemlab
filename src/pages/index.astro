@@ -54,7 +54,7 @@ import Layout from '../layouts/Layout.astro';
 		<!-- Calculator Card Shell -->
 		<section class="bg-surface inset-ring-1 inset-ring-hairline rounded-[16px] p-[16px] mobile:p-6">
 			<!-- Header Row -->
-			<header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5">
+			<header class="flex flex-col mobile:flex-row mobile:items-center justify-between gap-4 pb-6">
 				<div>
 					<h1 class="text-xl md:text-2xl font-semibold text-ink tracking-tight">
 						Mole &amp; Grams-to-Moles Calculator
@@ -62,7 +62,7 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 
 				<!-- Direction Toggle: toggle-direction, two-word segments joined by a chevron -->
-				<div class="inline-flex items-center gap-1 p-1 bg-transparent inset-ring-1 inset-ring-hairline rounded-full self-start sm:self-auto">
+				<div class="inline-flex items-center gap-1 p-1 bg-transparent inset-ring-1 inset-ring-hairline rounded-full self-start mobile:self-auto">
 					<button
 						id="toggle-g-to-mol"
 						type="button"
@@ -422,19 +422,19 @@ import Layout from '../layouts/Layout.astro';
 							<p id="element-grid-empty" class="hidden text-xs text-stone text-center py-4">No elements match your search.</p>
 
 							<!-- Formula Bar -->
-							<div class="mt-4 pt-4 border-t border-hairline-soft flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+							<div class="mt-4 pt-4 border-t border-hairline-soft flex flex-col mobile:flex-row mobile:items-center justify-between gap-3">
 								<div>
-									<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-0.5">Formula</span>
+									<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Formula</span>
 									<span id="custom-formula" class="text-base font-medium font-mono text-ink">—</span>
 								</div>
 								<div class="text-right sm:text-right">
-									<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-0.5">Molar Mass</span>
+									<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Molar Mass</span>
 									<span id="custom-molar-mass-val" class="text-base font-medium font-mono text-ink">—</span>
 								</div>
 								<button
 									id="use-custom"
 									type="button"
-									class="hidden self-end sm:self-auto min-h-[44px] px-5 py-2.5 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep whitespace-nowrap flex items-center justify-center"
+									class="hidden self-end mobile:self-auto min-h-[44px] px-5 py-2.5 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep whitespace-nowrap flex items-center justify-center"
 								>
 									Use this molar mass
 								</button>
