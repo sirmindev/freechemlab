@@ -241,6 +241,7 @@ test.describe('Browse panel – Presets', () => {
   test('selecting Water and clicking "Use this molar mass" fills Molar Mass with 18.015 and collapses panel', async ({ page }) => {
     await goto(page);
     await page.click('#browse-trigger');
+    await page.click('#tab-presets');
     await page.selectOption('#preset-select', '18.015');
     await page.click('#use-preset');
     // Molar Mass field should now show 18.015
@@ -253,6 +254,7 @@ test.describe('Browse panel – Presets', () => {
   test('selecting Carbon Dioxide fills Molar Mass with 44.01', async ({ page }) => {
     await goto(page);
     await page.click('#browse-trigger');
+    await page.click('#tab-presets');
     await page.selectOption('#preset-select', '44.01');
     await page.click('#use-preset');
     const mmVal = await page.locator('#molar-mass').inputValue();
@@ -262,6 +264,7 @@ test.describe('Browse panel – Presets', () => {
   test('"Use this molar mass" button is hidden until a compound is selected', async ({ page }) => {
     await goto(page);
     await page.click('#browse-trigger');
+    await page.click('#tab-presets');
     await expect(page.locator('#use-preset')).toBeHidden();
     await page.selectOption('#preset-select', '18.015');
     await expect(page.locator('#use-preset')).toBeVisible();
