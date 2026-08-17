@@ -7,7 +7,7 @@ import Layout from '../layouts/Layout.astro';
 	<header class="w-full bg-canvas border-b border-hairline-soft">
 		<div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
 			<!-- Logo / Wordmark -->
-			<a href="/" class="text-base font-semibold text-ink tracking-tight flex items-center gap-1.5">
+			<a href="/" class="text-base font-semibold text-ink tracking-tight flex items-center gap-1">
 				<span class="text-brand-green font-bold text-lg leading-none">&bull;</span>
 				<span>FreeChemLab</span>
 			</a>
@@ -18,7 +18,7 @@ import Layout from '../layouts/Layout.astro';
 					<li>
 						<a
 							href="/calculators"
-							class="min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 text-sm font-medium text-ink bg-surface rounded-full inset-ring-1 inset-ring-hairline transition-colors flex items-center justify-center"
+							class="min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 text-sm font-medium text-ink bg-surface rounded-full inset-ring-1 inset-ring-hairline transition-colors flex items-center justify-center"
 							aria-current="page"
 						>
 							Calculator
@@ -66,7 +66,7 @@ import Layout from '../layouts/Layout.astro';
 					<button
 						id="toggle-g-to-mol"
 						type="button"
-						class="min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep rounded-full transition-all cursor-pointer flex items-center gap-1"
+						class="min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep rounded-full transition-all cursor-pointer flex items-center gap-1"
 					>
 						<span>g</span>
 						<svg class="shrink-0" width="5.5" height="9.5" viewBox="0 0 5.5 9.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -77,7 +77,7 @@ import Layout from '../layouts/Layout.astro';
 					<button
 						id="toggle-mol-to-g"
 						type="button"
-						class="min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 text-sm font-medium text-ink-muted hover:bg-surface-soft hover:text-ink rounded-full transition-all cursor-pointer flex items-center gap-1"
+						class="min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 text-sm font-medium text-ink-muted hover:bg-surface-soft hover:text-ink rounded-full transition-all cursor-pointer flex items-center gap-1"
 					>
 						<span>mol</span>
 						<svg class="shrink-0" width="5.5" height="9.5" viewBox="0 0 5.5 9.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -164,14 +164,14 @@ import Layout from '../layouts/Layout.astro';
 								<button
 									type="button"
 									data-unit="g/mol"
-									class="unit-pill-mm min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-mm min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
 								>
 									g/mol
 								</button>
 								<button
 									type="button"
 									data-unit="kg/kmol"
-									class="unit-pill-mm min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-mm min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									kg/kmol
 								</button>
@@ -242,42 +242,42 @@ import Layout from '../layouts/Layout.astro';
 									<button
 										type="button"
 										data-unit="mg"
-										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										mg
 									</button>
 									<button
 										type="button"
 										data-unit="g"
-										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
 									>
 										g
 									</button>
 									<button
 										type="button"
 										data-unit="kg"
-										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										kg
 									</button>
 									<button
 										type="button"
 										data-unit="ng"
-										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										ng
 									</button>
 									<button
 										type="button"
 										data-unit="ug"
-										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										&micro;g
 									</button>
 									<button
 										type="button"
 										data-unit="dag"
-										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 									>
 										dag
 									</button>
@@ -396,7 +396,7 @@ import Layout from '../layouts/Layout.astro';
 							<button
 								id="use-preset"
 								type="button"
-								class="hidden mt-3 min-h-[44px] px-5 py-2.5 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep flex items-center justify-center"
+								class="hidden mt-3 min-h-[44px] px-5 py-3 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep flex items-center justify-center"
 							>
 								Use this molar mass
 							</button>
@@ -434,7 +434,7 @@ import Layout from '../layouts/Layout.astro';
 								<button
 									id="use-custom"
 									type="button"
-									class="hidden self-end mobile:self-auto min-h-[44px] px-5 py-2.5 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep whitespace-nowrap flex items-center justify-center"
+									class="hidden self-end mobile:self-auto min-h-[44px] px-5 py-3 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep whitespace-nowrap flex items-center justify-center"
 								>
 									Use this molar mass
 								</button>
@@ -518,35 +518,35 @@ import Layout from '../layouts/Layout.astro';
 								<button
 									type="button"
 									data-unit="mol"
-									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
 								>
 									mol
 								</button>
 								<button
 									type="button"
 									data-unit="mmol"
-									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									mmol
 								</button>
 								<button
 									type="button"
 									data-unit="umol"
-									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									&micro;mol
 								</button>
 								<button
 									type="button"
 									data-unit="nmol"
-									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									nmol
 								</button>
 								<button
 									type="button"
 									data-unit="pmol"
-									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center"
 								>
 									pmol
 								</button>
@@ -1002,9 +1002,9 @@ import Layout from '../layouts/Layout.astro';
 		buttons.forEach(btn => {
 			const unit = btn.getAttribute('data-unit');
 			if (unit === selectedUnit) {
-				btn.className = `${markerClass} min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center`;
+				btn.className = `${markerClass} min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center`;
 			} else {
-				btn.className = `${markerClass} min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center`;
+				btn.className = `${markerClass} min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center`;
 			}
 		});
 	}

@@ -193,13 +193,13 @@ components:
     backgroundColor: "transparent"
     textColor: "{colors.ink-subtle}"
     typography: "{typography.body-sm}"
-    padding: "8px 4px"
+    padding: "8px 16px"
     border: "0 0 2px transparent solid"
   segmented-tab-active:
     backgroundColor: "transparent"
     textColor: "{colors.primary}"
     typography: "{typography.body-sm}"
-    padding: "8px 4px"
+    padding: "8px 16px"
     border: "0 0 2px {colors.primary} solid"
 
   button-primary:
@@ -207,19 +207,19 @@ components:
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
-    padding: "10px 20px"
+    padding: "12px 20px"
   button-primary-pressed:
     backgroundColor: "{colors.primary-pressed}"
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
-    padding: "10px 20px"
+    padding: "12px 20px"
   button-secondary:
     backgroundColor: "transparent"
     textColor: "{colors.ink}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
-    padding: "10px 20px"
+    padding: "12px 20px"
     boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
   button-icon:
     backgroundColor: "{colors.surface-2}"
@@ -471,11 +471,12 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 - Result card padding: 16px below 520px, `{spacing.lg}` 24px at `mobile:` (≥520px) and up, symmetric on all sides at both breakpoints — it is a single field, not split.
 - Browse Elements panel tab content padding (Presets and Build custom): 16px below 520px, 20px (not a spacing token) at `mobile:` (≥520px) and up. Matches the outer card's mobile-reduction pattern; the panel's own desktop value stays a bespoke 20px, not 24px.
 - Pill padding: 8px vertical · 12px horizontal
-- Pill padding (touch viewports): 14px vertical · 16px horizontal, set explicitly — see Touch Targets.
-- Button padding: 10px vertical · 20px horizontal
+- Pill padding (touch viewports): 12px vertical · 16px horizontal, set explicitly — see Touch Targets.
+- Button padding: 12px vertical · 20px horizontal
 - Input padding: 8px vertical · 12px horizontal
 - Element search input (`#element-search`, Build Custom tab): 12px left / 12px right — symmetric, matching every other text input on the page. It briefly carried an asymmetric `pr-3.5` (14px) to clear the native browser search-cancel button; see "Suppressing native browser chrome" below for why that's no longer necessary.
 - Caption-above-value labels (e.g. "Molar Mass", "Mass", "Moles", "Common Compounds", the formula bar's "Formula"/"Molar Mass"): `{spacing.xs}` 8px between the caption and the value/control below it, at every breakpoint. Applies regardless of the container's own scale — the formula bar uses this same 8px even though its value text is smaller than a full field's, rather than a compressed value tuned to that one spot.
+- Nav bar logo (dot mark → "FreeChemLab" wordmark): `{spacing.xxs}` 4px gap. Chosen over 8px after a visual A/B at nav-bar scale — 8px visibly separated the dot from the wordmark into two elements instead of reading as one tight logotype; 4px kept the grouping closest to the prior (off-grid) 6px.
 
 ### Suppressing Native Browser Chrome
 Some inputs render browser-native UI (spinners, clear buttons, dropdown arrows) that this design replaces with its own controls, or that would otherwise sit inside a padding zone meant for something else. The convention, established by the number-input spinner suppression and extended to the search-cancel button:
@@ -597,7 +598,7 @@ Prior to this being made consistent, the header row used a bespoke `pb-5` (20px)
 - Transparent background, text `{colors.ink-muted}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, same padding and radius.
 - Hover state `pill-inactive-hover` fills to `{colors.surface-2}` and text darkens to `{colors.ink}`.
 
-**Nav bar "current page" pill** — the top-bar item marking the active nav destination (e.g. "Calculator"). Same padding/radius/breakpoint recipe as `pill-active`/`pill-inactive` — 8px/12px desktop, 14px/16px on touch viewports (`min-h-[44px] mobile:min-h-0`) — treated as the same component type, not a special case, even though it lives outside the card in a different context (top bar, `h-14` fixed-height container). Its own coloring is a third, distinct visual state (`{colors.surface-1}` background, `{colors.hairline}` inset ring, `{colors.ink}` text) that doesn't map to either `pill-active` or `pill-inactive` — this pill signals "you are here," not "selected value" or "unselected option," so it keeps its own color treatment while sharing the shared padding/touch-target mechanics.
+**Nav bar "current page" pill** — the top-bar item marking the active nav destination (e.g. "Calculator"). Same padding/radius/breakpoint recipe as `pill-active`/`pill-inactive` — 8px/12px desktop, 12px/16px on touch viewports (`min-h-[44px] mobile:min-h-0`) — treated as the same component type, not a special case, even though it lives outside the card in a different context (top bar, `h-14` fixed-height container). Its own coloring is a third, distinct visual state (`{colors.surface-1}` background, `{colors.hairline}` inset ring, `{colors.ink}` text) that doesn't map to either `pill-active` or `pill-inactive` — this pill signals "you are here," not "selected value" or "unselected option," so it keeps its own color treatment while sharing the shared padding/touch-target mechanics.
 
 **`toggle-direction`** — The g→mol / mol→g mode switch in the card header. This is a distinct component, not a reuse of `pill-active`/`pill-inactive` — those toggle a single value (a unit); this toggles calculation direction and each segment always shows both units of that direction, joined by a chevron (e.g. "g › mol").
 - Container: transparent, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, rounded `{rounded.pill}`, 4px padding, 4px gap between the two segments.
@@ -618,7 +619,7 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 ### Buttons
 
 **`button-primary`** — Green pill. Used for "Use this molar mass."
-- Background `{colors.primary}`, text `{colors.on-primary}`, padding 10px 20px, rounded `{rounded.pill}`.
+- Background `{colors.primary}`, text `{colors.on-primary}`, padding 12px 20px, rounded `{rounded.pill}`.
 - Pressed state darkens to `{colors.primary-pressed}`.
 
 **`button-secondary`** — Outlined pill for secondary actions (Clear, Reset).
@@ -791,7 +792,7 @@ The element grid's column counts above are *observed outcomes* of the computed i
 
 ### Touch Targets
 All interactive controls hold a minimum 44×44px tap target on touch viewports. This is a hard requirement, not a guideline — it was a defect in an earlier build. State the touch padding explicitly per control; do not leave it to inherit from desktop.
-- Pills and `toggle-direction` segments: 8px vertical / 12px horizontal padding on desktop (~32px effective height). On touch, padding increases explicitly to 14px vertical / 16px horizontal to clear 44px — this is not automatic from the desktop values.
+- Pills and `toggle-direction` segments: 8px vertical / 12px horizontal padding on desktop (~32px effective height). On touch, padding increases explicitly to 12px vertical / 16px horizontal, landing exactly on the 44px floor (20px line-height + 2×12px) — this is not automatic from the desktop values. (Previously 14px vertical, which rendered 48px — 4px past the 44px floor rather than on it; tightened for the same reason as the button-primary padding below: land on the reference value organically rather than overshoot it.)
 - The three direct-input number fields (Molar Mass / Mass / Moles) render at **44px at `mobile:` (≥520px) and up, 48px below it** — two explicitly different heights by breakpoint, not one shared value. Composition is line-height 24px + vertical padding + 2px border top and bottom; there is no `height` declaration anywhere, so **vertical padding is the only lever** (`py-2.5` = 10px below 520px → 48px; `mobile:py-2` = 8px at/above → 44px). An earlier version of this line claimed "40px on desktop; 44px on touch" — that was never true in the built app; both were measured at 44px before the mobile bump.
 - Element tiles hold ≥44px on all viewports.
 - Quantity steppers (− / +) in Build custom paint a 24×24px box at every viewport. The hit area and the painted box are deliberately separate: the `<button>` is a transparent wrapper around a 24×24 inner span that carries the radius and the hover fill. On desktop the wrapper adds no padding (24×24 total); on touch it adds **10px** on all sides, giving a 44×44px target while the painted box stays 24×24. The control looks identical at both widths — only the wrapper's padding changes, which is why the fill must live on the inner span and never on the button itself. Shrinking the visual size is always paid for by growing the wrapper's padding, never by letting the target shrink with it.
@@ -806,6 +807,7 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
     - **The two chips carry zero layout gap** (`flex` row, no `gap-*` utility) and sit flush against the 1px white divider — measured gap between the down-chip's right edge and the up-chip's left edge is **exactly 1.00px**, i.e. precisely the divider's own width and nothing more. With both chips' inner edges square (not rounded) and zero gap, the pair's outer silhouette reads as one continuous capsule, radius-matched to what a single pill of that height would have — confirmed by measuring the outer corners (down-chip's left pair, up-chip's right pair) against the chip's own half-height. **If both buttons ever go back to unconditional `rounded-full`, the outer curves separate visually and produce a false "gap" between two circles — this exact defect already shipped once and must not recur.**
   - **Painted vs. hit area are deliberately different, same pattern as `element-tile-stepper-button` — and both are responsive.** Each chip paints at **24×24px at `mobile:` (≥520px) and up, 32×32px below it** (the desktop size matches Figma; the mobile size uses the same responsive-touch-target philosophy as `element-tile-stepper-button`'s own `mobile:` keying). The tappable `<button>` around each chip is transparent and taller than its paint — **44px tall on desktop, 48px on mobile**, matching the input's own height at that breakpoint, hit-width matching the chip's own painted width — via `py-2.5` (desktop) / `py-2` (mobile) padding on the outer button only; the fill, radius, and icon live on an inner span that stays at its breakpoint's painted size regardless. Height-only growth, not width: widening the hit box horizontally would grow the capsule itself, which the inset/width budget below doesn't have room for.
     - **The padding pair did not change when the mobile chip went 28→32 and the mobile input went 44→48**, because both grew by the same 4px in the same change: 24+10+10 = 44 (desktop), 32+8+8 = 48 (mobile). That coincidence is load-bearing — change the chip size or the input height *independently* and the padding must be recomputed, or the hit area stops matching the input box.
+    - **The desktop `10px` (`mobile:py-2.5`) is off the 4px grid, and a later pass deliberately left it that way.** Both grid-aligned neighbors were checked against the math above and both break the match: `mobile:py-2` (8px) gives 24+8+8 = 40px, undershooting the 44px input height by 4px; `mobile:py-3` (12px) gives 24+12+12 = 48px, overshooting it by 4px. Since matching the input's own height exactly is the entire point of this padding (see above), **this value is held at 10px**, not grid-aligned — the off-grid value is the correct one here, not an oversight. If the chip size or input height is ever revisited, recompute this pair from the formula above rather than nudging it to the nearest 4px step.
   - **Fill is per-button, not a shared pill background** — the capsule look comes from two same-color chips forming one silhouette (see the shape bullet above), not from a separate pill-shaped background element; there is **no border in any state**. States, confirmed against the resolved `global.css` tokens (all four token names matched their Figma hexes exactly — `surface-4` #E8E6DF, `hairline-tertiary` #C4C0B2, `ink-tertiary` #A8A498, `ink-muted` #4A4842 — no divergence found):
     | State | Fill | Icon-vs-fill contrast |
     |---|---|---|

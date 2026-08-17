@@ -69,7 +69,7 @@ The header row switches `flex-col` → `sm:flex-row` at **640px** (`index.astro:
 | Element | Property | Mobile | Desktop | Source | Grid? |
 |---|---|---|---|---|---|
 | Header inner wrap | padding-x | 16px | 16px | `px-4` | ✅ |
-| Logo/wordmark link | gap | 6px | 6px | `gap-1.5` | ⚠️ 2px off 4 **and** 2px off 8 (equidistant) |
+| Logo/wordmark link | gap | 6px (orig.) | 6px (orig.) | `gap-1.5` (orig.) | ⚠️ 2px off 4 **and** 2px off 8 (equidistant) → **RESOLVED to 4px** (`gap-1`), chosen over 8px after a visual A/B — 8px visibly separated the dot from the wordmark, 4px kept the tight logotype grouping closest to the original 6px. |
 | Nav `<ul>` | gap | 4px | 4px | `space-x-1` | ✅ |
 | "Calculator" nav pill | padding-x | 12px (orig.) | 12px (orig.) | `px-3` (orig.) | ✅ |
 | "Calculator" nav pill | padding-y | 6px (orig.) | 6px (orig.) | `py-1.5` (orig.) | ⚠️ same tie as above |
@@ -103,10 +103,10 @@ The header row switches `flex-col` → `sm:flex-row` at **640px** (`index.astro:
 | Direction toggle container | padding | 4px | 4px | `p-1` | ✅ — matches `DESIGN.md:586` |
 | Direction toggle container | gap (between segments) | 4px | 4px | `gap-1` | ✅ — matches DESIGN.md |
 | Each toggle segment button | padding-x | 16px | 12px | `px-4 mobile:px-3` | ✅ |
-| Each toggle segment button | padding-y | 14px | 8px | `py-[14px] mobile:py-2` | ⚠️ mobile 14px (2px off 12 & 16) / ✅ desktop 8px |
+| Each toggle segment button | padding-y | 12px | 8px | `py-3 mobile:py-2` | ✅ **RESOLVED** — was `py-[14px]` (14px, off-grid); changed to `py-3` (12px), landing exactly on the 44px touch-target floor (20px line-height + 2×12px) rather than overshooting to 48px. Verified via computed style: 44px at mobile, unchanged 36px at desktop. |
 | Toggle segment inner (g/chevron/mol) | gap | 4px | 4px | `gap-1` | ✅ |
 
-Toggle padding recipe: fixed by commit `5ff219b` to match unit pills — **confirmed current, not stale**.
+Toggle padding recipe: fixed by commit `5ff219b` to match unit pills (breakpoint alignment) — **confirmed current, not stale**. The mobile `py-[14px]` value itself was later grid-aligned to `py-3` (12px), see the toggle-segment padding-y row above.
 
 ### 5. Molar Mass section (`#input-slot-a`, `index.astro:99-180`)
 
@@ -122,9 +122,9 @@ Toggle padding recipe: fixed by commit `5ff219b` to match unit pills — **confi
 | Unit-pill wrapper | margin-top | 16px | 16px | `mt-4` | ✅ |
 | Unit-pill row | gap | 8px | 8px | `gap-2` | ✅ |
 | Unit pill button | padding-x | 16px | 12px | `px-4 mobile:px-3` | ✅ |
-| Unit pill button | padding-y | 14px | 8px | `py-[14px] mobile:py-2` | ⚠️ 14px, same as toggle — documented, `DESIGN.md:474` |
+| Unit pill button | padding-y | 12px | 8px | `py-3 mobile:py-2` | ✅ **RESOLVED**, same fix and reasoning as the toggle segment above — was `py-[14px]`, now `py-3` (12px), exactly 44px mobile. |
 | Stepper cluster | inset from right edge | 8px | 8px | `right-2` | ✅ |
-| Stepper button (transparent hit-area) | padding-y | 8px | 10px | `py-2 mobile:py-2.5` | ⚠️ desktop 10px — documented hit-area padding, `DESIGN.md:326` |
+| Stepper button (transparent hit-area) | padding-y | 8px | 10px | `py-2 mobile:py-2.5` | ⚠️ desktop 10px — **HELD, not grid-aligned.** Checked both grid neighbors: `mobile:py-2` (8px) → 24+8+8=40px hit-area, undershoots the 44px desktop input height by 4px; `mobile:py-3` (12px) → 24+12+12=48px, overshoots by 4px. Since this padding's entire job is making the hit-area exactly match the input's own height (documented "load-bearing coincidence," `DESIGN.md`), 10px is the *correct* value here even though it's off-grid — held rather than "fixed." |
 | Field-row inner CSS (`.field-half:first-child`, ≥520px only) | padding-right | — | 12px | Custom `<style>` block, `index.astro:589-591` | ✅ |
 
 ### 6. Mass section (`#input-slot-b`, `index.astro:185-287`)
@@ -169,8 +169,8 @@ Mass's unit-pill set has 6 pills (mg/g/kg/ng/µg/dag) vs Molar Mass's 2 — same
 | Preset `<select>` | padding-right | 32px | 32px | `pr-8` | ✅ (chevron clearance, deliberately untouched by `4b453c4`) |
 | Preset `<select>` | padding-y | 12px | 10px | `py-[12px] mobile:py-[10px]` | ⚠️ desktop 10px, consistent w/ text-input recipe — fixed by `4b453c4` |
 | "Use this molar mass" button | margin-top | 12px | 12px | `mt-3` | ✅ |
-| "Use this molar mass" button | padding-x | 20px | 20px | `px-5` | ✅ — matches `DESIGN.md:604` |
-| "Use this molar mass" button | padding-y | 10px | 10px | `py-2.5` | ⚠️ documented, DESIGN.md `button-primary` |
+| "Use this molar mass" button | padding-x | 20px | 20px | `px-5` | ✅ — matches `DESIGN.md:621` |
+| "Use this molar mass" button | padding-y | 12px | 12px | `py-3` | ✅ **RESOLVED** — was `py-2.5` (10px). `min-h-[44px]` floors this button's height regardless of the padding value (10px gives 40px organic height, floored to 44), so 8px and 12px render identically at 44px; chose 12px so the height is hit organically rather than depending on the floor. Verified: still exactly 44px at both breakpoints. |
 
 **Build custom tab content** (`index.astro:406-442`)
 
@@ -178,7 +178,7 @@ Mass's unit-pill set has 6 pills (mg/g/kg/ng/µg/dag) vs Molar Mass's 2 — same
 |---|---|---|---|---|---|
 | Tab panel | padding (all sides) | 16px | 20px | `p-[16px] mobile:p-5` | ✅ same as Presets panel |
 | Search input | padding-left | 12px | 12px | `pl-3` | ✅ — fixed by `4b453c4` |
-| Search input | padding-right | 14px | 14px | `pr-3.5` | ⚠️ **left untouched by design, deliberately** — see below |
+| Search input | padding-right | 12px (was 14px) | 12px (was 14px) | `pr-3` (was `pr-3.5`) | ✅ **RESOLVED in a separate pass** — the native `::-webkit-search-cancel-button` this was clearing is now suppressed in `global.css`, so the padding was symmetrized to match `pl-3`. See the Git-history section below; this row is stale relative to that fix and kept only as a record of the original finding. |
 | Search input | padding-y | 12px | 10px | `py-[12px] mobile:py-[10px]` | ⚠️ desktop 10px, consistent |
 | Search input | margin-bottom | 16px | 16px | `mb-4` | ✅ |
 | Element grid scroll wrapper | margin-bottom | 16px | 16px | `mb-4` | ✅ |
@@ -188,8 +188,8 @@ Mass's unit-pill set has 6 pills (mg/g/kg/ng/µg/dag) vs Molar Mass's 2 — same
 | Formula bar row | margin-top | 16px | 16px | `mt-4` | ✅ |
 | Formula bar row | padding-top | 16px | 16px | `pt-4` | ✅ |
 | Formula bar row | gap | 12px | 12px | `gap-3` | ✅ |
-| Formula/Molar-Mass mini-labels | margin-bottom | 2px | 2px | `mb-0.5` | ⚠️ — see Flag D |
-| "Use this molar mass" (custom) button | padding-x/y | 20px / 10px | 20px / 10px | `px-5 py-2.5` | same as Presets button ✅/⚠️ |
+| Formula/Molar-Mass mini-labels | margin-bottom | 8px (was 2px) | 8px (was 2px) | `mb-2` (was `mb-0.5`) | ✅ **RESOLVED** — see Flag D resolution log above; this row is stale relative to that fix. |
+| "Use this molar mass" (custom) button | padding-x/y | 20px / 12px | 20px / 12px | `px-5 py-3` | ✅ **RESOLVED**, same fix as the Presets button above. |
 
 **Element tiles** (JS-rendered, `index.astro:1189-1334`)
 
@@ -226,11 +226,11 @@ Same recipe as Mass section for slot padding (`p-[16px] mobile:p-6`, matches `DE
 
 | Component type | Instances | Divergence |
 |---|---|---|
-| Pill-shaped button | "Calculator" nav pill vs. unit pills / direction toggle | **RESOLVED** — nav pill: was fixed `px-3/py-1.5`, no touch adjustment; now `px-4/py-[14px] mobile:px-3/py-2` + `min-h-[44px] mobile:min-h-0`, matching the others. Color treatment intentionally kept distinct (see §1 resolution log). |
+| Pill-shaped button | "Calculator" nav pill vs. unit pills / direction toggle | **RESOLVED** — nav pill: was fixed `px-3/py-1.5`, no touch adjustment; now `px-4/py-3 mobile:px-3/py-2` + `min-h-[44px] mobile:min-h-0`, matching the others (mobile `py` further tightened from `py-[14px]` to `py-3` in a later pass — same fix applied everywhere it appeared). Color treatment intentionally kept distinct (see §1 resolution log). |
 | Text-entry input right padding | Molar Mass/Mass (`pr-[80px]/72px`, stepper clearance) vs. Preset select (`pr-8`=32px, chevron clearance) vs. Element search (`pr-3.5`=14px, orig.) | **RESOLVED.** A prior pass found the original claim of "no icon, no stated reason for asymmetry" was wrong — `input[type="search"]` renders a native `::-webkit-search-cancel-button` in desktop Chrome/Edge once it has a value, unsuppressed. Rather than leave that asymmetry in place, a follow-up pass suppressed the native button globally (`global.css`, `input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }`) and then symmetrized the padding to `pl-3`/`pr-3` (12px/12px), matching every other input. Confirmed via direct device testing the button only ever rendered in desktop Chrome/Edge (not Firefox, not mobile Safari/Chrome), so it's now suppressed everywhere for consistency rather than left browser-dependent. Computed style confirmed 12px/12px at mobile and desktop; screenshots confirm no cancel icon renders after typing. |
-| Caption-above-value label spacing | Field labels (Molar Mass/Mass/Moles/Common Compounds): `mb-2` = 8px vs. Formula-bar mini-labels: `mb-0.5` = 2px | Same visual role, 4× different spacing (Flag D). |
-| Stepper hit-area padding (transparent outer button) | Field steppers (`py-2 mobile:py-2.5` = 8/10px) vs. element-tile stepper (`p-2.5 mobile:p-0` = 10/0px) | Different axis (all-sides vs. y-only) and different mobile/desktop split, but both land on the same "44px effective hit area" outcome per DESIGN.md — likely intentional given the differing painted-chip sizes, noting for completeness, not flagging as a defect. |
-| Major-block vertical separation ("rhythm") | Header→content: 20px · Breadcrumb→card: 16px · Card-internal blocks: 24px | Three different values doing conceptually the same job; two of the three also contradict what DESIGN.md claims for them (Flags A, C). |
+| Caption-above-value label spacing | Field labels (Molar Mass/Mass/Moles/Common Compounds): `mb-2` = 8px vs. Formula-bar mini-labels: `mb-2` = 8px (was `mb-0.5` = 2px) | **RESOLVED**, see Flag D resolution log above. |
+| Stepper hit-area padding (transparent outer button) | Field steppers (`py-2 mobile:py-2.5` = 8/10px) vs. element-tile stepper (`p-2.5 mobile:p-0` = 10/0px) | **Investigated and confirmed intentional, not a defect** (previously only "likely intentional" — a later pass checked the exact math). Field steppers: `mobile:py-2.5` (10px, off-grid) is load-bearing — it's the only value where `chip + 2×padding` equals the desktop input's own 44px height exactly; both grid-aligned alternatives (8px→40px, 12px→48px) break that match, so it's held off-grid deliberately. Element-tile steppers have no such constraint (no input to match) and use a different, independently-chosen recipe. Different axis (all-sides vs. y-only) and different mobile/desktop split remain, but neither is a bug. |
+| Major-block vertical separation ("rhythm") | Header→first block: 20px (orig., now 24px) · Breadcrumb→card: 16px · Card-internal blocks: 24px | **RESOLVED** in an earlier pass — header→first-block (`pb-5`) unified with card-internal blocks (`gap-6`) at 24px; see Flag C resolution log above. This row is stale relative to that fix and kept for the original record. |
 
 ---
 
