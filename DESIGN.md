@@ -588,6 +588,8 @@ Prior to this being made consistent, the header row used a bespoke `pb-5` (20px)
 - Transparent background, text `{colors.ink-muted}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, same padding and radius.
 - Hover state `pill-inactive-hover` fills to `{colors.surface-2}` and text darkens to `{colors.ink}`.
 
+**Nav bar "current page" pill** — the top-bar item marking the active nav destination (e.g. "Calculator"). Same padding/radius/breakpoint recipe as `pill-active`/`pill-inactive` — 8px/12px desktop, 14px/16px on touch viewports (`min-h-[44px] mobile:min-h-0`) — treated as the same component type, not a special case, even though it lives outside the card in a different context (top bar, `h-14` fixed-height container). Its own coloring is a third, distinct visual state (`{colors.surface-1}` background, `{colors.hairline}` inset ring, `{colors.ink}` text) that doesn't map to either `pill-active` or `pill-inactive` — this pill signals "you are here," not "selected value" or "unselected option," so it keeps its own color treatment while sharing the shared padding/touch-target mechanics.
+
 **`toggle-direction`** — The g→mol / mol→g mode switch in the card header. This is a distinct component, not a reuse of `pill-active`/`pill-inactive` — those toggle a single value (a unit); this toggles calculation direction and each segment always shows both units of that direction, joined by a chevron (e.g. "g › mol").
 - Container: transparent, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, rounded `{rounded.pill}`, 4px padding, 4px gap between the two segments.
 - `toggle-direction-segment-active`: background `{colors.primary}`, text `{colors.on-primary}`, padding 8px 12px, rounded `{rounded.pill}`.

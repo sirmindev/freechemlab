@@ -1,6 +1,6 @@
 # Spacing Audit — Calculator Page (v2)
 
-**Status:** read-only report as originally written. A follow-up pass has since resolved Flags A–E below (code + DESIGN.md) — see the "Resolution log" note under each flag. Table rows below reflect the **original** audited values; where a fix changed a value, the row is annotated rather than silently rewritten, so this stays a record of what was found as well as what changed.
+**Status:** read-only report as originally written. Two follow-up passes have since acted on this audit: the first resolved Flags A–E (code + DESIGN.md), the second resolved the nav-pill and search-input findings below — see the "Resolution log" notes inline. Table rows below reflect the **original** audited values; where a fix changed a value, the row is annotated rather than silently rewritten, so this stays a record of what was found as well as what changed.
 **Scope:** [src/pages/index.astro](src/pages/index.astro), [src/layouts/Layout.astro](src/layouts/Layout.astro), [src/styles/global.css](src/styles/global.css)
 **Purpose:** baseline inventory for standardizing spacing rules going forward, including new modules built after this one.
 
@@ -71,10 +71,12 @@ The header row switches `flex-col` → `sm:flex-row` at **640px** (`index.astro:
 | Header inner wrap | padding-x | 16px | 16px | `px-4` | ✅ |
 | Logo/wordmark link | gap | 6px | 6px | `gap-1.5` | ⚠️ 2px off 4 **and** 2px off 8 (equidistant) |
 | Nav `<ul>` | gap | 4px | 4px | `space-x-1` | ✅ |
-| "Calculator" nav pill | padding-x | 12px | 12px | `px-3` | ✅ |
-| "Calculator" nav pill | padding-y | 6px | 6px | `py-1.5` | ⚠️ same tie as above |
+| "Calculator" nav pill | padding-x | 12px (orig.) | 12px (orig.) | `px-3` (orig.) | ✅ |
+| "Calculator" nav pill | padding-y | 6px (orig.) | 6px (orig.) | `py-1.5` (orig.) | ⚠️ same tie as above |
 
 **Flag:** the "Calculator" nav pill is a pill-shaped button but uses a completely different recipe from every other pill in the app (unit pills, direction toggle) — fixed `px-3/py-1.5`, no `mobile:` touch-target adjustment, no `min-h-[44px]`. Plausibly intentional (persistent nav-state chip, not an interactive multi-value toggle) but it is a same-component-type/different-recipe case.
+
+> **Resolution log:** brought in line with the unit-pill/direction-toggle recipe: `min-h-[44px] mobile:min-h-0 px-4 py-[14px] mobile:px-3 mobile:py-2` (+ `flex items-center justify-center` to keep the text centered at the new heights). Color treatment (`bg-surface`/`inset-ring-hairline`/`text-ink`) deliberately left unchanged — that's the "current page" signal, a third visual state distinct from `pill-active`/`pill-inactive`, and wasn't part of this fix. Confirmed via computed style and screenshots at 320/375/500/540/650/800px that the nav bar's `h-14` (57px incl. border) never changes and the pill never overlaps the logo, even at 320px. New padding-y (14px mobile / 6px→8px desktop) is now on the same off-grid pattern as every other touch-adjusted pill.
 
 ### 2. Breadcrumb (`index.astro:34-52`)
 
@@ -224,8 +226,8 @@ Same recipe as Mass section for slot padding (`p-[16px] mobile:p-6`, matches `DE
 
 | Component type | Instances | Divergence |
 |---|---|---|
-| Pill-shaped button | "Calculator" nav pill vs. unit pills / direction toggle | Nav pill: fixed `px-3/py-1.5`, no touch adjustment. Others: `px-4/py-[14px] mobile:px-3/py-2` + `min-h-[44px] mobile:min-h-0`. |
-| Text-entry input right padding | Molar Mass/Mass (`pr-[80px]/72px`, stepper clearance) vs. Preset select (`pr-8`=32px, chevron clearance) vs. Element search (`pr-3.5`=14px, **no icon, no stated reason for asymmetry with its own `pl-3`=12px**) | First two are functionally justified (something sits in that space). Search input's right padding has nothing to clear and is still 2px larger than its own left padding — the one instance of "different for no visible reason." |
+| Pill-shaped button | "Calculator" nav pill vs. unit pills / direction toggle | **RESOLVED** — nav pill: was fixed `px-3/py-1.5`, no touch adjustment; now `px-4/py-[14px] mobile:px-3/py-2` + `min-h-[44px] mobile:min-h-0`, matching the others. Color treatment intentionally kept distinct (see §1 resolution log). |
+| Text-entry input right padding | Molar Mass/Mass (`pr-[80px]/72px`, stepper clearance) vs. Preset select (`pr-8`=32px, chevron clearance) vs. Element search (`pr-3.5`=14px) | **Correction, not a defect:** the original claim of "no icon, no stated reason for asymmetry" was wrong — re-checked live in headless Chromium and `input[type="search"]` renders a native `::-webkit-search-cancel-button` ("×" clear button) inside the field once it has a value, and `global.css` never suppresses it (no `appearance: none`/`-webkit-appearance` override, unlike the number inputs). That "×" *is* the thing occupying the extra 2px, the same category of justification as the stepper/chevron clearance on the other two inputs — it just isn't visible in the static markup because the browser renders it, not the app. `pr-3.5` was **not** changed; see the Git-history section below for the full finding. |
 | Caption-above-value label spacing | Field labels (Molar Mass/Mass/Moles/Common Compounds): `mb-2` = 8px vs. Formula-bar mini-labels: `mb-0.5` = 2px | Same visual role, 4× different spacing (Flag D). |
 | Stepper hit-area padding (transparent outer button) | Field steppers (`py-2 mobile:py-2.5` = 8/10px) vs. element-tile stepper (`p-2.5 mobile:p-0` = 10/0px) | Different axis (all-sides vs. y-only) and different mobile/desktop split, but both land on the same "44px effective hit area" outcome per DESIGN.md — likely intentional given the differing painted-chip sizes, noting for completeness, not flagging as a defect. |
 | Major-block vertical separation ("rhythm") | Header→content: 20px · Breadcrumb→card: 16px · Card-internal blocks: 24px | Three different values doing conceptually the same job; two of the three also contradict what DESIGN.md claims for them (Flags A, C). |
@@ -243,7 +245,7 @@ Same recipe as Mass section for slot padding (`p-[16px] mobile:p-6`, matches `DE
 - Field/result/browse-panel mobile padding reduced 24/20px → 16px — `31f0e62`. Confirmed current (this is the `p-[16px] mobile:p-6`/`p-5` pattern seen throughout §5–8).
 - Unit pill row top-alignment (`justify-between`→`justify-start`) — `98e8fd7`. Layout fix, not a spacing-value change, confirmed current.
 
-**Explicitly decided-but-still-asymmetric (not a bug, but worth re-reviewing):** Element search's `pr-3.5` was deliberately *kept* at 14px by `4b453c4` ("right side kept at 14px since the input has no icon needing clearance") rather than unified to `pr-3` (12px) to match its own left padding. The commit message doesn't give a visual reason for the extra 2px beyond "that's what it was" — worth a follow-up decision on whether it should now be symmetric.
+**Resolved as "not a bug" (follow-up pass re-checked live, rather than assuming from this audit's own note):** Element search's `pr-3.5` was deliberately *kept* at 14px by `4b453c4` ("right side kept at 14px since the input has no icon needing clearance"). That commit message was written believing there was nothing in that space — but a live-browser check (headless Chromium, field focused + given a value) shows `input[type="search"]` renders a native `::-webkit-search-cancel-button` there, and nothing in `global.css` suppresses it. So the asymmetry does have a functional reason after all, it's just browser-rendered rather than markup-visible. **Held, not changed** — `pr-3` would have shaved the clearance between typed text and that native control. If symmetric padding is wanted later, it needs `appearance: none`-style suppression of the native cancel button first (as the number inputs already do for their spinners), not just a padding edit.
 
 **New findings (no prior commit or DESIGN.md reference touches these):**
 
@@ -252,4 +254,4 @@ Same recipe as Mass section for slot padding (`p-[16px] mobile:p-6`, matches `DE
 - Flag C — header row's 20px separator, a third undocumented rhythm value.
 - Flag D — formula-bar mini-label spacing (2px vs. the 8px used by every other field label).
 - Flag E — header/formula-bar `sm:` (640px) wrap point vs. the rest of the page's 520px convention — the "narrow window" gap `5ff219b` set out to close still exists one container level up.
-- Nav "Calculator" pill's divergent recipe vs. other pills (§1 table above).
+- Nav "Calculator" pill's divergent recipe vs. other pills (§1 table above) — **resolved**, see §1 resolution log.
