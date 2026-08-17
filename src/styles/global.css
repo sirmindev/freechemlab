@@ -115,6 +115,17 @@ input[type="number"] {
   appearance: textfield;
 }
 
+/* Suppress the native search-input cancel ("x") button — found via direct
+   device testing to render in desktop Chrome/Edge only (not Firefox, not
+   mobile Safari/Chrome), which made #element-search's right padding read
+   as unjustified in isolation when it was actually clearing this icon in
+   the browsers that paint it. Suppressed everywhere rather than left
+   inconsistent across browsers — see DESIGN.md's Spacing System. */
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  display: none;
+}
+
 /* Windows High Contrast Mode (forced-colors) fallback for the site's
    border -> box-shadow:inset conversion (see DESIGN.md). `box-shadow` is
    treated as decorative and computes to `none` in forced-colors mode, while

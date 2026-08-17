@@ -474,7 +474,16 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 - Pill padding (touch viewports): 14px vertical · 16px horizontal, set explicitly — see Touch Targets.
 - Button padding: 10px vertical · 20px horizontal
 - Input padding: 8px vertical · 12px horizontal
+- Element search input (`#element-search`, Build Custom tab): 12px left / 12px right — symmetric, matching every other text input on the page. It briefly carried an asymmetric `pr-3.5` (14px) to clear the native browser search-cancel button; see "Suppressing native browser chrome" below for why that's no longer necessary.
 - Caption-above-value labels (e.g. "Molar Mass", "Mass", "Moles", "Common Compounds", the formula bar's "Formula"/"Molar Mass"): `{spacing.xs}` 8px between the caption and the value/control below it, at every breakpoint. Applies regardless of the container's own scale — the formula bar uses this same 8px even though its value text is smaller than a full field's, rather than a compressed value tuned to that one spot.
+
+### Suppressing Native Browser Chrome
+Some inputs render browser-native UI (spinners, clear buttons, dropdown arrows) that this design replaces with its own controls, or that would otherwise sit inside a padding zone meant for something else. The convention, established by the number-input spinner suppression and extended to the search-cancel button:
+- Target the specific pseudo-element with `-webkit-appearance: none` (the property that actually removes the native rendering, not just a visibility toggle), paired with `display: none` or `margin: 0` as needed to fully collapse the space it would otherwise reserve.
+- Comment *why* — which control replaces the native affordance (or why none is needed) and, where relevant, which browsers were confirmed to render the native chrome in the first place, since that isn't always all of them.
+- Live in `global.css` as a global element-type selector (`input[type="..."]::-webkit-...`), not scoped per-instance — every input of that type gets the same treatment.
+- **`input[type="number"]`** (Molar Mass / Mass / Moles): suppresses `::-webkit-outer-spin-button`/`::-webkit-inner-spin-button` plus a Firefox-specific `appearance: textfield` fallback, replaced by the functional stepper pill.
+- **`input[type="search"]`** (`#element-search`): suppresses `::-webkit-search-cancel-button`. Confirmed via direct device testing to render in desktop Chrome/Edge only (not Firefox, not mobile Safari/Chrome) — suppressed unconditionally so behavior doesn't vary by browser, rather than leaving it browser-dependent. No Firefox-specific rule needed here since Firefox doesn't render one to begin with. This is also why `#element-search`'s padding could go from an asymmetric `pl-3`/`pr-3.5` to the symmetric `pl-3`/`pr-3` every other input uses — nothing occupies that space in any browser anymore.
 
 ### Grid & Container
 - Single-column page, max content width ~880px. This is a calculator, not a dashboard — it should not sprawl.
