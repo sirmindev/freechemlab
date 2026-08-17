@@ -662,6 +662,7 @@ Tabs are underline-style, not pills. Pills signal "toggle a value"; tabs signal 
 
 **`panel-browse-elements`** — The expandable element/preset picker.
 - Background `{colors.surface-2}`, rounded `{rounded.lg}`, padding `{spacing.md}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
+- **Opening the panel scrolls it into view** (`scrollIntoView({ behavior: 'smooth', block: 'start' })` on `#browse-panel`, deferred one `requestAnimationFrame` after unhiding so the panel — and, on the Custom tab, the just-rendered element grid — has committed layout before the browser measures where to scroll). Without this the newly-revealed content could extend below the fold with no indication there's more to see. Fires **only** on the trigger's open action — never on close (no scroll call in that branch; any scroll-position change on close is the browser passively re-clamping to a shorter document once the panel's content is hidden, not an active scroll), never on switching between Presets/Build custom, and never on search filtering within the Custom tab. There is no sticky/fixed header on this page to offset against; if one is ever added, this call needs a compensating `scroll-margin-top` or offset. On a short panel (e.g. the default Presets tab, nothing selected yet) the document may not have enough content below to scroll the panel flush to the viewport top — the browser scrolls as far as it can and stops there, which is expected, not a bug to chase.
 
 **`element-tile`** / **`element-tile-selected`** — Individual elements in the Build custom grid.
 

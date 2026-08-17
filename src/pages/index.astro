@@ -1142,7 +1142,20 @@ import Layout from '../layouts/Layout.astro';
 		panelOpen = !panelOpen;
 		browsePanel?.classList.toggle('hidden', !panelOpen);
 		browseChevron?.classList.toggle('rotate-90', panelOpen);
-		if (panelOpen && activeTab === 'custom') renderGrid();
+		if (panelOpen) {
+			if (activeTab === 'custom') renderGrid();
+			// Scroll so the newly-revealed panel starts at the top of the
+			// viewport, instead of leaving the user to discover it extends
+			// below the fold on their own. Only on the open action — not on
+			// close, tab switches, or search filtering, none of which call
+			// this handler. rAF lets the browser commit the unhidden panel's
+			// layout (and, on the custom tab, the grid renderGrid() just
+			// populated) before measuring where to scroll to, same ordering
+			// moveFieldTo() uses elsewhere for a post-DOM-change follow-up.
+			requestAnimationFrame(() => {
+				browsePanel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			});
+		}
 	});
 
 	function collapsePanel() {
