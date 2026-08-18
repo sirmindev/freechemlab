@@ -262,6 +262,39 @@ test.describe('Browse panel – Presets', () => {
     expect(parseFloat(mmVal)).toBeCloseTo(44.01, 2);
   });
 
+  test('trigger shows the last-picked compound (not the placeholder) after selection, in sync with its accessible name', async ({ page }) => {
+    await goto(page);
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    await page.click('#preset-trigger');
+    await page.getByRole('option', { name: /^Water/ }).click();
+
+    // Visible label reflects the pick — shorter than the option row's own
+    // text (which also carries "— <mass> g/mol"), since Molar Mass itself
+    // already shows that once filled. Checked via text content rather than
+    // accessible name here: selecting also collapses #browse-panel (hidden),
+    // and a hidden element has no accessible name to check yet — that's
+    // covered below once the panel is reopened.
+    await expect(page.locator('#preset-trigger')).toHaveText('Water (H₂O)');
+
+    // Reopening pre-highlights the same compound rather than starting over,
+    // and — now that the trigger is visible again — its accessible name
+    // (aria-labelledby="preset-label preset-trigger-label") tracks the same
+    // text automatically, not just the visible label.
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    await page.click('#preset-trigger');
+    await expect(page.locator('#preset-trigger')).toHaveAccessibleName(/Water \(H₂O\)/);
+    const waterOption = page.getByRole('option', { name: /^Water/ });
+    const waterId = await waterOption.getAttribute('id');
+    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-activedescendant', waterId!);
+    await expect(waterOption).toHaveAttribute('aria-selected', 'true');
+
+    // A second selection replaces the label, not stacks onto it.
+    await page.getByRole('option', { name: /^Carbon Dioxide/ }).click();
+    await expect(page.locator('#preset-trigger')).toHaveText('Carbon Dioxide (CO₂)');
+  });
+
   test('listbox is closed until the trigger is clicked, and shows a placeholder', async ({ page }) => {
     await goto(page);
     await page.click('#browse-trigger');
@@ -311,6 +344,32 @@ test.describe('Browse panel – Presets', () => {
     await expect(page.locator('#preset-listbox')).toBeVisible();
     await page.mouse.click(10, 10);
     await expect(page.locator('#preset-listbox')).toBeHidden();
+  });
+
+  // Regression test: mouse hover over an option produced no visual feedback
+  // at all — option elements were built with no `hover:` class and no
+  // mouse/pointer listener of any kind, so nothing updated on mouseover.
+  // Uses a real `hover()` (mousemove-driven), not a click or keyboard path,
+  // since that's specifically what was broken.
+  test('hovering an option highlights it (bg-surface-2) and updates aria-activedescendant', async ({ page }) => {
+    await goto(page);
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    await page.click('#preset-trigger');
+    await expect(page.locator('#preset-listbox')).toBeVisible();
+
+    const target = page.getByRole('option', { name: /^Nitric Acid/ });
+    const targetId = await target.getAttribute('id');
+    await target.hover();
+
+    await expect(target).toHaveClass(/bg-surface-2/);
+    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-activedescendant', targetId!);
+
+    // Moving to a different option moves the highlight, not just adds to it.
+    const other = page.getByRole('option', { name: /^Water/ });
+    await other.hover();
+    await expect(target).not.toHaveClass(/bg-surface-2/);
+    await expect(other).toHaveClass(/bg-surface-2/);
   });
 
   // Regression test for a real bug: #browse-panel (an ancestor of the

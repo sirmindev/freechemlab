@@ -1392,23 +1392,31 @@ import Layout from '../layouts/Layout.astro';
 		if (!opt || !molarMassInput) return;
 		presetSelectedIndex = index;
 		updatePresetOptionStates();
+		// Trigger label shows the compound, not the full option row text
+		// (which also carries " — <mass> g/mol") — the mass is already
+		// visible in the Molar Mass field itself once filled below, so
+		// repeating it on the trigger would be redundant. This persists
+		// after the panel collapses (see below) rather than reverting to
+		// the placeholder, so the trigger keeps showing what's actually
+		// loaded into Molar Mass. aria-labelledby="preset-label
+		// preset-trigger-label" means the trigger's accessible name is
+		// computed live from this element's text content, so updating it
+		// here keeps the accessible name in sync automatically — no
+		// separate aria-label to maintain.
 		if (presetTriggerLabel) {
-			presetTriggerLabel.textContent = opt.el.textContent;
+			presetTriggerLabel.textContent = `${opt.preset.name} (${opt.preset.formula})`;
 			presetTriggerLabel.classList.remove('text-ink-tertiary');
 		}
 		molarMassInput.value = String(opt.preset.molarMass);
 		molarMassInput.dispatchEvent(new Event('input'));
-		// Same end effect the old select-then-"Use this molar mass" flow
-		// had: fill Molar Mass, then collapse the whole Browse Elements
-		// panel and reset the picker to its placeholder, ready to reopen
-		// fresh next time.
+		// Fill Molar Mass, then collapse the whole Browse Elements panel —
+		// same end effect the old select-then-"Use this molar mass" flow
+		// had. Unlike that old flow, the picker's selection is NOT reset:
+		// reopening the panel/listbox shows the last-picked compound both
+		// on the trigger and as the pre-highlighted option (see
+		// openPresetListbox's use of presetSelectedIndex), rather than
+		// starting over from the placeholder every time.
 		collapsePanel();
-		presetSelectedIndex = -1;
-		if (presetTriggerLabel) {
-			presetTriggerLabel.textContent = 'Select a compound…';
-			presetTriggerLabel.classList.add('text-ink-tertiary');
-		}
-		updatePresetOptionStates();
 	}
 
 	function presetTypeaheadSearch(char: string) {
@@ -1475,6 +1483,23 @@ import Layout from '../layouts/Layout.astro';
 		if (!optionEl) return;
 		const idx = presetOptions.findIndex(({ el }) => el === optionEl);
 		if (idx >= 0) selectPresetOption(idx);
+	});
+
+	// Mouse hover shares the same "active" highlight as keyboard nav — this
+	// was documented (DESIGN.md: "highlighted (keyboard-active or hovered)
+	// gets bg-surface-2") but never actually wired up: option elements were
+	// built with no `hover:` class and no pointer/mouse listener of any
+	// kind, so a mouse-only user got no feedback moving over the list.
+	// `mouseover` (delegated, bubbles), not `mouseenter` (doesn't bubble —
+	// wouldn't reach a listener on the shared container), reusing
+	// setPresetActive() so hovering an option updates aria-activedescendant
+	// the same way arrowing to it does, keeping mouse and keyboard state in
+	// sync rather than layering on a second, independent visual-only state.
+	presetListbox?.addEventListener('mouseover', (e) => {
+		const optionEl = (e.target as HTMLElement).closest('[role="option"]');
+		if (!optionEl) return;
+		const idx = presetOptions.findIndex(({ el }) => el === optionEl);
+		if (idx >= 0 && idx !== presetActiveIndex) setPresetActive(idx);
 	});
 
 	// --- Element Grid ---
