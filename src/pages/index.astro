@@ -104,13 +104,53 @@ import Layout from '../layouts/Layout.astro';
 								</label>
 							</div>
 							<div class="relative flex items-center">
-								<input
-									type="number"
-									id="molar-mass"
-									step="1"
-									placeholder="e.g. 18.02"
-									class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] inset-ring-1 inset-ring-hairline focus:outline-none focus:inset-ring-2 focus:inset-ring-primary focus:ring-0 transition-all"
-								/>
+								<!-- Molar Mass mode: fused dropdown + input (stage 1 of a multi-stage
+								     rebuild — see DESIGN.md screenshots). The wrapper, not the input,
+								     now carries the border/radius/focus-ring/error-ring, since a second
+								     control (the mode trigger) shares its edge — the error/clear-error
+								     JS below was retargeted from #molar-mass to #molar-mass-mode-wrapper
+								     accordingly. This stage wires only the dropdown shell and
+								     mode-switching state (activeMolarMassMode, in the second <script>
+								     block below, next to #preset-listbox whose combobox/listbox pattern
+								     it reuses). Selecting "Build custom" or "Compounds" does not yet
+								     swap in their panels (stages 3-4) or touch the existing "Browse
+								     elements" accordion further down, which stays fully functional
+								     until stage 5's teardown. -->
+								<div id="molar-mass-mode-wrapper" class="flex items-stretch w-full rounded-[8px] overflow-hidden inset-ring-1 inset-ring-hairline focus-within:inset-ring-2 focus-within:inset-ring-primary transition-all">
+									<button
+										type="button"
+										id="molar-mass-mode-trigger"
+										role="combobox"
+										aria-haspopup="listbox"
+										aria-expanded="false"
+										aria-controls="molar-mass-mode-listbox"
+										aria-label="Molar mass input mode"
+										class="shrink-0 flex items-center gap-1.5 bg-surface-3 text-ink text-sm font-sans pl-3 pr-2.5 py-[12px] mobile:py-[10px] border-r border-hairline cursor-pointer focus:outline-none"
+									>
+										<span id="molar-mass-mode-label">Type in</span>
+										<svg class="pointer-events-none shrink-0 rotate-90 text-ink-muted" width="6" height="10.5" viewBox="0 0 6 10.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M0.75 9.75L5.25 5.25L0.75 0.75" />
+										</svg>
+									</button>
+									<input
+										type="number"
+										id="molar-mass"
+										step="1"
+										placeholder="e.g. 18.02"
+										class="flex-1 min-w-0 bg-surface text-ink font-mono text-base pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] focus:outline-none focus:ring-0 transition-all"
+									/>
+								</div>
+								<!-- Mode listbox popup — same `position: fixed`-off-trigger-rect pattern
+								     as #preset-listbox (see that element's comment for why: it escapes
+								     #browse-panel's overflow-hidden clip and repositions rather than
+								     closing on scroll/resize). -->
+								<div
+									id="molar-mass-mode-listbox"
+									role="listbox"
+									aria-label="Molar mass input mode options"
+									tabindex="-1"
+									class="hidden fixed z-20 overflow-y-auto bg-surface-1 inset-ring-1 inset-ring-hairline rounded-[8px] py-1"
+								></div>
 								<!-- Functional stepper — one capsule, not two circles. Rounding is per-side,
 								     not per-button: "-" is permanently rounded-l-full/square-right (it never
 								     appears without "+" beside it), "+" is rounded-full (full circle) while
@@ -634,6 +674,9 @@ import Layout from '../layouts/Layout.astro';
 	const toggleMolToGBtn = document.getElementById('toggle-mol-to-g');
 
 	const molarMassInput = document.getElementById('molar-mass') as HTMLInputElement | null;
+	// The border/radius/focus-ring/error-ring live here now, not on #molar-mass
+	// itself — see the markup comment above #molar-mass-mode-wrapper.
+	const molarMassFieldWrapper = document.getElementById('molar-mass-mode-wrapper');
 	const molarMassError = document.getElementById('molar-mass-error');
 	const molarMassStepUp = document.getElementById('molar-mass-step-up') as HTMLButtonElement | null;
 	const molarMassStepDown = document.getElementById('molar-mass-step-down') as HTMLButtonElement | null;
@@ -823,8 +866,8 @@ import Layout from '../layouts/Layout.astro';
 	// class, not a pseudo-class.
 	function clearAllErrors() {
 		molarMassError?.classList.add('hidden');
-		molarMassInput?.classList.remove('inset-ring-error', 'inset-ring-2');
-		molarMassInput?.classList.add('inset-ring-hairline', 'inset-ring-1');
+		molarMassFieldWrapper?.classList.remove('inset-ring-error', 'inset-ring-2');
+		molarMassFieldWrapper?.classList.add('inset-ring-hairline', 'inset-ring-1');
 
 		// Only reset the hairline ring on mass/moles when they're the editable
 		// text-input — the readonly result-value has no box, and re-adding a
@@ -927,8 +970,8 @@ import Layout from '../layouts/Layout.astro';
 			if (molarMassError) {
 				molarMassError.classList.remove('hidden');
 			}
-			molarMassInput?.classList.add('inset-ring-error', 'inset-ring-2');
-			molarMassInput?.classList.remove('inset-ring-hairline', 'inset-ring-1');
+			molarMassFieldWrapper?.classList.add('inset-ring-error', 'inset-ring-2');
+			molarMassFieldWrapper?.classList.remove('inset-ring-hairline', 'inset-ring-1');
 			hasError = true;
 		}
 
@@ -1240,6 +1283,193 @@ import Layout from '../layouts/Layout.astro';
 
 	tabPresets?.addEventListener('click', () => setTab('presets'));
 	tabCustom?.addEventListener('click', () => setTab('custom'));
+
+	// --- Molar Mass mode dropdown ---
+	//
+	// Stage 1 of a multi-stage rebuild (see the markup comment above
+	// #molar-mass-mode-wrapper): a mode selector fused to the left of the
+	// Molar Mass input, replacing the implicit "always typed in" assumption
+	// with three modes. This stage wires only the dropdown shell and
+	// mode-switching state — selecting "Build custom"/"Compounds" does not
+	// yet swap in their panels (stages 3-4), and the "Browse elements"
+	// accordion above is untouched until stage 5's teardown.
+	//
+	// Follows the same ARIA APG "Collapsible Dropdown Listbox" pattern as
+	// #preset-listbox below (focus stays on #molar-mass-mode-trigger the
+	// whole time the popup is open; aria-activedescendant tracks the
+	// highlighted option instead of DOM focus moving into the listbox), and
+	// reuses its `position: fixed`-off-trigger-rect + scroll/resize
+	// reposition handling verbatim — see that section's comments for why.
+	type MolarMassMode = 'type-in' | 'build-custom' | 'compounds';
+	const MOLAR_MASS_MODES: { mode: MolarMassMode; label: string }[] = [
+		{ mode: 'type-in', label: 'Type in' },
+		{ mode: 'build-custom', label: 'Build custom' },
+		{ mode: 'compounds', label: 'Compounds' },
+	];
+
+	const molarMassModeTrigger = document.getElementById('molar-mass-mode-trigger');
+	const molarMassModeLabel = document.getElementById('molar-mass-mode-label');
+	const molarMassModeListbox = document.getElementById('molar-mass-mode-listbox');
+	// The whole stepper ("+"/"-" capsule) — hidden outside Type in mode, see
+	// selectMolarMassMode below.
+	const molarMassStepperEl = document.getElementById('molar-mass-stepper');
+
+	let activeMolarMassMode: MolarMassMode = 'type-in';
+	let molarMassModeOpen = false;
+	let molarMassModeActiveIndex = -1;
+
+	type MolarMassModeOption = { mode: MolarMassMode; label: string; el: HTMLElement };
+	const molarMassModeOptions: MolarMassModeOption[] = [];
+
+	function buildMolarMassModeListbox() {
+		if (!molarMassModeListbox) return;
+		MOLAR_MASS_MODES.forEach(({ mode, label }, i) => {
+			const el = document.createElement('div');
+			el.id = `molar-mass-mode-option-${i}`;
+			el.setAttribute('role', 'option');
+			el.className = 'px-3 py-2 text-sm font-sans cursor-pointer whitespace-nowrap';
+			el.textContent = label;
+			molarMassModeListbox.appendChild(el);
+			molarMassModeOptions.push({ mode, label, el });
+		});
+	}
+	buildMolarMassModeListbox();
+
+	function updateMolarMassModeOptionStates() {
+		molarMassModeOptions.forEach(({ el, mode }, idx) => {
+			const isActive = idx === molarMassModeActiveIndex;
+			const isSelected = mode === activeMolarMassMode;
+			el.setAttribute('aria-selected', String(isSelected));
+			el.classList.toggle('bg-surface-2', isActive);
+			el.classList.toggle('text-primary', isSelected);
+			el.classList.toggle('font-medium', isSelected);
+			el.classList.toggle('text-ink', !isSelected);
+		});
+		if (molarMassModeActiveIndex >= 0) {
+			molarMassModeTrigger?.setAttribute('aria-activedescendant', molarMassModeOptions[molarMassModeActiveIndex].el.id);
+		} else {
+			molarMassModeTrigger?.removeAttribute('aria-activedescendant');
+		}
+	}
+	updateMolarMassModeOptionStates();
+
+	function setMolarMassModeActive(index: number) {
+		if (molarMassModeOptions.length === 0) return;
+		molarMassModeActiveIndex = Math.max(0, Math.min(index, molarMassModeOptions.length - 1));
+		updateMolarMassModeOptionStates();
+		molarMassModeOptions[molarMassModeActiveIndex].el.scrollIntoView({ block: 'nearest' });
+	}
+
+	function positionMolarMassModeListbox() {
+		if (!molarMassModeTrigger || !molarMassModeListbox) return;
+		const rect = molarMassModeTrigger.getBoundingClientRect();
+		molarMassModeListbox.style.top = `${rect.bottom + 4}px`;
+		molarMassModeListbox.style.left = `${rect.left}px`;
+		molarMassModeListbox.style.minWidth = `${rect.width}px`;
+	}
+
+	function handleMolarMassModeViewportChange() {
+		if (!molarMassModeOpen) return;
+		positionMolarMassModeListbox();
+	}
+
+	function openMolarMassModeListbox() {
+		if (molarMassModeOpen || !molarMassModeListbox || molarMassModeOptions.length === 0) return;
+		molarMassModeOpen = true;
+		positionMolarMassModeListbox();
+		molarMassModeListbox.classList.remove('hidden');
+		molarMassModeTrigger?.setAttribute('aria-expanded', 'true');
+		const selectedIdx = molarMassModeOptions.findIndex(o => o.mode === activeMolarMassMode);
+		setMolarMassModeActive(selectedIdx >= 0 ? selectedIdx : 0);
+		document.addEventListener('click', handleMolarMassModeOutsideClick, true);
+		window.addEventListener('scroll', handleMolarMassModeViewportChange, true);
+		window.addEventListener('resize', handleMolarMassModeViewportChange);
+	}
+
+	function closeMolarMassModeListbox() {
+		if (!molarMassModeOpen) return;
+		molarMassModeOpen = false;
+		molarMassModeListbox?.classList.add('hidden');
+		molarMassModeTrigger?.setAttribute('aria-expanded', 'false');
+		molarMassModeActiveIndex = -1;
+		molarMassModeTrigger?.removeAttribute('aria-activedescendant');
+		document.removeEventListener('click', handleMolarMassModeOutsideClick, true);
+		window.removeEventListener('scroll', handleMolarMassModeViewportChange, true);
+		window.removeEventListener('resize', handleMolarMassModeViewportChange);
+	}
+
+	function handleMolarMassModeOutsideClick(e: MouseEvent) {
+		const target = e.target as Node;
+		if (molarMassModeTrigger?.contains(target) || molarMassModeListbox?.contains(target)) return;
+		closeMolarMassModeListbox();
+	}
+
+	function selectMolarMassMode(index: number) {
+		const opt = molarMassModeOptions[index];
+		if (!opt) return;
+		activeMolarMassMode = opt.mode;
+		if (molarMassModeLabel) molarMassModeLabel.textContent = opt.label;
+		// The stepper ("+") only makes sense while typing a value directly —
+		// hidden for Build custom/Compounds, whose panels (stages 3-4) will
+		// fill Molar Mass themselves.
+		molarMassStepperEl?.classList.toggle('hidden', opt.mode !== 'type-in');
+		updateMolarMassModeOptionStates();
+		closeMolarMassModeListbox();
+	}
+
+	molarMassModeTrigger?.addEventListener('click', () => {
+		if (molarMassModeOpen) closeMolarMassModeListbox();
+		else openMolarMassModeListbox();
+	});
+
+	molarMassModeTrigger?.addEventListener('keydown', (e) => {
+		switch (e.key) {
+			case 'ArrowDown':
+				e.preventDefault();
+				if (!molarMassModeOpen) openMolarMassModeListbox();
+				else setMolarMassModeActive(molarMassModeActiveIndex + 1);
+				break;
+			case 'ArrowUp':
+				e.preventDefault();
+				if (!molarMassModeOpen) openMolarMassModeListbox();
+				else setMolarMassModeActive(molarMassModeActiveIndex - 1);
+				break;
+			case 'Home':
+				if (molarMassModeOpen) { e.preventDefault(); setMolarMassModeActive(0); }
+				break;
+			case 'End':
+				if (molarMassModeOpen) { e.preventDefault(); setMolarMassModeActive(molarMassModeOptions.length - 1); }
+				break;
+			case 'Enter':
+			case ' ':
+				e.preventDefault();
+				if (!molarMassModeOpen) { openMolarMassModeListbox(); break; }
+				if (molarMassModeActiveIndex >= 0) selectMolarMassMode(molarMassModeActiveIndex);
+				break;
+			case 'Escape':
+				if (molarMassModeOpen) { e.preventDefault(); closeMolarMassModeListbox(); }
+				break;
+			case 'Tab':
+				closeMolarMassModeListbox();
+				break;
+		}
+	});
+
+	molarMassModeListbox?.addEventListener('click', (e) => {
+		const optionEl = (e.target as HTMLElement).closest('[role="option"]');
+		if (!optionEl) return;
+		const idx = molarMassModeOptions.findIndex(({ el }) => el === optionEl);
+		if (idx >= 0) selectMolarMassMode(idx);
+	});
+
+	// Mouse hover shares the same "active" highlight as keyboard nav — see the
+	// identical rationale on #preset-listbox's own mouseover handler below.
+	molarMassModeListbox?.addEventListener('mouseover', (e) => {
+		const optionEl = (e.target as HTMLElement).closest('[role="option"]');
+		if (!optionEl) return;
+		const idx = molarMassModeOptions.findIndex(({ el }) => el === optionEl);
+		if (idx >= 0 && idx !== molarMassModeActiveIndex) setMolarMassModeActive(idx);
+	});
 
 	// --- Presets: custom listbox ---
 	//

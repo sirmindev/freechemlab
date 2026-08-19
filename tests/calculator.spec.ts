@@ -827,3 +827,133 @@ test.describe('Touch targets – 44px minimum', () => {
     }
   });
 });
+
+// ─── 10. Molar Mass Mode Dropdown ────────────────────────────────────────────
+// Stage 1 of the mode-selector rebuild: dropdown shell + mode-switching state
+// only. "Build custom"/"Compounds" don't wire up their panels yet (stages
+// 3-4), so these tests cover the dropdown itself, not what a selected mode
+// does beyond updating its own label and the "+" stepper's visibility.
+
+test.describe('Molar Mass mode dropdown', () => {
+  test('default mode is "Type in" on load, and the "+" button is visible', async ({ page }) => {
+    await goto(page);
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Type in');
+    await expect(page.locator('#molar-mass-mode-trigger')).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#molar-mass-stepper')).toBeVisible();
+    await expect(page.locator('#molar-mass-step-up')).toBeVisible();
+  });
+
+  test('clicking the trigger opens the listbox with all three options', async ({ page }) => {
+    await goto(page);
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeHidden();
+    await page.click('#molar-mass-mode-trigger');
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeVisible();
+    await expect(page.locator('#molar-mass-mode-trigger')).toHaveAttribute('aria-expanded', 'true');
+    const options = page.locator('#molar-mass-mode-listbox [role="option"]');
+    await expect(options).toHaveCount(3);
+    await expect(options.nth(0)).toHaveText('Type in');
+    await expect(options.nth(1)).toHaveText('Build custom');
+    await expect(options.nth(2)).toHaveText('Compounds');
+  });
+
+  test('clicking the trigger again closes the listbox', async ({ page }) => {
+    await goto(page);
+    await page.click('#molar-mass-mode-trigger');
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeVisible();
+    await page.click('#molar-mass-mode-trigger');
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeHidden();
+    await expect(page.locator('#molar-mass-mode-trigger')).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('clicking outside the listbox closes it', async ({ page }) => {
+    await goto(page);
+    await page.click('#molar-mass-mode-trigger');
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeVisible();
+    await page.mouse.click(10, 10);
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeHidden();
+  });
+
+  test('keyboard flow: ArrowDown opens and highlights, ArrowDown again moves, Enter selects', async ({ page }) => {
+    await goto(page);
+    await page.locator('#molar-mass-mode-trigger').focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeVisible();
+    // "Type in" (the current selection) is highlighted first
+    await expect(page.locator('#molar-mass-mode-trigger')).toHaveAttribute('aria-activedescendant', 'molar-mass-mode-option-0');
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#molar-mass-mode-trigger')).toHaveAttribute('aria-activedescendant', 'molar-mass-mode-option-1');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Build custom');
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeHidden();
+  });
+
+  test('ArrowUp moves the highlight backward', async ({ page }) => {
+    await goto(page);
+    await page.locator('#molar-mass-mode-trigger').focus();
+    await page.keyboard.press('ArrowDown'); // open, highlight index 0
+    await page.keyboard.press('ArrowDown'); // index 1
+    await page.keyboard.press('ArrowUp'); // back to index 0
+    await expect(page.locator('#molar-mass-mode-trigger')).toHaveAttribute('aria-activedescendant', 'molar-mass-mode-option-0');
+  });
+
+  test('Escape closes the listbox without changing the selected mode', async ({ page }) => {
+    await goto(page);
+    await page.click('#molar-mass-mode-trigger');
+    await page.keyboard.press('ArrowDown'); // highlight "Build custom"
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeHidden();
+    await expect(page.locator('#molar-mass-mode-trigger')).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Type in');
+  });
+
+  test('selecting "Build custom" updates the label and hides the "+" button', async ({ page }) => {
+    await goto(page);
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Build custom' }).click();
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Build custom');
+    await expect(page.locator('#molar-mass-mode-listbox')).toBeHidden();
+    await expect(page.locator('#molar-mass-stepper')).toBeHidden();
+  });
+
+  test('selecting "Compounds" updates the label and hides the "+" button', async ({ page }) => {
+    await goto(page);
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Compounds' }).click();
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Compounds');
+    await expect(page.locator('#molar-mass-stepper')).toBeHidden();
+  });
+
+  test('switching back to "Type in" restores the label and reveals the "+" button', async ({ page }) => {
+    await goto(page);
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Compounds' }).click();
+    await expect(page.locator('#molar-mass-stepper')).toBeHidden();
+
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Type in' }).click();
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Type in');
+    await expect(page.locator('#molar-mass-stepper')).toBeVisible();
+  });
+
+  test('reopening the listbox pre-highlights the currently selected mode', async ({ page }) => {
+    await goto(page);
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Compounds' }).click();
+
+    await page.click('#molar-mass-mode-trigger');
+    await expect(page.locator('#molar-mass-mode-trigger')).toHaveAttribute('aria-activedescendant', 'molar-mass-mode-option-2');
+    await expect(page.getByRole('option', { name: 'Compounds' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('the mode dropdown does not disturb the Molar Mass value or calculation', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '18.015');
+    await setMass(page, '18.015');
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Build custom' }).click();
+    const mmVal = await page.locator('#molar-mass').inputValue();
+    expect(parseFloat(mmVal)).toBeCloseTo(18.015, 3);
+    const result = await page.locator('#moles-input').inputValue();
+    expect(parseFloat(result)).toBeCloseTo(1.0, 5);
+  });
+});
