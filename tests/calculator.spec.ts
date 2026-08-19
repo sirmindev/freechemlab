@@ -945,15 +945,253 @@ test.describe('Molar Mass mode dropdown', () => {
     await expect(page.getByRole('option', { name: 'Compounds' })).toHaveAttribute('aria-selected', 'true');
   });
 
-  test('the mode dropdown does not disturb the Molar Mass value or calculation', async ({ page }) => {
+  // Stage 1 asserted the mode dropdown left #molar-mass untouched. Stage 2
+  // deliberately changed that: the field is now a view onto the active mode's
+  // own slot, so switching to an untouched mode shows that mode's empty slot.
+  // What still must hold is that the TYPED value is preserved (not destroyed)
+  // and comes back intact — covered in depth in the per-mode state section
+  // below; kept here as the dropdown-level guarantee.
+  test('the mode dropdown preserves the typed Molar Mass and restores it on return', async ({ page }) => {
     await goto(page);
     await setMolarMass(page, '18.015');
     await setMass(page, '18.015');
+    expect(parseFloat(await page.locator('#moles-input').inputValue())).toBeCloseTo(1.0, 5);
+
     await page.click('#molar-mass-mode-trigger');
     await page.getByRole('option', { name: 'Build custom' }).click();
-    const mmVal = await page.locator('#molar-mass').inputValue();
-    expect(parseFloat(mmVal)).toBeCloseTo(18.015, 3);
-    const result = await page.locator('#moles-input').inputValue();
-    expect(parseFloat(result)).toBeCloseTo(1.0, 5);
+    await expect(page.locator('#molar-mass')).toHaveValue('');
+
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Type in' }).click();
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    expect(parseFloat(await page.locator('#moles-input').inputValue())).toBeCloseTo(1.0, 5);
+  });
+});
+
+// ─── 11. Molar Mass Per-Mode State ───────────────────────────────────────────
+// Stage 2: each mode owns an independent value slot, and #molar-mass is a view
+// onto whichever slot is active. The Build-custom and Compounds panels that
+// will eventually write those slots don't exist yet (stages 3-4), so these
+// drive the documented window.molarMassMode hook directly — the same entry
+// point those panels are meant to use.
+
+test.describe('Molar Mass per-mode state', () => {
+  type Mode = 'type-in' | 'build-custom' | 'compounds';
+
+  /** Write a mode's slot through the exposed hook, as a stage 3/4 panel would. */
+  async function setModeValue(page: Page, mode: Mode, data: unknown) {
+    await page.evaluate(
+      ({ mode, data }) => (window as any).molarMassMode.set(mode, data),
+      { mode, data }
+    );
+  }
+
+  async function getModeValue(page: Page, mode: Mode) {
+    return page.evaluate(
+      (mode) => (window as any).molarMassMode.get(mode),
+      mode
+    );
+  }
+
+  /** Switch mode through the real UI, not the hook — that's the path users take. */
+  async function pickMode(page: Page, label: string) {
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: label, exact: true }).click();
+  }
+
+  test('Type in: typing updates the stored slot', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '44.01');
+    expect(await getModeValue(page, 'type-in')).toEqual({ raw: '44.01' });
+  });
+
+  test('Type in: a typed value survives switching away and back', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '18.015');
+
+    await pickMode(page, 'Build custom');
+    // The field now shows Build custom's (empty) slot, not the typed value
+    await expect(page.locator('#molar-mass')).toHaveValue('');
+
+    await pickMode(page, 'Type in');
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    expect(await getModeValue(page, 'type-in')).toEqual({ raw: '18.015' });
+  });
+
+  test('Build custom: a value set via the hook persists across a mode round-trip and displays', async ({ page }) => {
+    await goto(page);
+    await setModeValue(page, 'build-custom', {
+      quantities: { H: 2, O: 1 },
+      formula: 'H2O',
+      molarMass: 18.015,
+    });
+
+    // Written while inactive — staged silently, field untouched
+    await expect(page.locator('#molar-mass')).toHaveValue('');
+
+    await pickMode(page, 'Build custom');
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    await expect(page.locator('#molar-mass')).toHaveJSProperty('readOnly', true);
+
+    await pickMode(page, 'Type in');
+    await pickMode(page, 'Build custom');
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    expect(await getModeValue(page, 'build-custom')).toEqual({
+      quantities: { H: 2, O: 1 },
+      formula: 'H2O',
+      molarMass: 18.015,
+    });
+  });
+
+  test('Compounds: a value set via the hook persists across a mode round-trip and displays', async ({ page }) => {
+    await goto(page);
+    await setModeValue(page, 'compounds', {
+      name: 'Water',
+      formula: 'H₂O',
+      molarMass: 18.015,
+    });
+
+    await pickMode(page, 'Compounds');
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    await expect(page.locator('#molar-mass')).toHaveJSProperty('readOnly', true);
+
+    await pickMode(page, 'Type in');
+    await pickMode(page, 'Compounds');
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    expect(await getModeValue(page, 'compounds')).toEqual({
+      name: 'Water',
+      formula: 'H₂O',
+      molarMass: 18.015,
+    });
+  });
+
+  test('Type in is freely editable; the other two modes are read-only', async ({ page }) => {
+    await goto(page);
+    await expect(page.locator('#molar-mass')).toHaveJSProperty('readOnly', false);
+
+    await pickMode(page, 'Build custom');
+    await expect(page.locator('#molar-mass')).toHaveJSProperty('readOnly', true);
+
+    await pickMode(page, 'Compounds');
+    await expect(page.locator('#molar-mass')).toHaveJSProperty('readOnly', true);
+
+    await pickMode(page, 'Type in');
+    await expect(page.locator('#molar-mass')).toHaveJSProperty('readOnly', false);
+  });
+
+  test('typing is rejected in a read-only mode and cannot corrupt another slot', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '18.015'); // Type-in slot
+    await setModeValue(page, 'compounds', { name: 'Glucose', formula: 'C₆H₁₂O₆', molarMass: 180.16 });
+
+    await pickMode(page, 'Compounds');
+    await page.locator('#molar-mass').focus();
+    await page.keyboard.type('999');
+
+    // Field unchanged, and neither slot moved
+    await expect(page.locator('#molar-mass')).toHaveValue('180.16');
+    expect(await getModeValue(page, 'compounds')).toEqual({
+      name: 'Glucose', formula: 'C₆H₁₂O₆', molarMass: 180.16,
+    });
+    expect(await getModeValue(page, 'type-in')).toEqual({ raw: '18.015' });
+  });
+
+  test('switching modes never clears any other mode\'s stored state', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '12.011');
+    await setModeValue(page, 'build-custom', { quantities: { C: 1 }, formula: 'C', molarMass: 12.011 });
+    await setModeValue(page, 'compounds', { name: 'Ethanol', formula: 'C₂H₅OH', molarMass: 46.07 });
+
+    // Cycle through every mode twice
+    for (let i = 0; i < 2; i++) {
+      await pickMode(page, 'Build custom');
+      await pickMode(page, 'Compounds');
+      await pickMode(page, 'Type in');
+    }
+
+    expect(await getModeValue(page, 'type-in')).toEqual({ raw: '12.011' });
+    expect(await getModeValue(page, 'build-custom')).toEqual({
+      quantities: { C: 1 }, formula: 'C', molarMass: 12.011,
+    });
+    expect(await getModeValue(page, 'compounds')).toEqual({
+      name: 'Ethanol', formula: 'C₂H₅OH', molarMass: 46.07,
+    });
+  });
+
+  test('an untouched mode shows the placeholder, not the previous mode\'s value', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '18.015');
+    await pickMode(page, 'Compounds');
+    await expect(page.locator('#molar-mass')).toHaveValue('');
+    // Placeholder is what's actually rendered in an empty read-only field
+    await expect(page.locator('#molar-mass')).toHaveAttribute('placeholder', 'e.g. 18.02');
+    expect(await getModeValue(page, 'compounds')).toEqual({
+      name: null, formula: null, molarMass: null,
+    });
+  });
+
+  test('a read-only mode input stays in the accessibility tree: enabled, focusable, labelled', async ({ page }) => {
+    await goto(page);
+    await setModeValue(page, 'build-custom', { quantities: { C: 1 }, formula: 'C', molarMass: 12.011 });
+    await pickMode(page, 'Build custom');
+
+    const input = page.locator('#molar-mass');
+    // readOnly, explicitly NOT disabled — a disabled input leaves the tab
+    // order and is skipped by some screen readers, and this value is real
+    // content a non-typing user still needs to read.
+    await expect(input).toHaveJSProperty('readOnly', true);
+    await expect(input).toHaveJSProperty('disabled', false);
+    await expect(input).toBeEnabled();
+    await expect(input).toHaveAccessibleName(/Molar Mass/i);
+
+    // Still reachable by focus
+    await input.focus();
+    await expect(input).toBeFocused();
+  });
+
+  test('the displayed value swaps in the same tick as the mode — no stale frame', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '18.015');
+    await setModeValue(page, 'compounds', { name: 'Glucose', formula: 'C₆H₁₂O₆', molarMass: 180.16 });
+
+    await page.click('#molar-mass-mode-trigger');
+    // Read the label and the value from the SAME evaluate, immediately after
+    // the click resolves: if the input lagged the mode by a frame, these two
+    // would disagree here.
+    const [label, value] = await page.evaluate(() => {
+      const opts = [...document.querySelectorAll('#molar-mass-mode-listbox [role="option"]')] as HTMLElement[];
+      opts.find(o => o.textContent === 'Compounds')!.click();
+      return [
+        document.getElementById('molar-mass-mode-label')!.textContent,
+        (document.getElementById('molar-mass') as HTMLInputElement).value,
+      ];
+    });
+    expect(label).toBe('Compounds');
+    expect(value).toBe('180.16');
+  });
+
+  test('switching to a mode recalculates against that mode\'s molar mass', async ({ page }) => {
+    await goto(page);
+    await setMolarMass(page, '18.015');
+    await setMass(page, '18.015');
+    expect(parseFloat(await page.locator('#moles-input').inputValue())).toBeCloseTo(1.0, 5);
+
+    // 36.03 g/mol against the same 18.015 g of mass → 0.5 mol
+    await setModeValue(page, 'build-custom', { quantities: { H: 4, O: 2 }, formula: 'H4O2', molarMass: 36.03 });
+    await pickMode(page, 'Build custom');
+    expect(parseFloat(await page.locator('#moles-input').inputValue())).toBeCloseTo(0.5, 5);
+
+    // ...and back to the typed value
+    await pickMode(page, 'Type in');
+    expect(parseFloat(await page.locator('#moles-input').inputValue())).toBeCloseTo(1.0, 5);
+  });
+
+  test('setModeValue on the ACTIVE mode updates the field immediately', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+    await expect(page.locator('#molar-mass')).toHaveValue('');
+
+    await setModeValue(page, 'compounds', { name: 'Ammonia', formula: 'NH₃', molarMass: 17.031 });
+    await expect(page.locator('#molar-mass')).toHaveValue('17.031');
   });
 });

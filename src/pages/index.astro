@@ -1318,6 +1318,115 @@ import Layout from '../layouts/Layout.astro';
 	let molarMassModeOpen = false;
 	let molarMassModeActiveIndex = -1;
 
+	// --- Per-mode state store (stage 2) ---
+	//
+	// Each mode owns an independent slot. Switching modes NEVER clears another
+	// mode's slot — it only changes which slot #molar-mass is currently a view
+	// of. A mode never touched since load reads as its empty shape below.
+	//
+	// STAGES 3-4 PLUG IN HERE. The Build-custom panel (stage 3) and Compounds
+	// panel (stage 4) should write their result with setModeValue(), and read
+	// back what to re-select on reopen with getModeValue(). Neither should
+	// touch #molar-mass.value directly — setModeValue() already refreshes the
+	// input when the mode it wrote to is the active one, so writing the input
+	// as well would double-apply and desync the store from the DOM.
+	//
+	// Shape notes, chosen so stages 3-4 don't need another rework:
+	//   • build-custom.quantities is the REAL source of truth for that mode —
+	//     `formula`/`molarMass` are both derived from it (buildFormula() /
+	//     computeCustomMolarMass() in browseElements.ts). Stage 3 needs the
+	//     quantities to restore the element grid's selection + per-tile counts
+	//     on reopen; deriving them back out of a formula STRING would mean
+	//     parsing subscripts, so the map is stored directly. Held as a plain
+	//     Record, not a Map, so the whole store stays structured-clone- and
+	//     JSON-safe (Playwright reads it across the page boundary, and a Map
+	//     would arrive as `{}`). Stage 3 converts with
+	//     `new Map(Object.entries(quantities ?? {}))`.
+	//   • compounds keeps `name` AND `formula`, not just a name: the existing
+	//     picker's trigger label is `${name} (${formula})` (see
+	//     selectPresetOption below), so stage 4 needs both to render its
+	//     trigger without re-looking-up PRESETS. `name` is unique across
+	//     PRESETS, so it doubles as the identity stage 4 re-highlights by —
+	//     deliberately not a list index, which would silently repoint if the
+	//     PRESETS order ever changes. Field is `name` (not `compoundName`) so
+	//     a Preset's own fields can be copied across without renaming.
+	//   • molarMass is a number, already rounded to its display precision by
+	//     whoever writes it — the formatting policy stays at the write site,
+	//     as it already does for #use-custom's `toFixed(3)`. Stage 3 should
+	//     therefore store `Number(mass.toFixed(3))`, not the raw float.
+	//   • type-in holds the RAW STRING, not a number: it must round-trip
+	//     exactly what was typed, including in-progress text like "18." or
+	//     "" — coercing to a number would rewrite the field under the user.
+	type TypeInState = { raw: string };
+	type BuildCustomState = {
+		quantities: Record<string, number> | null;
+		formula: string | null;
+		molarMass: number | null;
+	};
+	type CompoundsState = {
+		name: string | null;
+		formula: string | null;
+		molarMass: number | null;
+	};
+	type MolarMassModeStates = {
+		'type-in': TypeInState;
+		'build-custom': BuildCustomState;
+		'compounds': CompoundsState;
+	};
+
+	const molarMassModeStates: MolarMassModeStates = {
+		'type-in': { raw: '' },
+		'build-custom': { quantities: null, formula: null, molarMass: null },
+		'compounds': { name: null, formula: null, molarMass: null },
+	};
+
+	/** What #molar-mass should display while `mode` is active. '' shows the placeholder. */
+	function molarMassDisplayValue(mode: MolarMassMode): string {
+		if (mode === 'type-in') return molarMassModeStates['type-in'].raw;
+		const mass = molarMassModeStates[mode].molarMass;
+		return mass === null ? '' : String(mass);
+	}
+
+	// Re-points #molar-mass at the active mode's slot. Called synchronously
+	// from the mode-switch handler (and from setModeValue), so the field never
+	// paints an intermediate frame still showing the outgoing mode's value.
+	//
+	// readOnly, NOT disabled: a disabled input drops out of the tab order and
+	// is skipped by some screen readers, and the value here is real content a
+	// non-typing user still needs to read. readOnly keeps it focusable, in the
+	// accessibility tree, and still labelled by its <label for="molar-mass">.
+	// (stepInput() already bails on a readOnly input, so the stepper — itself
+	// hidden outside Type in — can't write through this either.)
+	function syncMolarMassInputToMode({ dispatch = true } = {}) {
+		if (!molarMassInput) return;
+		molarMassInput.readOnly = activeMolarMassMode !== 'type-in';
+		molarMassInput.value = molarMassDisplayValue(activeMolarMassMode);
+		// Let the calculator recompute against the newly-shown molar mass —
+		// same "write the field, then announce it" contract #use-custom and
+		// selectPresetOption already use to reach the recalc in the first
+		// <script> block (separate module scope, no shared function to call).
+		if (dispatch) molarMassInput.dispatchEvent(new Event('input', { bubbles: true }));
+	}
+
+	/**
+	 * Read a mode's stored slot. Returns the live object — treat it as
+	 * read-only and go through setModeValue() to write.
+	 */
+	function getModeValue<M extends MolarMassMode>(mode: M): MolarMassModeStates[M] {
+		return molarMassModeStates[mode];
+	}
+
+	/**
+	 * Replace a mode's stored slot. If that mode is currently active, the
+	 * input is refreshed (and a recalc announced) in the same tick.
+	 * Writing to an INACTIVE mode is legal and silent — that's what makes a
+	 * panel able to stage a value the user hasn't switched to yet.
+	 */
+	function setModeValue<M extends MolarMassMode>(mode: M, data: MolarMassModeStates[M]): void {
+		molarMassModeStates[mode] = data;
+		if (mode === activeMolarMassMode) syncMolarMassInputToMode();
+	}
+
 	type MolarMassModeOption = { mode: MolarMassMode; label: string; el: HTMLElement };
 	const molarMassModeOptions: MolarMassModeOption[] = [];
 
@@ -1413,8 +1522,19 @@ import Layout from '../layouts/Layout.astro';
 		// hidden for Build custom/Compounds, whose panels (stages 3-4) will
 		// fill Molar Mass themselves.
 		molarMassStepperEl?.classList.toggle('hidden', opt.mode !== 'type-in');
+		// Re-point the input at the incoming mode's slot. Ordered AFTER
+		// activeMolarMassMode is reassigned, which is what keeps the typing
+		// listener below from writing the restored value into the outgoing
+		// mode's slot.
+		syncMolarMassInputToMode();
 		updateMolarMassModeOptionStates();
 		closeMolarMassModeListbox();
+	}
+
+	/** Programmatic mode switch — same effect as picking the option by hand. */
+	function setActiveMolarMassMode(mode: MolarMassMode) {
+		const idx = molarMassModeOptions.findIndex(o => o.mode === mode);
+		if (idx >= 0) selectMolarMassMode(idx);
 	}
 
 	molarMassModeTrigger?.addEventListener('click', () => {
@@ -1470,6 +1590,50 @@ import Layout from '../layouts/Layout.astro';
 		const idx = molarMassModeOptions.findIndex(({ el }) => el === optionEl);
 		if (idx >= 0 && idx !== molarMassModeActiveIndex) setMolarMassModeActive(idx);
 	});
+
+	// Typing (and the stepper's programmatic writes) feeds the Type-in slot,
+	// and ONLY that slot. A second, independent 'input' listener on the same
+	// element — the first <script> block has its own for recalc/stepper state,
+	// which stays untouched.
+	//
+	// The mode guard is what makes syncMolarMassInputToMode() safe to call on
+	// every switch: its dispatch re-enters here, and while switching TO a
+	// non-Type-in mode this returns early, so the outgoing mode's typed text
+	// is never overwritten by the incoming mode's value. Switching back TO
+	// Type in re-enters with the restored raw string and writes it over
+	// itself, which is a no-op.
+	//
+	// Known transitional gap, resolved by stage 5: the old "Browse elements"
+	// accordion still writes #molar-mass directly (#use-custom and
+	// selectPresetOption). While Type in is active that lands here and is
+	// captured correctly. While Build custom/Compounds is active it is
+	// skipped, so the field can show a value the active slot doesn't hold
+	// until the next mode switch restores the slot. Not reconciled on
+	// purpose: that UI is deleted in stage 5, and coupling the two now would
+	// be work thrown away.
+	molarMassInput?.addEventListener('input', () => {
+		if (activeMolarMassMode !== 'type-in') return;
+		molarMassModeStates['type-in'] = { raw: molarMassInput.value };
+	});
+
+	// Integration surface for stages 3-4 and for the Playwright suite, which
+	// has to drive this state directly while the Build-custom and Compounds
+	// panels that will eventually write it don't exist yet. Kept as an
+	// explicit named hook rather than reaching into the module's closure, so
+	// there is exactly one documented way in. `as any` because typing a
+	// one-off window property would mean shipping a global .d.ts for a hook
+	// only this module and its tests use.
+	(window as any).molarMassMode = {
+		get: getModeValue,
+		set: setModeValue,
+		getActiveMode: () => activeMolarMassMode,
+		setActiveMode: setActiveMolarMassMode,
+	};
+
+	// Put the DOM in sync with the initial mode without announcing a recalc:
+	// on load the field is already empty and the first <script> block has done
+	// its own init pass, so a dispatch here would only re-run that work.
+	syncMolarMassInputToMode({ dispatch: false });
 
 	// --- Presets: custom listbox ---
 	//
