@@ -1195,3 +1195,551 @@ test.describe('Molar Mass per-mode state', () => {
     await expect(page.locator('#molar-mass')).toHaveValue('17.031');
   });
 });
+
+// ─── 12. Molar Mass "Build custom" panel ─────────────────────────────────────
+// Stage 3: the element picker mounted under the Molar Mass field. A second,
+// independent instance of the same element-grid component the old "Browse
+// elements" accordion renders — these cover the new instance and the fact that
+// the two don't share a selection. There is no confirm button here: the field
+// is a live view onto the build-custom slot, so every tile click lands in it.
+
+test.describe('Molar Mass Build custom panel', () => {
+  const PANEL = '#molar-mass-build-panel';
+  const GRID = '#molar-mass-element-grid';
+
+  async function pickMode(page: Page, label: string) {
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: label, exact: true }).click();
+  }
+
+  function tile(page: Page, symbol: string) {
+    return page.locator(`${GRID} [data-symbol="${symbol}"]`);
+  }
+
+  /** Click a tile's body — the select action, which reveals its stepper at 1. */
+  async function selectElement(page: Page, symbol: string) {
+    await tile(page, symbol).getByRole('button').first().click();
+  }
+
+  async function stepElement(page: Page, symbol: string, dir: 'plus' | 'minus', times = 1) {
+    const btn = tile(page, symbol).locator(`[data-step="${dir}"]`);
+    for (let i = 0; i < times; i++) await btn.click();
+  }
+
+  /** Build H₂O in the panel: 2 × H (1.0080) + 1 × O (15.999) = 18.015 g/mol. */
+  async function buildWater(page: Page) {
+    await selectElement(page, 'H');
+    await stepElement(page, 'H', 'plus');
+    await selectElement(page, 'O');
+  }
+
+  async function getBuildCustom(page: Page) {
+    return page.evaluate(() => (window as any).molarMassMode.get('build-custom'));
+  }
+
+  test('the panel is hidden until Build custom is the active mode', async ({ page }) => {
+    await goto(page);
+    await expect(page.locator(PANEL)).toBeHidden();
+
+    await pickMode(page, 'Build custom');
+    await expect(page.locator(PANEL)).toBeVisible();
+
+    await pickMode(page, 'Compounds');
+    await expect(page.locator(PANEL)).toBeHidden();
+
+    await pickMode(page, 'Type in');
+    await expect(page.locator(PANEL)).toBeHidden();
+  });
+
+  test('the panel renders the full element catalogue with a working search', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await expect(tile(page, 'H')).toBeVisible();
+    await expect(tile(page, 'U')).toBeAttached();
+
+    await page.locator('#molar-mass-element-search').fill('oxy');
+    await expect(page.locator(`${GRID} [data-symbol]`)).toHaveCount(1);
+    await expect(tile(page, 'O')).toBeVisible();
+
+    await page.locator('#molar-mass-element-search').fill('zzzz');
+    await expect(page.locator('#molar-mass-element-grid-empty')).toBeVisible();
+  });
+
+  test('selecting elements writes the build-custom slot and shows the mass in the field', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await buildWater(page);
+
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    expect(await getBuildCustom(page)).toEqual({
+      quantities: { H: 2, O: 1 },
+      formula: 'H2O',
+      molarMass: 18.015,
+    });
+    await expect(page.locator('#molar-mass-custom-formula')).toHaveText('H2O');
+    await expect(page.locator('#molar-mass-custom-mass')).toHaveText('18.015 g/mol');
+  });
+
+  test('the Molar Mass readout restores the trailing zeros the slot drops', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await selectElement(page, 'Ne'); // 20.18 — stored as a Number, so 20.18
+    await expect(page.locator('#molar-mass-custom-mass')).toHaveText('20.180 g/mol');
+    // The field itself shows the stored number, unpadded
+    await expect(page.locator('#molar-mass')).toHaveValue('20.18');
+  });
+
+  test('the panel is an overlay: card-wide, flush under the field, out of flow', async ({ page }) => {
+    await goto(page);
+    await page.setViewportSize({ width: 1100, height: 805 });
+
+    const heightBefore = await page.evaluate(() => document.documentElement.scrollHeight);
+    await pickMode(page, 'Build custom');
+
+    const geom = await page.evaluate(() => {
+      const panel = document.getElementById('molar-mass-build-panel')!;
+      const wrap = document.getElementById('molar-mass-mode-wrapper')!;
+      const row = document.querySelector('.field-row')!;
+      const p = panel.getBoundingClientRect();
+      const w = wrap.getBoundingClientRect();
+      const r = row.getBoundingClientRect();
+      return {
+        position: getComputedStyle(panel).position,
+        // Left edge flush with the Molar Mass control...
+        leftDelta: Math.round(p.left - w.left),
+        // ...and the same inset mirrored on the right, so the panel spans the
+        // card's content box rather than either half of it
+        rightDelta: Math.round((r.right - p.right) - (w.left - r.left)),
+        topDelta: Math.round(p.top - w.bottom),
+        docHeight: document.documentElement.scrollHeight,
+      };
+    });
+
+    expect(geom.position).toBe('fixed');
+    expect(geom.leftDelta).toBe(0);
+    expect(geom.rightDelta).toBe(0);
+    expect(geom.topDelta).toBe(0);
+    // Out of flow: opening it must not grow the document
+    expect(geom.docHeight).toBe(heightBefore);
+    // It overlays what follows the field — the unit pills are still laid out
+    // where they were, but the panel is what a click at their centre would hit.
+    const covered = await page.evaluate(() => {
+      const pill = document.querySelector('#molar-mass-units button')!.getBoundingClientRect();
+      const hit = document.elementFromPoint(pill.left + pill.width / 2, pill.top + pill.height / 2);
+      return document.getElementById('molar-mass-build-panel')!.contains(hit);
+    });
+    expect(covered).toBe(true);
+  });
+
+  test('the grid stays 3-up in the panel at desktop widths', async ({ page }) => {
+    await goto(page);
+    await page.setViewportSize({ width: 1100, height: 805 });
+    await pickMode(page, 'Build custom');
+    // The panel is inset to the card's content box and so is narrower than the
+    // accordion's — it carries its own targetCol to hold three columns here.
+    const cols = await page.evaluate(() =>
+      getComputedStyle(document.getElementById('molar-mass-element-grid')!)
+        .gridTemplateColumns.trim().split(/\s+/).length
+    );
+    expect(cols).toBe(3);
+  });
+
+  test('the panel tracks the field when the page scrolls', async ({ page }) => {
+    await goto(page);
+    await page.setViewportSize({ width: 1100, height: 600 });
+    await pickMode(page, 'Build custom');
+
+    await page.evaluate(() => window.scrollBy(0, 200));
+    await expect.poll(async () => page.evaluate(() => {
+      const p = document.getElementById('molar-mass-build-panel')!.getBoundingClientRect();
+      const w = document.getElementById('molar-mass-mode-wrapper')!.getBoundingClientRect();
+      return Math.round(p.top - w.bottom);
+    })).toBe(0);
+  });
+
+  test('the field tracks every step live — there is no confirm button to press', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+
+    // Nothing in this panel commits a value; the field moves on each click.
+    await expect(page.locator(`${PANEL} button:has-text("Use this molar mass")`)).toHaveCount(0);
+
+    await selectElement(page, 'O');
+    await expect(page.locator('#molar-mass')).toHaveValue('15.999');
+
+    await selectElement(page, 'H');
+    await expect(page.locator('#molar-mass')).toHaveValue('17.007'); // 15.999 + 1.008
+
+    await stepElement(page, 'H', 'plus');
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+
+    await stepElement(page, 'H', 'minus');
+    await expect(page.locator('#molar-mass')).toHaveValue('17.007');
+  });
+
+  test('the built molar mass drives the calculation', async ({ page }) => {
+    await goto(page);
+    await setMass(page, '36.03');
+    await pickMode(page, 'Build custom');
+    await buildWater(page);
+    // 36.03 g ÷ 18.015 g/mol = 2 mol
+    expect(parseFloat(await page.locator('#moles-input').inputValue())).toBeCloseTo(2.0, 5);
+  });
+
+  test('leaving and returning restores the exact tile selection and counts', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await buildWater(page);
+    await stepElement(page, 'O', 'plus', 2); // O 1 → 3, giving H2O3: both counts
+                                             // differ, so a restore that reset
+                                             // either to 1 would show up here
+
+    await pickMode(page, 'Type in');
+    await expect(page.locator(PANEL)).toBeHidden();
+
+    await pickMode(page, 'Build custom');
+    await expect(page.locator(PANEL)).toBeVisible();
+    // Steppers only exist on selected tiles, and their count is the quantity
+    await expect(tile(page, 'H').locator('[data-step="plus"]')).toBeVisible();
+    await expect(tile(page, 'O').locator('[data-step="plus"]')).toBeVisible();
+    await expect(tile(page, 'C').locator('[data-step="plus"]')).toHaveCount(0);
+    await expect(tile(page, 'H').getByRole('button').first()).toHaveAttribute('aria-current', 'true');
+
+    expect(await getBuildCustom(page)).toEqual({
+      quantities: { H: 2, O: 3 },
+      formula: 'H2O3',
+      molarMass: 50.013, // 2 × 1.0080 + 3 × 15.999
+    });
+    await expect(page.locator('#molar-mass')).toHaveValue('50.013');
+  });
+
+  test('deselecting everything empties the slot and clears the field', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await selectElement(page, 'H');
+    await expect(page.locator('#molar-mass')).toHaveValue('1.008');
+
+    await stepElement(page, 'H', 'minus'); // 1 → deselected
+    await expect(page.locator('#molar-mass')).toHaveValue('');
+    await expect(page.locator('#molar-mass-custom-formula')).toHaveText('—');
+    await expect(page.locator('#molar-mass-custom-mass')).toHaveText('—');
+    expect(await getBuildCustom(page)).toEqual({
+      quantities: null, formula: null, molarMass: null,
+    });
+  });
+
+  // The grid instance is never torn down, so it would keep showing its own last
+  // selection across a hide/show on its own — which makes "switch away and back"
+  // alone too weak to prove where the restore comes from. Overwriting the slot
+  // while the mode is INACTIVE separates the two: only a panel that reloads from
+  // the slot can show the new selection here.
+  test('returning to the mode restores from the slot, not from the grid\'s own leftovers', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await buildWater(page);
+
+    await pickMode(page, 'Type in');
+    await page.evaluate(() => (window as any).molarMassMode.set('build-custom', {
+      quantities: { H: 3, N: 1 },
+      formula: 'H3N',
+      molarMass: 17.031,
+    }));
+
+    await pickMode(page, 'Build custom');
+    await expect(tile(page, 'N').locator('[data-step="plus"]')).toBeVisible();
+    await expect(tile(page, 'H').locator('span.text-center')).toHaveText('3');
+    // Oxygen was in the panel's own leftover selection but not in the slot
+    await expect(tile(page, 'O').locator('[data-step="plus"]')).toHaveCount(0);
+    await expect(page.locator('#molar-mass')).toHaveValue('17.031');
+    await expect(page.locator('#molar-mass-custom-formula')).toHaveText('H3N');
+  });
+
+  test('a slot written through the hook repaints the panel', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await page.evaluate(() => (window as any).molarMassMode.set('build-custom', {
+      quantities: { C: 6, H: 12, O: 6 },
+      formula: 'C6H12O6',
+      molarMass: 180.156,
+    }));
+
+    await expect(tile(page, 'C').locator('[data-step="plus"]')).toBeVisible();
+    await expect(tile(page, 'H').locator('[data-step="plus"]')).toBeVisible();
+    await expect(tile(page, 'O').locator('[data-step="plus"]')).toBeVisible();
+    await expect(page.locator('#molar-mass')).toHaveValue('180.156');
+    await expect(page.locator('#molar-mass-custom-formula')).toHaveText('C6H12O6');
+  });
+
+  test('this grid and the old accordion grid are independent pickers', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await buildWater(page);
+
+    // Back to Type in first: the panel is an overlay anchored under the Molar
+    // Mass field, so while it is open it covers the accordion's trigger.
+    await pickMode(page, 'Type in');
+
+    // The old Build custom tab is untouched by the new panel's selection
+    await page.click('#browse-trigger');
+    await expect(page.locator('#custom-formula')).toHaveText('—');
+    await expect(page.locator('#use-custom')).toBeHidden();
+    await expect(page.locator('#element-grid [data-symbol="H"] [data-step="plus"]')).toHaveCount(0);
+
+    // ...and selecting there doesn't disturb the new panel or its slot
+    await page.locator('#element-grid [data-symbol="C"]').getByRole('button').first().click();
+    await expect(page.locator('#custom-formula')).toHaveText('C');
+    await expect(tile(page, 'C').locator('[data-step="plus"]')).toHaveCount(0);
+    expect(await getBuildCustom(page)).toEqual({
+      quantities: { H: 2, O: 1 }, formula: 'H2O', molarMass: 18.015,
+    });
+  });
+});
+
+// ─── 13. Molar Mass "Compounds" panel ────────────────────────────────────────
+// Stage 4: the compound picker mounted under the Molar Mass field. A second
+// instance of the same createPresetListbox() component the old "Browse
+// elements" accordion's Presets tab renders, minus the combobox lifecycle —
+// this one has no trigger and no open/close, so the panel element IS the
+// focusable listbox. Selecting writes the compounds slot; stage 2 does the rest.
+
+test.describe('Molar Mass Compounds panel', () => {
+  const PANEL = '#molar-mass-compounds-panel';
+
+  async function pickMode(page: Page, label: string) {
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: label, exact: true }).click();
+  }
+
+  function option(page: Page, namePattern: RegExp) {
+    return page.locator(`${PANEL} [role="option"]`).filter({ hasText: namePattern });
+  }
+
+  async function getCompounds(page: Page) {
+    return page.evaluate(() => (window as any).molarMassMode.get('compounds'));
+  }
+
+  test('the panel is hidden until Compounds is the active mode', async ({ page }) => {
+    await goto(page);
+    await expect(page.locator(PANEL)).toBeHidden();
+
+    await pickMode(page, 'Compounds');
+    await expect(page.locator(PANEL)).toBeVisible();
+
+    await pickMode(page, 'Build custom');
+    await expect(page.locator(PANEL)).toBeHidden();
+    await expect(page.locator('#molar-mass-build-panel')).toBeVisible();
+
+    await pickMode(page, 'Type in');
+    await expect(page.locator(PANEL)).toBeHidden();
+  });
+
+  test('the panel renders all three groups and the full compound list', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+
+    const groups = page.locator(`${PANEL} [role="group"]`);
+    await expect(groups).toHaveCount(3);
+    await expect(groups.nth(0)).toHaveAttribute('aria-label', 'Common');
+    await expect(groups.nth(1)).toHaveAttribute('aria-label', 'Acids & Bases');
+    await expect(groups.nth(2)).toHaveAttribute('aria-label', 'Salts & Oxides');
+    // Headings are decorative — the group is already named by aria-label
+    await expect(groups.nth(0).locator('[aria-hidden="true"]').first()).toHaveText('Common');
+
+    await expect(page.locator(`${PANEL} [role="option"]`)).toHaveCount(20);
+    await expect(option(page, /^Water/)).toHaveText('Water (H₂O) — 18.015 g/mol');
+  });
+
+  test('option ids are namespaced per instance — no duplicates in the document', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+    const dupes = await page.evaluate(() => {
+      const seen = new Set<string>();
+      const dup: string[] = [];
+      document.querySelectorAll('[role="option"][id]').forEach((el) => {
+        if (seen.has(el.id)) dup.push(el.id);
+        seen.add(el.id);
+      });
+      return dup;
+    });
+    expect(dupes).toEqual([]);
+    // The accordion keeps its original ids; this instance gets its own prefix
+    await expect(page.locator('#preset-option-0')).toHaveCount(1);
+    await expect(page.locator('#molar-mass-compound-option-0')).toHaveCount(1);
+  });
+
+  test('clicking a compound writes the slot and fills the read-only field', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+    await option(page, /^Glucose/).click();
+
+    await expect(page.locator('#molar-mass')).toHaveValue('180.16');
+    await expect(page.locator('#molar-mass')).toHaveJSProperty('readOnly', true);
+    expect(await getCompounds(page)).toEqual({
+      name: 'Glucose', formula: 'C₆H₁₂O₆', molarMass: 180.16,
+    });
+    // Single click, no confirm step — and the panel stays: it is the mode's UI
+    await expect(page.locator(PANEL)).toBeVisible();
+    await expect(option(page, /^Glucose/)).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('the picked compound drives the calculation', async ({ page }) => {
+    await goto(page);
+    await setMass(page, '36.03');
+    await pickMode(page, 'Compounds');
+    await option(page, /^Water/).click();
+    // 36.03 g ÷ 18.015 g/mol = 2 mol
+    expect(parseFloat(await page.locator('#moles-input').inputValue())).toBeCloseTo(2.0, 5);
+  });
+
+  test('keyboard: arrow to a compound and Enter selects it', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+    // Park the pointer off the list: hover shares the same highlight as the
+    // keyboard, and picking the mode leaves the cursor sitting over a row.
+    await page.mouse.move(5, 5);
+    await page.locator(PANEL).focus();
+    // Opens highlighted on option 0; two downs lands on Carbon Dioxide
+    await expect(page.locator(PANEL)).toHaveAttribute('aria-activedescendant', 'molar-mass-compound-option-0');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator(PANEL)).toHaveAttribute('aria-activedescendant', 'molar-mass-compound-option-2');
+    await page.keyboard.press('Enter');
+
+    await expect(page.locator('#molar-mass')).toHaveValue('44.01');
+    expect(await getCompounds(page)).toEqual({
+      name: 'Carbon Dioxide', formula: 'CO₂', molarMass: 44.01,
+    });
+  });
+
+  test('leaving and returning restores the picked compound', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+    await option(page, /^Ethanol/).click();
+
+    await pickMode(page, 'Type in');
+    await expect(page.locator(PANEL)).toBeHidden();
+
+    await pickMode(page, 'Compounds');
+    await expect(option(page, /^Ethanol/)).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#molar-mass')).toHaveValue('46.07');
+    // The highlight lands on the restored selection, not back at option 0
+    await expect(page.locator(PANEL)).toHaveAttribute('aria-activedescendant', 'molar-mass-compound-option-4');
+  });
+
+  // Same trap stage 3 fell into: the picker instance is never torn down, so it
+  // would keep its own selectedIndex across a hide/show regardless of where the
+  // restore reads from. Overwriting the slot while the mode is INACTIVE is what
+  // separates "restored from the store" from "never lost it".
+  test('returning restores from the slot, not from the picker\'s own leftovers', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+    await option(page, /^Ethanol/).click();
+
+    await pickMode(page, 'Type in');
+    await page.evaluate(() => (window as any).molarMassMode.set('compounds', {
+      name: 'Ammonia', formula: 'NH₃', molarMass: 17.031,
+    }));
+
+    await pickMode(page, 'Compounds');
+    await expect(option(page, /^Ammonia/)).toHaveAttribute('aria-selected', 'true');
+    await expect(option(page, /^Ethanol/)).toHaveAttribute('aria-selected', 'false');
+    await expect(page.locator('#molar-mass')).toHaveValue('17.031');
+  });
+
+  test('the panel is an overlay on the same geometry as Build custom', async ({ page }) => {
+    await goto(page);
+    await page.setViewportSize({ width: 1100, height: 805 });
+
+    const heightBefore = await page.evaluate(() => document.documentElement.scrollHeight);
+    await pickMode(page, 'Compounds');
+
+    const geom = await page.evaluate(() => {
+      const panel = document.getElementById('molar-mass-compounds-panel')!;
+      const wrap = document.getElementById('molar-mass-mode-wrapper')!;
+      const row = document.querySelector('.field-row')!;
+      const p = panel.getBoundingClientRect();
+      const w = wrap.getBoundingClientRect();
+      const r = row.getBoundingClientRect();
+      return {
+        position: getComputedStyle(panel).position,
+        leftDelta: Math.round(p.left - w.left),
+        rightDelta: Math.round((r.right - p.right) - (w.left - r.left)),
+        topDelta: Math.round(p.top - w.bottom),
+        width: Math.round(p.width),
+        docHeight: document.documentElement.scrollHeight,
+      };
+    });
+
+    expect(geom.position).toBe('fixed');
+    expect(geom.leftDelta).toBe(0);
+    expect(geom.rightDelta).toBe(0);
+    expect(geom.topDelta).toBe(0);
+    expect(geom.docHeight).toBe(heightBefore);
+
+    // Identical box to the Build custom panel — same slot, one shared positioner
+    await pickMode(page, 'Build custom');
+    const buildWidth = await page.evaluate(() =>
+      Math.round(document.getElementById('molar-mass-build-panel')!.getBoundingClientRect().width)
+    );
+    expect(geom.width).toBe(buildWidth);
+  });
+
+  test('the mode listbox layers above the panel', async ({ page }) => {
+    await goto(page);
+    await page.setViewportSize({ width: 1100, height: 805 });
+    await pickMode(page, 'Compounds');
+
+    const z = await page.evaluate(() => ({
+      panel: getComputedStyle(document.getElementById('molar-mass-compounds-panel')!).zIndex,
+      modeListbox: getComputedStyle(document.getElementById('molar-mass-mode-listbox')!).zIndex,
+    }));
+    expect(Number(z.panel)).toBeLessThan(Number(z.modeListbox));
+
+    // ...and it really does draw over it: the mode dropdown's own options are
+    // what a click would hit where the two overlap.
+    await page.click('#molar-mass-mode-trigger');
+    const hitsListbox = await page.evaluate(() => {
+      const opt = document.querySelector('#molar-mass-mode-listbox [role="option"]')!.getBoundingClientRect();
+      const hit = document.elementFromPoint(opt.left + opt.width / 2, opt.top + opt.height / 2);
+      return document.getElementById('molar-mass-mode-listbox')!.contains(hit);
+    });
+    expect(hitsListbox).toBe(true);
+  });
+
+  test('the panel tracks the field when the page scrolls', async ({ page }) => {
+    await goto(page);
+    await page.setViewportSize({ width: 1100, height: 600 });
+    await pickMode(page, 'Compounds');
+
+    await page.evaluate(() => window.scrollBy(0, 200));
+    await expect.poll(async () => page.evaluate(() => {
+      const p = document.getElementById('molar-mass-compounds-panel')!.getBoundingClientRect();
+      const w = document.getElementById('molar-mass-mode-wrapper')!.getBoundingClientRect();
+      return Math.round(p.top - w.bottom);
+    })).toBe(0);
+  });
+
+  test('this picker and the old accordion picker are independent', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+    await option(page, /^Methane/).click();
+    expect(await getCompounds(page)).toEqual({
+      name: 'Methane', formula: 'CH₄', molarMass: 16.043,
+    });
+
+    // Back to Type in first — the overlay covers the accordion's trigger
+    await pickMode(page, 'Type in');
+    await page.click('#browse-trigger');
+    await page.click('#tab-presets');
+    // The accordion's trigger never saw this panel's selection
+    await expect(page.locator('#preset-trigger')).toHaveText('Select a compound…');
+
+    // ...and picking there doesn't disturb the compounds slot
+    await page.click('#preset-trigger');
+    await page.locator('#preset-listbox [role="option"]').filter({ hasText: /^Water/ }).click();
+    await expect(page.locator('#preset-trigger')).toHaveText('Water (H₂O)');
+    expect(await getCompounds(page)).toEqual({
+      name: 'Methane', formula: 'CH₄', molarMass: 16.043,
+    });
+  });
+});
