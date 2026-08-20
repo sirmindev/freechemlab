@@ -104,19 +104,15 @@ import Layout from '../layouts/Layout.astro';
 								</label>
 							</div>
 							<div class="relative flex items-center">
-								<!-- Molar Mass mode: fused dropdown + input (stage 1 of a multi-stage
-								     rebuild — see DESIGN.md screenshots). The wrapper, not the input,
-								     now carries the border/radius/focus-ring/error-ring, since a second
-								     control (the mode trigger) shares its edge — the error/clear-error
-								     JS below was retargeted from #molar-mass to #molar-mass-mode-wrapper
-								     accordingly. This stage wires only the dropdown shell and
-								     mode-switching state (activeMolarMassMode, in the second <script>
-								     block below, next to #preset-listbox whose combobox/listbox pattern
-								     it reuses). Selecting "Build custom" now reveals its element picker
-								     (#molar-mass-build-panel, stage 3, just below this card);
-								     "Compounds" still has no panel (stage 4). Neither touches the
-								     existing "Browse elements" accordion further down, which stays
-								     fully functional until stage 5's teardown. -->
+								<!-- Molar Mass mode: fused dropdown + input. The wrapper, not the
+								     input, carries the border/radius/focus-ring/error-ring, since a
+								     second control (the mode trigger) shares its edge — the
+								     error/clear-error JS below targets #molar-mass-mode-wrapper, not
+								     #molar-mass, for that reason. The trigger follows the ARIA APG
+								     "Collapsible Dropdown Listbox" pattern; mode-switching state lives
+								     in the second <script> block below (activeMolarMassMode).
+								     Each non-typing mode has an overlay panel below this card:
+								     #molar-mass-build-panel and #molar-mass-compounds-panel. -->
 								<div id="molar-mass-mode-wrapper" class="flex items-stretch w-full rounded-[8px] overflow-hidden inset-ring-1 inset-ring-hairline focus-within:inset-ring-2 focus-within:inset-ring-primary transition-all">
 									<button
 										type="button"
@@ -141,10 +137,10 @@ import Layout from '../layouts/Layout.astro';
 										class="flex-1 min-w-0 bg-surface text-ink font-mono text-base pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] focus:outline-none focus:ring-0 transition-all"
 									/>
 								</div>
-								<!-- Mode listbox popup — same `position: fixed`-off-trigger-rect pattern
-								     as #preset-listbox (see that element's comment for why: it escapes
-								     #browse-panel's overflow-hidden clip and repositions rather than
-								     closing on scroll/resize). -->
+								<!-- Mode listbox popup. `position: fixed`, placed off the trigger's own
+								     bounding rect in JS, and repositioned (not closed) on scroll/resize —
+								     see positionMolarMassModeListbox() for why fixed rather than
+								     absolute. -->
 								<div
 									id="molar-mass-mode-listbox"
 									role="listbox"
@@ -328,7 +324,7 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 				</div>
 
-				<!-- Build custom element picker (stage 3 of the Molar Mass mode rebuild).
+				<!-- Build custom element picker — the "Build custom" mode's panel.
 				     An OVERLAY, not an in-flow block: `position: fixed`, anchored under the
 				     Molar Mass control and spanning the full content width of the card above
 				     (both halves), so it floats over the unit pills, the Mass field's lower
@@ -340,29 +336,20 @@ import Layout from '../layouts/Layout.astro';
 				     222px (GRID_MIN_COL, the "Molybdenum" + stepper truncation floor) — the
 				     card-wide span is what keeps it 3-up instead of collapsing to 1-up.
 
-				     Geometry is computed in positionMolarMassBuildPanel(), not declared:
+				     Geometry is computed in positionMolarMassModePanel(), not declared:
 				     the left edge and the width are derived from .field-row's rect and the
 				     card's own outer padding (24px at `mobile:`, 16px below), which is also
 				     the Molar Mass control's left inset — so the panel lines up with that
 				     control on the left and with the Mass field on the right at both
 				     breakpoints, without restating either padding value here. `fixed` (with
-				     scroll/resize reposition) rather than `absolute` for the same reason
-				     #preset-listbox uses it — see that element's comment.
+				     scroll/resize reposition) rather than `absolute` so the panel is not
+				     clipped by, or offset against, any ancestor of this DOM position.
 
-				     This is a SECOND, INDEPENDENT instance of the same element-grid
-				     component the "Browse elements" accordion's Build-custom tab renders
-				     (createElementGrid() in the script below) — same tiles, same steppers,
-				     same column math, its own quantities Map. The two never share a
-				     selection: this one's writes go to the build-custom mode slot, the
-				     old one's still go through #use-custom, and the old tab keeps working
-				     untouched until stage 5 removes it.
-
-				     No "Use this molar mass" confirm button, unlike the accordion tab this
-				     otherwise mirrors: #molar-mass is a live view onto the build-custom slot
-				     (stage 2), so every tile click already lands in the field and there is
-				     nothing left for a confirm step to do. The Formula/Molar Mass readout
-				     pair the accordion's formula bar carries is kept as-is — z-10, under the
-				     mode listbox's z-20, so opening the mode dropdown still draws over it. -->
+				     No confirm button: #molar-mass is a live view onto the build-custom
+				     slot, so every tile click already lands in the field and there is
+				     nothing left for a confirm step to do. The Formula / Molar Mass readout
+				     is z-10, under the mode listbox's z-20, so opening the mode dropdown
+				     still draws over it. -->
 				<div id="molar-mass-build-panel" class="hidden fixed z-10 bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-[16px] mobile:p-5">
 					<input
 						type="search"
@@ -380,11 +367,9 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 					<p id="molar-mass-element-grid-empty" class="hidden text-xs text-stone text-center py-4">No elements match your search.</p>
 
-					<!-- Same Formula / Molar Mass pair as the accordion tab's formula bar,
-					     minus its "Use this molar mass" button. With the button gone the two
-					     readouts fit side by side at every width, so this drops that bar's
-					     `flex-col mobile:flex-row` stack — there is no third item to make
-					     room for below 520px. -->
+					<!-- Formula / Molar Mass readout. Only two items and no button, so they
+					     fit side by side at every width — no `flex-col mobile:flex-row`
+					     stack is needed below 520px. -->
 					<div class="mt-4 pt-4 border-t border-hairline-soft flex items-center justify-between gap-3">
 						<div>
 							<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Formula</span>
@@ -397,35 +382,37 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 				</div>
 
-				<!-- Compounds picker (stage 4). Same overlay slot and the same geometry as
-				     #molar-mass-build-panel above — both are placed by
+				<!-- Compounds picker — the "Compounds" mode's panel. Same overlay slot and
+				     the same geometry as #molar-mass-build-panel above: both are placed by
 				     positionMolarMassModePanel(), so they line up with the Molar Mass
 				     control on the left and the Mass field on the right at both
 				     breakpoints, and neither is in flow.
 
 				     Unlike the Build-custom panel this has no container of its own: the
-				     panel IS the listbox, carrying #preset-listbox's own popup styling
-				     (bg-surface-1 a step above the card it floats over, hairline ring,
-				     max-h-72 + overflow-y-auto). Its options and group headings are built
-				     by createPresetListbox() from the same PRESETS/PRESET_GROUP_ORDER the
-				     accordion's Presets tab reads — one component, two instances, no second
-				     copy of the compound list.
+				     panel IS the listbox, so it carries popup styling directly (bg-surface-1
+				     a step above the card it floats over, hairline ring, max-h-72 +
+				     overflow-y-auto). Its options and group headings are built by
+				     createPresetListbox() from PRESETS/PRESET_GROUP_ORDER in
+				     browseElements.ts — the compound list is not duplicated here.
 
-				     tabindex="0" and role="listbox" here, where the accordion's equivalent
-				     is tabindex="-1": that one is the popup half of a combobox, so focus
-				     stays on #preset-trigger and this element is never a tab stop. This one
-				     has no trigger — the mode dropdown already chose "Compounds", and a
-				     second collapsed control to expand would be a redundant step — so it is
-				     the focusable element itself, and carries aria-activedescendant
-				     directly (ARIA APG "Listbox", not "Combobox"). Its focus ring is the
-				     only `focus-visible:` in the app, which is otherwise all `focus:`:
-				     every other focusable here is an input or a button, where a ring on
-				     click reads as normal, but clicking an option focuses this whole
-				     ~280px panel and a 2px green ring around all of it is both louder than
-				     anything else on the page and absent from the mockup. `focus-visible:`
-				     keeps the keyboard affordance and drops the pointer-only case. There is no confirm
-				     step: a click or Enter writes the compounds slot, which stage 2 pushes
-				     straight into #molar-mass. -->
+				     tabindex="0" and role="listbox", not a collapsed combobox: there is no
+				     trigger row, because the mode dropdown has already chosen "Compounds"
+				     and a second collapsed control to expand would be a redundant step. So
+				     this element is the focusable one itself and carries
+				     aria-activedescendant directly (ARIA APG "Listbox", not "Combobox"),
+				     and the last selection is shown by aria-selected + the pre-highlight on
+				     return rather than by a trigger label.
+
+				     Its focus ring is the only `focus-visible:` in the app, which is
+				     otherwise all `focus:`: every other focusable here is an input or a
+				     button, where a ring on click reads as normal, but clicking an option
+				     focuses this whole ~280px panel and a 2px green ring around all of it is
+				     both louder than anything else on the page and absent from the mockup.
+				     `focus-visible:` keeps the keyboard affordance and drops the
+				     pointer-only case.
+
+				     There is no confirm step: a click or Enter writes the compounds slot,
+				     which setModeValue() pushes straight into #molar-mass. -->
 				<div
 					id="molar-mass-compounds-panel"
 					role="listbox"
@@ -433,182 +420,6 @@ import Layout from '../layouts/Layout.astro';
 					tabindex="0"
 					class="hidden fixed z-10 max-h-72 overflow-y-auto bg-surface-1 inset-ring-1 inset-ring-hairline rounded-[8px] py-1 focus:outline-none focus-visible:inset-ring-2 focus-visible:inset-ring-primary"
 				></div>
-
-				<!-- Browse Elements Trigger + Panel (col-span-2, between inputs and result) -->
-				<div class="md:col-span-2">
-					<!-- Trigger: trigger-browse-elements -->
-					<!--
-						`items-start` + the h-5 chevron box pin the chevron to line one, so it
-						does not recentre against a wrapped block. `text-left` resets the UA
-						button default (`text-align: center`), which Tailwind preflight leaves
-						alone. `gap-2` (not gap-1) is sized for the OPEN state: rotating the
-						chevron 90° swaps its visual extent, so it overflows its own layout box
-						by half the difference and eats into the gap — see the svg below.
-					-->
-					<button
-						id="browse-trigger"
-						type="button"
-						class="flex items-start gap-2 text-left text-sm text-ink-muted hover:text-ink transition-colors cursor-pointer"
-					>
-						<span class="flex h-5 shrink-0 items-center">
-							<!--
-								viewBox maps 1:1 to px, so stroke-width 1.5 renders as exactly
-								1.5px. Shrink the glyph by editing the box AND the path together;
-								scaling via width/height alone would thin the stroke with it.
-							-->
-							<svg id="browse-chevron" class="shrink-0 text-ink-muted transition-transform duration-200" width="6" height="10.5" viewBox="0 0 6 10.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M0.75 9.75L5.25 5.25L0.75 0.75" />
-							</svg>
-						</span>
-						<!--
-							One text flow, not two flex children. "Browse elements" is an inline
-							span inside the sentence. Both halves are `whitespace-nowrap`, so the
-							single space between them is the ONLY soft-wrap opportunity in the
-							row — the break can therefore only ever land after the question and
-							before the link, at whatever width it lands. A hard <br> would force
-							that break at every width, including desktop.
-						-->
-						<span>
-							<span class="whitespace-nowrap">Not sure of the molar mass?</span> <span class="text-ink underline whitespace-nowrap">Browse elements</span>
-						</span>
-					</button>
-
-					<!-- Collapsible Panel -->
-					<div id="browse-panel" class="hidden mt-3 bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] overflow-hidden">
-						<!-- Tabs -->
-						<div class="flex border-b border-hairline">
-							<button
-								id="tab-custom"
-								type="button"
-								class="py-2 px-4 text-sm font-medium text-brand-green border-b-2 border-brand-green -mb-px transition-colors cursor-pointer"
-							>
-								Build custom
-							</button>
-							<button
-								id="tab-presets"
-								type="button"
-								class="py-2 px-4 text-sm font-medium text-stone border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer"
-							>
-								Presets
-							</button>
-						</div>
-
-						<!-- Build Custom Tab Content -->
-						<div id="panel-custom" class="p-[16px] mobile:p-5">
-							<!-- Search -->
-							<input
-								type="search"
-								id="element-search"
-								placeholder="Search by name or symbol…"
-								class="w-full bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] pl-3 pr-3 py-[12px] mobile:py-[10px] mb-4 focus:outline-none focus:inset-ring-primary focus:ring-1 focus:ring-brand-green transition-all"
-							/>
-
-							<!-- Element Grid -->
-							<!-- id added alongside the class: the stage-3 Build-custom panel mounts a
-							     SECOND .element-grid-scroll higher up the document, so the old
-							     `document.querySelector('.element-grid-scroll')` lookup would have
-							     resolved to that one instead of this. The class stays for DESIGN.md's
-							     element-grid spec; the id is what the JS binds to. -->
-							<div id="element-grid-scroll" class="element-grid-scroll max-h-[320px] overflow-y-auto rounded-[8px] mb-4">
-								<!-- Columns are computed to whole pixels by layoutElementGrid() -->
-								<div id="element-grid" class="grid gap-2">
-									<!-- Rendered by JS -->
-								</div>
-							</div>
-							<p id="element-grid-empty" class="hidden text-xs text-stone text-center py-4">No elements match your search.</p>
-
-							<!-- Formula Bar -->
-							<div class="mt-4 pt-4 border-t border-hairline-soft flex flex-col mobile:flex-row mobile:items-center justify-between gap-3">
-								<div>
-									<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Formula</span>
-									<span id="custom-formula" class="text-base font-medium font-mono text-ink">—</span>
-								</div>
-								<div class="mobile:text-right">
-									<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Molar Mass</span>
-									<span id="custom-molar-mass-val" class="text-base font-medium font-mono text-ink">—</span>
-								</div>
-								<button
-									id="use-custom"
-									type="button"
-									class="hidden self-stretch mobile:self-auto min-h-[44px] px-5 py-3 bg-brand-green text-on-primary text-sm font-medium rounded-full cursor-pointer transition-colors hover:bg-brand-green-deep whitespace-nowrap flex items-center justify-center"
-								>
-									Use this molar mass
-								</button>
-							</div>
-						</div>
-
-						<!-- Presets Tab Content -->
-						<div id="panel-presets" class="hidden p-[16px] mobile:p-5">
-							<label id="preset-label" class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">
-								Common Compounds
-							</label>
-							<!--
-								Custom listbox replacing the native <select>. On mobile a native
-								<select> with <optgroup>s hands off to the OS's own picker (wheel
-								or full-screen overlay depending on platform), which can't be
-								restyled and doesn't respect the page's width — this reimplements
-								the same "pick one grouped value" interaction as an in-page
-								combobox, per the ARIA APG "Collapsible Dropdown Listbox"
-								(select-only combobox) pattern: focus stays on the trigger the
-								whole time, aria-activedescendant tracks the highlighted option
-								instead of DOM focus moving into the listbox.
-
-								Selecting an option (click, or Enter/Space while highlighted)
-								fills Molar Mass immediately and collapses the whole Browse
-								Elements panel — the same end effect the old
-								select-then-"Use this molar mass" flow had, just triggered
-								directly by the selection. There is no confirm button on this
-								tab; see #use-custom on the sibling Build-custom tab, unrelated
-								to this control.
-							-->
-							<div class="relative">
-								<button
-									type="button"
-									id="preset-trigger"
-									role="combobox"
-									aria-haspopup="listbox"
-									aria-expanded="false"
-									aria-controls="preset-listbox"
-									aria-labelledby="preset-label preset-trigger-label"
-									class="w-full flex items-center justify-between gap-2 bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans text-left rounded-[8px] pl-3 pr-8 py-[12px] mobile:py-[10px] cursor-pointer focus:outline-none focus:inset-ring-2 focus:inset-ring-primary transition-all"
-								>
-									<span id="preset-trigger-label" class="truncate text-ink-tertiary">Select a compound…</span>
-								</button>
-								<!-- Same glyph/spec as #browse-chevron: 6x10.5 viewBox, 1.5px
-								     stroke, round caps/joins — rotated 90° permanently, since
-								     this chevron never animates (unlike #browse-chevron). -->
-								<svg class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 rotate-90 text-ink-muted" width="6" height="10.5" viewBox="0 0 6 10.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M0.75 9.75L5.25 5.25L0.75 0.75" />
-								</svg>
-								<!-- Populated by JS from PRESETS (src/utils/browseElements.ts) —
-								     see the note above the script's Presets section for why the
-								     data isn't duplicated here.
-
-								     position:fixed, not absolute: #browse-panel (an ancestor,
-								     several levels up) carries overflow-hidden to keep its own
-								     rounded corners clean, and an absolutely-positioned popup's
-								     containing block (this element's nearest positioned ancestor,
-								     the .relative wrapper above) still sits *inside* that clipping
-								     box — so `absolute` got clipped flush with #browse-panel's
-								     bottom edge, cutting the list off after ~1 row. Fixed
-								     positioning's containing block is the viewport itself (no
-								     ancestor here sets transform/filter/perspective/contain, any
-								     of which would pull it back into a local containing block), so
-								     it escapes that clip entirely. top/left/width are computed from
-								     #preset-trigger's own bounding rect in JS on open, since fixed
-								     has no positioned-ancestor offset to lean on the way absolute
-								     did. -->
-								<div
-									id="preset-listbox"
-									role="listbox"
-									aria-labelledby="preset-label"
-									tabindex="-1"
-									class="hidden fixed z-20 max-h-72 overflow-y-auto bg-surface-1 inset-ring-1 inset-ring-hairline rounded-[8px] py-1"
-								></div>
-							</div>
-						</div>
-					</div>
-				</div>
 
 				<!-- result-slot: permanent shell (card-result, no tint, no box on the value).
 				     Receives whichever of Mass/Moles is currently the calculated output. The
@@ -1282,135 +1093,18 @@ import Layout from '../layouts/Layout.astro';
 
 	// --- DOM refs ---
 	const molarMassInput = document.getElementById('molar-mass') as HTMLInputElement | null;
-	const browseTrigger = document.getElementById('browse-trigger');
-	const browseChevron = document.getElementById('browse-chevron');
-	const browsePanel = document.getElementById('browse-panel');
-
-	const tabPresets = document.getElementById('tab-presets');
-	const tabCustom = document.getElementById('tab-custom');
-	const panelPresets = document.getElementById('panel-presets');
-	const panelCustom = document.getElementById('panel-custom');
-
-	const presetTrigger = document.getElementById('preset-trigger');
-	const presetTriggerLabel = document.getElementById('preset-trigger-label');
-	const presetListbox = document.getElementById('preset-listbox');
-
-	const elementSearch = document.getElementById('element-search') as HTMLInputElement | null;
-	const elementGrid = document.getElementById('element-grid');
-	const elementGridScroll = document.getElementById('element-grid-scroll');
-	const elementGridEmpty = document.getElementById('element-grid-empty');
-	const customFormula = document.getElementById('custom-formula');
-	const customMolarMassVal = document.getElementById('custom-molar-mass-val');
-	const useCustomBtn = document.getElementById('use-custom');
-
-	// --- State ---
-	let panelOpen = false;
-	let activeTab: 'presets' | 'custom' = 'custom';
-
-	// --- Panel toggle ---
-	browseTrigger?.addEventListener('click', () => {
-		panelOpen = !panelOpen;
-		browsePanel?.classList.toggle('hidden', !panelOpen);
-		browseChevron?.classList.toggle('rotate-90', panelOpen);
-		if (panelOpen) {
-			if (activeTab === 'custom') customGrid.render();
-			// Scroll so the newly-revealed panel is visible, instead of leaving
-			// the user to discover it extends below the fold on their own. Only
-			// on the open action — not on close, tab switches, or search
-			// filtering, none of which call this handler. rAF lets the browser
-			// commit the unhidden panel's layout (and, on the custom tab, the
-			// grid renderGrid() just populated) before measuring where to
-			// scroll to, same ordering moveFieldTo() uses elsewhere for a
-			// post-DOM-change follow-up.
-			//
-			// Below the 520px breakpoint this uses a 'nearest'-style scroll
-			// instead of desktop's full 'start' alignment — see DESIGN.md for
-			// why — but computed manually rather than via scrollIntoView's own
-			// 'nearest' so a reserve can be folded in for the Build-custom
-			// tab's "Use this molar mass" button. That button is still
-			// `hidden` at scroll time (nothing is selected yet), so it
-			// contributes zero height to the panel this measures against;
-			// native 'nearest' would happily zero out the gap below the
-			// panel, and the button — appearing later, after a selection,
-			// with no scroll of its own — would render partly or fully below
-			// the fold. The reserve is measured live (toggle the button's
-			// `hidden` class off, diff the panel height, toggle back) rather
-			// than hardcoded, so it can't go stale if the button's own size
-			// ever changes. The Presets tab has no equivalent button —
-			// selecting a compound there fills Molar Mass and collapses the
-			// whole panel immediately, so there's nothing that can land below
-			// the fold after the fact — so `btn` is only ever looked up for
-			// 'custom'.
-			requestAnimationFrame(() => {
-				const mobile = !window.matchMedia('(min-width: 520px)').matches;
-				if (!mobile) {
-					browsePanel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-					return;
-				}
-				if (!browsePanel) return;
-				const btn = activeTab === 'custom' ? useCustomBtn : null;
-				let reserve = 0;
-				if (btn?.classList.contains('hidden')) {
-					const heightBefore = browsePanel.getBoundingClientRect().height;
-					btn.classList.remove('hidden');
-					reserve = browsePanel.getBoundingClientRect().height - heightBefore;
-					btn.classList.add('hidden');
-				}
-				const rect = browsePanel.getBoundingClientRect();
-				const startTarget = window.scrollY + rect.top;
-				const nearestTarget = window.scrollY + rect.bottom - window.innerHeight;
-				// Never scroll further than 'start' would — that full-alignment
-				// jump is exactly the "too much scroll" behavior 'nearest'
-				// replaced, so the reserve is capped rather than allowed to push
-				// past it on a panel too tall for reserve + content to both fit.
-				const target = Math.min(startTarget, nearestTarget + reserve);
-				window.scrollTo({ top: target, behavior: 'smooth' });
-			});
-		}
-	});
-
-	function collapsePanel() {
-		panelOpen = false;
-		browsePanel?.classList.add('hidden');
-		browseChevron?.classList.remove('rotate-90');
-		closePresetListbox();
-	}
-
-	// --- Tab switching ---
-	function setTab(tab: 'presets' | 'custom') {
-		activeTab = tab;
-		const presetActive = tab === 'presets';
-		panelPresets?.classList.toggle('hidden', !presetActive);
-		panelCustom?.classList.toggle('hidden', presetActive);
-		closePresetListbox();
-
-		const activeClass = 'py-2 px-4 text-sm font-medium text-brand-green border-b-2 border-brand-green -mb-px transition-colors cursor-pointer';
-		const inactiveClass = 'py-2 px-4 text-sm font-medium text-stone border-b-2 border-transparent -mb-px hover:text-ink transition-colors cursor-pointer';
-		if (tabPresets) tabPresets.className = presetActive ? activeClass : inactiveClass;
-		if (tabCustom) tabCustom.className = presetActive ? inactiveClass : activeClass;
-
-		if (tab === 'custom') customGrid.render();
-	}
-
-	tabPresets?.addEventListener('click', () => setTab('presets'));
-	tabCustom?.addEventListener('click', () => setTab('custom'));
 
 	// --- Molar Mass mode dropdown ---
 	//
-	// Stage 1 of a multi-stage rebuild (see the markup comment above
-	// #molar-mass-mode-wrapper): a mode selector fused to the left of the
-	// Molar Mass input, replacing the implicit "always typed in" assumption
-	// with three modes. This stage wires only the dropdown shell and
-	// mode-switching state — selecting "Build custom"/"Compounds" does not
-	// yet swap in their panels (stages 3-4), and the "Browse elements"
-	// accordion above is untouched until stage 5's teardown.
+	// A mode selector fused to the left of the Molar Mass input (see the markup
+	// comment above #molar-mass-mode-wrapper), replacing the implicit "always
+	// typed in" assumption with three modes. Each non-typing mode owns an
+	// overlay panel below the card, shown while that mode is active.
 	//
-	// Follows the same ARIA APG "Collapsible Dropdown Listbox" pattern as
-	// #preset-listbox below (focus stays on #molar-mass-mode-trigger the
-	// whole time the popup is open; aria-activedescendant tracks the
-	// highlighted option instead of DOM focus moving into the listbox), and
-	// reuses its `position: fixed`-off-trigger-rect + scroll/resize
-	// reposition handling verbatim — see that section's comments for why.
+	// Follows the ARIA APG "Collapsible Dropdown Listbox" pattern: focus stays
+	// on #molar-mass-mode-trigger the whole time the popup is open, and
+	// aria-activedescendant tracks the highlighted option instead of DOM focus
+	// moving into the listbox.
 	type MolarMassMode = 'type-in' | 'build-custom' | 'compounds';
 	const MOLAR_MASS_MODES: { mode: MolarMassMode; label: string }[] = [
 		{ mode: 'type-in', label: 'Type in' },
@@ -1429,42 +1123,40 @@ import Layout from '../layouts/Layout.astro';
 	let molarMassModeOpen = false;
 	let molarMassModeActiveIndex = -1;
 
-	// --- Per-mode state store (stage 2) ---
+	// --- Per-mode state store ---
 	//
 	// Each mode owns an independent slot. Switching modes NEVER clears another
 	// mode's slot — it only changes which slot #molar-mass is currently a view
 	// of. A mode never touched since load reads as its empty shape below.
 	//
-	// PANELS PLUG IN HERE. The Build-custom panel (stage 3, wired below) writes
-	// its result with setModeValue() and reads back what to re-select via
-	// getModeValue(); the Compounds panel (stage 4) should do the same. Neither
-	// should touch #molar-mass.value directly — setModeValue() already refreshes
-	// the input when the mode it wrote to is the active one, so writing the input
-	// as well would double-apply and desync the store from the DOM.
+	// THE PANELS PLUG IN HERE. Each writes its result with setModeValue() and
+	// reads back what to re-select via getModeValue(). Neither touches
+	// #molar-mass.value directly — setModeValue() already refreshes the input
+	// when the mode it wrote to is the active one, so writing the input as well
+	// would double-apply and desync the store from the DOM.
 	//
-	// Shape notes, chosen so stages 3-4 don't need another rework:
+	// Shape notes:
 	//   • build-custom.quantities is the REAL source of truth for that mode —
 	//     `formula`/`molarMass` are both derived from it (buildFormula() /
-	//     computeCustomMolarMass() in browseElements.ts). Stage 3 needs the
-	//     quantities to restore the element grid's selection + per-tile counts
-	//     on reopen; deriving them back out of a formula STRING would mean
-	//     parsing subscripts, so the map is stored directly. Held as a plain
-	//     Record, not a Map, so the whole store stays structured-clone- and
-	//     JSON-safe (Playwright reads it across the page boundary, and a Map
-	//     would arrive as `{}`). Stage 3 converts with
+	//     computeCustomMolarMass() in browseElements.ts). The quantities are what
+	//     restore the element grid's selection + per-tile counts on return;
+	//     deriving them back out of a formula STRING would mean parsing
+	//     subscripts, so the map is stored directly. Held as a plain Record, not
+	//     a Map, so the whole store stays structured-clone- and JSON-safe
+	//     (Playwright reads it across the page boundary, and a Map would arrive
+	//     as `{}`). The panel converts with
 	//     `new Map(Object.entries(quantities ?? {}))`.
-	//   • compounds keeps `name` AND `formula`, not just a name: the existing
-	//     picker's trigger label is `${name} (${formula})` (see
-	//     the accordion picker's onSelect below), so stage 4 needs both to render its
-	//     trigger without re-looking-up PRESETS. `name` is unique across
-	//     PRESETS, so it doubles as the identity stage 4 re-highlights by —
-	//     deliberately not a list index, which would silently repoint if the
-	//     PRESETS order ever changes. Field is `name` (not `compoundName`) so
-	//     a Preset's own fields can be copied across without renaming.
+	//   • compounds keeps `name` AND `formula`, not just a name, so a consumer
+	//     can render "<name> (<formula>)" without re-looking-up PRESETS. `name`
+	//     is unique across PRESETS, so it doubles as the identity the panel
+	//     re-highlights by — deliberately not a list index, which would silently
+	//     repoint if the PRESETS order ever changed. Field is `name` (not
+	//     `compoundName`) so a Preset's own fields can be copied across without
+	//     renaming.
 	//   • molarMass is a number, already rounded to its display precision by
-	//     whoever writes it — the formatting policy stays at the write site,
-	//     as it already does for #use-custom's `toFixed(3)`. Stage 3 should
-	//     therefore store `Number(mass.toFixed(3))`, not the raw float.
+	//     whoever writes it — the formatting policy stays at the write site.
+	//     The Build-custom panel therefore stores `Number(mass.toFixed(3))`,
+	//     not the raw float.
 	//   • type-in holds the RAW STRING, not a number: it must round-trip
 	//     exactly what was typed, including in-progress text like "18." or
 	//     "" — coercing to a number would rewrite the field under the user.
@@ -1512,10 +1204,10 @@ import Layout from '../layouts/Layout.astro';
 		if (!molarMassInput) return;
 		molarMassInput.readOnly = activeMolarMassMode !== 'type-in';
 		molarMassInput.value = molarMassDisplayValue(activeMolarMassMode);
-		// Let the calculator recompute against the newly-shown molar mass —
-		// same "write the field, then announce it" contract #use-custom and
-		// the preset picker's onSelect already use to reach the recalc in the first
-		// <script> block (separate module scope, no shared function to call).
+		// Let the calculator recompute against the newly-shown molar mass. The
+		// recalc lives in the first <script> block — a separate module scope with
+		// no shared function to call — so a dispatched 'input' event is the only
+		// way to reach it.
 		if (dispatch) molarMassInput.dispatchEvent(new Event('input', { bubbles: true }));
 	}
 
@@ -1544,7 +1236,7 @@ import Layout from '../layouts/Layout.astro';
 		if (mode === 'compounds') onCompoundsStateChanged();
 	}
 
-	// --- Build custom panel plumbing (stage 3) ---
+	// --- Mode panel plumbing ---
 	// Declared here, next to the state it mirrors; assigned at the bottom of this
 	// script, where createElementGrid() and its column constants are in scope.
 	// Everything below runs from user interaction only, well after that point.
@@ -1572,7 +1264,7 @@ import Layout from '../layouts/Layout.astro';
 		if (molarMassCustomMass) {
 			// toFixed(3) again on an already-rounded number is a no-op numerically
 			// but not textually — it restores the trailing zeros the slot's Number
-			// dropped (20.18 → "20.180"), matching the accordion bar's own format.
+			// dropped (20.18 → "20.180"), so the readout is fixed-precision.
 			molarMassCustomMass.textContent = state.molarMass === null ? '—' : `${state.molarMass.toFixed(3)} g/mol`;
 		}
 		// Skipped for the panel's own writes: the tiles already show this
@@ -1619,10 +1311,11 @@ import Layout from '../layouts/Layout.astro';
 		return MOLAR_MASS_MODE_PANELS.find(p => p.mode === activeMolarMassMode)?.el ?? null;
 	}
 
-	// Same reposition-don't-close handling the two listboxes use: a panel is
-	// anchored to an element that moves with the page, and unlike them it stays
-	// open for as long as its mode is selected, so it has to track scrolling
-	// rather than dismiss on it. Capture phase to catch scrolls in any container.
+	// Same reposition-don't-close handling the mode listbox uses: a panel is
+	// anchored to an element that moves with the page, and unlike a popup it
+	// stays open for as long as its mode is selected, so it has to track
+	// scrolling rather than dismiss on it. Capture phase to catch scrolls in any
+	// container.
 	function handleMolarMassModePanelViewportChange() {
 		const panel = activeMolarMassModePanel();
 		if (panel) positionMolarMassModePanel(panel);
@@ -1653,7 +1346,7 @@ import Layout from '../layouts/Layout.astro';
 		} else {
 			onCompoundsStateChanged();
 			// Highlight follows the restored selection, falling back to the first
-			// option when the slot is empty — same rule openPresetListbox() uses.
+			// option when the slot is empty.
 			const selected = compoundsPicker?.getSelectedIndex() ?? -1;
 			compoundsPicker?.setActive(selected >= 0 ? selected : 0);
 		}
@@ -1818,7 +1511,7 @@ import Layout from '../layouts/Layout.astro';
 	});
 
 	// Mouse hover shares the same "active" highlight as keyboard nav — see the
-	// identical rationale on #preset-listbox's own mouseover handler below.
+	// identical rationale on createPresetListbox()'s own mouseover handler below.
 	molarMassModeListbox?.addEventListener('mouseover', (e) => {
 		const optionEl = (e.target as HTMLElement).closest('[role="option"]');
 		if (!optionEl) return;
@@ -1838,26 +1531,20 @@ import Layout from '../layouts/Layout.astro';
 	// Type in re-enters with the restored raw string and writes it over
 	// itself, which is a no-op.
 	//
-	// Known transitional gap, resolved by stage 5: the old "Browse elements"
-	// accordion still writes #molar-mass directly (#use-custom and
-	// the accordion preset picker's onSelect). While Type in is active that lands here and is
-	// captured correctly. While Build custom/Compounds is active it is
-	// skipped, so the field can show a value the active slot doesn't hold
-	// until the next mode switch restores the slot. Not reconciled on
-	// purpose: that UI is deleted in stage 5, and coupling the two now would
-	// be work thrown away.
+	// Nothing else writes #molar-mass directly: the mode panels go through
+	// setModeValue(), which writes the slot and refreshes the field from it, so
+	// the store and the DOM cannot drift apart.
 	molarMassInput?.addEventListener('input', () => {
 		if (activeMolarMassMode !== 'type-in') return;
 		molarMassModeStates['type-in'] = { raw: molarMassInput.value };
 	});
 
-	// Integration surface for stages 3-4 and for the Playwright suite, which
-	// has to drive this state directly while the Build-custom and Compounds
-	// panels that will eventually write it don't exist yet. Kept as an
-	// explicit named hook rather than reaching into the module's closure, so
-	// there is exactly one documented way in. `as any` because typing a
-	// one-off window property would mean shipping a global .d.ts for a hook
-	// only this module and its tests use.
+	// Integration surface for the Playwright suite, which drives and reads this
+	// state directly — including writing a slot for a mode that is not active,
+	// which no UI path can do. Kept as an explicit named hook rather than
+	// letting tests reach into the module's closure, so there is exactly one
+	// documented way in. `as any` because typing a one-off window property would
+	// mean shipping a global .d.ts for a hook only this module and its tests use.
 	(window as any).molarMassMode = {
 		get: getModeValue,
 		set: setModeValue,
@@ -1870,36 +1557,28 @@ import Layout from '../layouts/Layout.astro';
 	// its own init pass, so a dispatch here would only re-run that work.
 	syncMolarMassInputToMode({ dispatch: false });
 
-	// --- Presets: custom listbox (reusable) ---
+	// --- Compound listbox (reusable) ---
 	//
-	// Replaces the native <select> (see the markup comment above
-	// #preset-listbox). Reads PRESETS/PRESET_GROUP_ORDER from browseElements.ts
-	// rather than hardcoding a second copy of the compound list.
+	// Builds a grouped list of PRESETS as ARIA options. Reads
+	// PRESETS/PRESET_GROUP_ORDER from browseElements.ts rather than hardcoding a
+	// second copy of the compound list.
 	//
-	// Stage 4 of the Molar Mass mode rebuild needs a second compound picker —
-	// one in the accordion's Presets tab, one under the Molar Mass field — so
-	// what both need is factored out here, the same way createElementGrid()
-	// factored out the element grid in stage 3. The split is by what actually
-	// differs, which is the LIFECYCLE, not the list:
+	// Split by LIFECYCLE, not by widget shape:
 	//
 	//   Shared (here): building the grouped options, active/selected paint,
 	//   aria-activedescendant, scroll-into-view, typeahead matching, and the
 	//   click/hover delegation.
 	//
-	//   Per-owner (left to each call site): whether the list opens and closes
-	//   at all, where it is positioned, and what a selection does downstream.
-	//   The accordion's instance is the popup half of a combobox — ARIA APG
-	//   "Collapsible Dropdown Listbox", focus staying on #preset-trigger, which
-	//   is also what carries aria-activedescendant. The Molar Mass panel's is a
-	//   plain always-open APG "Listbox" that is focusable itself. Neither
-	//   lifecycle is expressible as options on the other, so this exposes index
-	//   math and paint and lets each owner drive it.
+	//   Per-owner (left to the call site): whether the list opens and closes at
+	//   all, where it is positioned, and what a selection does downstream. The
+	//   Compounds panel is a plain always-open APG "Listbox" that is focusable
+	//   itself; a popup-half-of-a-combobox owner would drive the same index math
+	//   from a trigger instead. This exposes the index math and the paint and
+	//   lets the owner decide.
 	//
-	// idPrefix exists because option ids are referenced by
-	// aria-activedescendant: a second instance emitting `preset-option-0` again
-	// would put duplicate ids in the document and leave that reference
-	// ambiguous — the same class of collision as stage 3's `.element-grid-scroll`
-	// double-match, caught here before it shipped rather than after.
+	// idPrefix names this instance's option ids. Those ids are what
+	// aria-activedescendant points at, so they are the instance's identity in
+	// the document and belong to the call site, not baked in here.
 	type PresetOption = { preset: (typeof PRESETS)[number]; el: HTMLElement };
 
 	type PresetListboxInstance = {
@@ -1908,8 +1587,6 @@ import Layout from '../layouts/Layout.astro';
 		getSelectedIndex: () => number;
 		/** Highlight an option (clamped) and scroll it into view. */
 		setActive: (index: number) => void;
-		/** Drop the highlight — for an owner that collapses its list. */
-		clearActive: () => void;
 		/** Commit a selection: repaint, then hand the preset to onSelect. */
 		commit: (index: number) => void;
 		/**
@@ -2012,14 +1689,11 @@ import Layout from '../layouts/Layout.astro';
 			if (idx >= 0) commit(idx);
 		});
 
-		// Mouse hover shares the same "active" highlight as keyboard nav — this
-		// was documented (DESIGN.md: "highlighted (keyboard-active or hovered)
-		// gets bg-surface-2") but never actually wired up: option elements were
-		// built with no `hover:` class and no pointer/mouse listener of any
-		// kind, so a mouse-only user got no feedback moving over the list.
-		// `mouseover` (delegated, bubbles), not `mouseenter` (doesn't bubble —
-		// wouldn't reach a listener on the shared container), reusing
-		// setActive() so hovering an option updates aria-activedescendant
+		// Mouse hover shares the same "active" highlight as keyboard nav
+		// (DESIGN.md: "highlighted (keyboard-active or hovered) gets
+		// bg-surface-2"). `mouseover` (delegated, bubbles), not `mouseenter`
+		// (doesn't bubble — wouldn't reach a listener on the shared container),
+		// reusing setActive() so hovering an option updates aria-activedescendant
 		// the same way arrowing to it does, keeping mouse and keyboard state in
 		// sync rather than layering on a second, independent visual-only state.
 		listboxEl?.addEventListener('mouseover', (e) => {
@@ -2034,10 +1708,6 @@ import Layout from '../layouts/Layout.astro';
 			getActiveIndex: () => activeIndex,
 			getSelectedIndex: () => selectedIndex,
 			setActive,
-			clearActive() {
-				activeIndex = -1;
-				updateOptionStates();
-			},
 			commit,
 			selectByName(name) {
 				const idx = name === null ? -1 : options.findIndex(o => o.preset.name === name);
@@ -2060,185 +1730,14 @@ import Layout from '../layouts/Layout.astro';
 		};
 	}
 
-	// The accordion's Presets tab: the popup half of a combobox. #preset-trigger
-	// keeps focus and carries aria-activedescendant; the open/close/position
-	// lifecycle below is this instance's alone.
-	const presetPicker = createPresetListbox({
-		listboxEl: presetListbox,
-		idPrefix: 'preset',
-		activeDescendantHost: presetTrigger,
-		onSelect: (preset) => {
-			if (!molarMassInput) return;
-			// Trigger label shows the compound, not the full option row text
-			// (which also carries " — <mass> g/mol") — the mass is already
-			// visible in the Molar Mass field itself once filled below, so
-			// repeating it on the trigger would be redundant. This persists
-			// after the panel collapses (see below) rather than reverting to
-			// the placeholder, so the trigger keeps showing what's actually
-			// loaded into Molar Mass. aria-labelledby="preset-label
-			// preset-trigger-label" means the trigger's accessible name is
-			// computed live from this element's text content, so updating it
-			// here keeps the accessible name in sync automatically — no
-			// separate aria-label to maintain.
-			if (presetTriggerLabel) {
-				presetTriggerLabel.textContent = `${preset.name} (${preset.formula})`;
-				presetTriggerLabel.classList.remove('text-ink-tertiary');
-			}
-			molarMassInput.value = String(preset.molarMass);
-			molarMassInput.dispatchEvent(new Event('input'));
-			// Fill Molar Mass, then collapse the whole Browse Elements panel —
-			// same end effect the old select-then-"Use this molar mass" flow
-			// had. Unlike that old flow, the picker's selection is NOT reset:
-			// reopening the panel/listbox shows the last-picked compound both
-			// on the trigger and as the pre-highlighted option (see
-			// openPresetListbox's use of getSelectedIndex), rather than
-			// starting over from the placeholder every time.
-			collapsePanel();
-		},
-	});
-
-	let presetOpen = false;
-
-	// #preset-listbox is `position: fixed`, positioned off #preset-trigger's
-	// own bounding rect (getBoundingClientRect() is already viewport-relative,
-	// same coordinate space `fixed` uses — no scrollX/scrollY offset needed,
-	// unlike positioning an `absolute` element against document coordinates).
-	// Computed fresh on every open rather than left to CSS, since fixed has no
-	// positioned-ancestor offset to lean on. See the markup comment above
-	// #preset-listbox for why this can't be plain `absolute` inside a
-	// `.relative` wrapper: #browse-panel (several levels up) clips overflow,
-	// and `absolute`'s containing block is still inside that clip — only
-	// `fixed` (viewport-relative) escapes it, given no ancestor here sets
-	// transform/filter/perspective/contain to pull it back into a local one.
-	function positionPresetListbox() {
-		if (!presetTrigger || !presetListbox) return;
-		const rect = presetTrigger.getBoundingClientRect();
-		presetListbox.style.top = `${rect.bottom + 4}px`;
-		presetListbox.style.left = `${rect.left}px`;
-		presetListbox.style.width = `${rect.width}px`;
-	}
-
-	// A `fixed` popup doesn't track the page scrolling out from under it on
-	// its own — the position computed above is a one-time snapshot, not a
-	// live binding. Re-measure and re-anchor to the trigger on every
-	// scroll/resize tick while open, rather than closing: closing on scroll
-	// was tried first and reopened a race with the Browse Elements panel's
-	// own open-time smooth-scroll (see the browseTrigger click handler) —
-	// opening the listbox via keyboard while that unrelated scroll animation
-	// was still mid-flight let its very next scroll tick close the listbox
-	// the instant it opened. Repositioning has no such race (it's a no-op
-	// if the trigger hasn't actually moved) and is also just better UX than
-	// a dropdown that vanishes the moment the page scrolls at all. This also
-	// fires for the listbox's own internal `overflow-y-auto` scrolling
-	// (scroll events don't bubble, but capture-phase listeners on ancestors
-	// still see them) — harmless, since re-reading the trigger's rect while
-	// only the option list scrolled internally just recomputes the same
-	// coordinates.
-	function handlePresetViewportChange() {
-		if (!presetOpen) return;
-		positionPresetListbox();
-	}
-
-	function openPresetListbox() {
-		if (presetOpen || !presetListbox || presetPicker.options.length === 0) return;
-		presetOpen = true;
-		positionPresetListbox();
-		presetListbox.classList.remove('hidden');
-		presetTrigger?.setAttribute('aria-expanded', 'true');
-		const selected = presetPicker.getSelectedIndex();
-		presetPicker.setActive(selected >= 0 ? selected : 0);
-		document.addEventListener('click', handlePresetOutsideClick, true);
-		window.addEventListener('scroll', handlePresetViewportChange, true);
-		window.addEventListener('resize', handlePresetViewportChange);
-	}
-
-	function closePresetListbox() {
-		if (!presetOpen) return;
-		presetOpen = false;
-		presetListbox?.classList.add('hidden');
-		presetTrigger?.setAttribute('aria-expanded', 'false');
-		presetPicker.clearActive();
-		document.removeEventListener('click', handlePresetOutsideClick, true);
-		window.removeEventListener('scroll', handlePresetViewportChange, true);
-		window.removeEventListener('resize', handlePresetViewportChange);
-	}
-
-	function handlePresetOutsideClick(e: MouseEvent) {
-		const target = e.target as Node;
-		if (presetTrigger?.contains(target) || presetListbox?.contains(target)) return;
-		closePresetListbox();
-	}
-
-	function presetTypeaheadSearch(char: string) {
-		const from = presetOpen ? presetPicker.getActiveIndex() : presetPicker.getSelectedIndex();
-		const idx = presetPicker.typeahead(char, from);
-		if (idx < 0) return;
-		if (!presetOpen) openPresetListbox();
-		presetPicker.setActive(idx);
-	}
-
-	presetTrigger?.addEventListener('click', () => {
-		if (presetOpen) closePresetListbox();
-		else openPresetListbox();
-	});
-
-	presetTrigger?.addEventListener('keydown', (e) => {
-		switch (e.key) {
-			case 'ArrowDown':
-				e.preventDefault();
-				if (!presetOpen) openPresetListbox();
-				else presetPicker.setActive(presetPicker.getActiveIndex() + 1);
-				break;
-			case 'ArrowUp':
-				e.preventDefault();
-				if (!presetOpen) openPresetListbox();
-				else presetPicker.setActive(presetPicker.getActiveIndex() - 1);
-				break;
-			case 'Home':
-				if (presetOpen) { e.preventDefault(); presetPicker.setActive(0); }
-				break;
-			case 'End':
-				if (presetOpen) { e.preventDefault(); presetPicker.setActive(presetPicker.options.length - 1); }
-				break;
-			case 'Enter':
-			case ' ':
-				e.preventDefault();
-				if (!presetOpen) { openPresetListbox(); break; }
-				if (presetPicker.getActiveIndex() >= 0) presetPicker.commit(presetPicker.getActiveIndex());
-				break;
-			case 'Escape':
-				if (presetOpen) { e.preventDefault(); closePresetListbox(); }
-				break;
-			case 'Tab':
-				closePresetListbox();
-				break;
-			default:
-				if (e.key.length === 1 && /\S/.test(e.key)) {
-					presetTypeaheadSearch(e.key);
-				}
-		}
-	});
-
-	// Click and hover delegation live in createPresetListbox() — both instances
-	// want them identically, so neither call site wires its own.
-
 	// --- Element Grid (reusable) ---
 	//
-	// Stage 3 of the Molar Mass mode rebuild needs a second element grid — one
-	// under the Molar Mass field, one on the old "Browse elements" tab — so this
-	// was lifted out of the single hardcoded-#element-grid closure it used to be
-	// and parameterised by its four DOM nodes. Everything inside is unchanged
-	// from that version except the three bindings that had to become per-instance:
-	// `quantities` (was a module-level Map shared with the formula bar), the grid
-	// nodes, and the commit hop, which now calls the owner's onChange instead of
-	// updateFormulaBar() directly. Each instance owns its own selection — the two
-	// grids are independent pickers that happen to render the same catalogue, not
-	// two views of one selection.
+	// The periodic-table picker: a searchable grid of element tiles, each with a
+	// quantity stepper that appears on selection. Parameterised by its four DOM
+	// nodes and an onChange hop rather than bound to fixed ids, so the selection
+	// state and the commit path both belong to the owner — the instance never
+	// reaches out to a specific readout or field of its own.
 	type ElementGridInstance = {
-		/** Re-render tiles, optionally filtered by name/symbol. Does not fire onChange. */
-		render: (filter?: string) => void;
-		/** Live selection map. Read-only to callers — write via setQuantities(). */
-		quantities: Map<string, number>;
 		/** Replace the selection and repaint. Does not fire onChange (the caller already knows). */
 		setQuantities: (next: Map<string, number>) => void;
 		/** Recompute whole-pixel columns. Also runs from the instance's ResizeObserver. */
@@ -2252,17 +1751,6 @@ import Layout from '../layouts/Layout.astro';
 		searchEl: HTMLInputElement | null;
 		/** Fired after any user-driven selection change, with this instance's live map. */
 		onChange: (quantities: Map<string, number>) => void;
-		/**
-		 * Column width the layout aims for, which is what decides the column
-		 * COUNT at a given width (see layoutElementGrid). Per-instance because
-		 * the two grids are not the same width: the accordion panel spans the
-		 * calculator card's full content box, the Molar Mass panel is inset to
-		 * the field card's content box and comes out 48px narrower, which is
-		 * enough to drop it a whole column at the shared 244 target. Defaults to
-		 * the accordion's documented value; see the Molar Mass panel's call site
-		 * for why it asks for a narrower one.
-		 */
-		targetCol?: number;
 	}): ElementGridInstance {
 	const { gridEl: elementGrid, emptyEl: elementGridEmpty, scrollEl: elementGridScroll, searchEl: elementSearch, onChange } = opts;
 	const quantities = new Map<string, number>();
@@ -2428,7 +1916,11 @@ import Layout from '../layouts/Layout.astro';
 	// so identical controls antialias differently from column to column. Solve
 	// for whole-pixel columns and gaps instead, keeping the count responsive.
 	const GRID_MIN_COL = 222;    // "Molybdenum" + mounted stepper — see DESIGN.md
-	const GRID_TARGET_COL = opts.targetCol ?? 244; // design intent; 3 × 244 + 2 × 12 = 756 exactly
+	// The panel is inset to the field card's content box and gets 712px of grid
+	// width at desktop. 232 is the largest 4pt-aligned target that keeps three
+	// columns there (3 × 232 + 2 × 8 = 712 exactly) and still clears the 222px
+	// truncation floor with room to spare.
+	const GRID_TARGET_COL = 232;
 	const GRID_MIN_GAP = 8;
 	// The wrapper is overflow-y:auto, so Chrome/Edge take a classic 15px
 	// scrollbar out of its clientWidth and the grid drops a whole column.
@@ -2507,8 +1999,6 @@ import Layout from '../layouts/Layout.astro';
 	renderGrid();
 
 	return {
-		render: renderGrid,
-		quantities,
 		setQuantities(next) {
 			quantities.clear();
 			next.forEach((v, k) => quantities.set(k, v));
@@ -2520,103 +2010,55 @@ import Layout from '../layouts/Layout.astro';
 	};
 	}
 
-	// --- Browse-elements accordion: Build custom tab ---
-	// The original grid instance, unchanged in behaviour: its selection still
-	// only reaches Molar Mass through the #use-custom button below. Stage 5
-	// removes this whole accordion; until then it and the mode panel's grid are
-	// two independent pickers.
-	const customGrid = createElementGrid({
-		gridEl: elementGrid,
-		emptyEl: elementGridEmpty,
-		scrollEl: elementGridScroll,
-		searchEl: elementSearch,
-		onChange: updateFormulaBar,
-	});
-
-	// --- Formula bar ---
-	function updateFormulaBar(quantities: Map<string, number>) {
-		const hasSelection = quantities.size > 0;
-		const formula = hasSelection ? buildFormula(quantities) : '—';
-		const mass = hasSelection ? computeCustomMolarMass(quantities) : 0;
-
-		if (customFormula) customFormula.textContent = formula || '—';
-		if (customMolarMassVal) {
-			customMolarMassVal.textContent = hasSelection ? `${mass.toFixed(3)} g/mol` : '—';
-		}
-		useCustomBtn?.classList.toggle('hidden', !hasSelection);
-	}
-
-	useCustomBtn?.addEventListener('click', () => {
-		if (!molarMassInput) return;
-		const mass = computeCustomMolarMass(customGrid.quantities);
-		molarMassInput.value = String(mass.toFixed(3));
-		molarMassInput.dispatchEvent(new Event('input'));
-		collapsePanel();
-		customGrid.setQuantities(new Map());
-		if (elementSearch) elementSearch.value = '';
-		updateFormulaBar(customGrid.quantities);
-	});
-
-	// --- Molar Mass "Build custom" panel (stage 3) ---
+	// --- Molar Mass "Build custom" panel ---
 	//
-	// The second instance of the same grid, mounted under the Molar Mass field
-	// (see the markup comment on #molar-mass-build-panel). Unlike the accordion
-	// tab there is no confirm step: every tile click writes the build-custom
-	// mode slot immediately, and stage 2's setModeValue() pushes that straight
-	// into #molar-mass, so the field tracks the selection live.
+	// The element grid mounted under the Molar Mass field (see the markup comment
+	// on #molar-mass-build-panel). There is no confirm step: every tile click
+	// writes the build-custom mode slot immediately, and setModeValue() pushes
+	// that straight into #molar-mass, so the field tracks the selection live.
 	//
 	// `quantities` is what gets stored, not just the derived formula/mass — it
 	// is what restores the grid's per-tile counts when the user comes back to
 	// this mode. Stored as a Record (Object.fromEntries), per the slot's shape
-	// note in the stage-2 section: a Map wouldn't survive the structured clone
-	// Playwright reads the store through.
+	// note in the state-store section: a Map wouldn't survive the structured
+	// clone Playwright reads the store through.
 	buildCustomGrid = createElementGrid({
 		gridEl: document.getElementById('molar-mass-element-grid'),
 		emptyEl: document.getElementById('molar-mass-element-grid-empty'),
 		scrollEl: document.getElementById('molar-mass-element-grid-scroll'),
 		searchEl: document.getElementById('molar-mass-element-search') as HTMLInputElement | null,
-		// This panel is inset to the field card's content box, so its grid gets
-		// 712px where the accordion's gets 760px — under the 748px the shared 244
-		// target needs for a third column, which would render this panel 2-up
-		// against a design that is 3-up. 232 is the largest 4pt-aligned target
-		// that keeps three columns here (3 × 232 + 2 × 8 = 712 exactly, and 232
-		// clears the 222px truncation floor with room to spare). Scoped to this
-		// instance rather than lowered globally: the accordion is 3-up at every
-		// desktop width either way, but the two targets disagree in a ~40px band
-		// of viewport widths around 880px, and there is no reason to move that
-		// boundary on a panel this change isn't about.
-		targetCol: 232,
 		onChange: (quantities) => {
-			// Guards the round trip: setModeValue() below calls back into
-			// onBuildCustomStateChanged(), which would otherwise rebuild all ~110
+			// Guards the round trip: setModeValue() calls back into
+			// onBuildCustomStateChanged(), which would otherwise rebuild all ~63
 			// tiles on every +/- click to restore a selection this grid is already
-			// showing. External writes (stage 4's siblings, the test hook) leave
-			// the flag false and do get the repaint.
+			// showing. External writes (the test hook) leave the flag false and do
+			// get the repaint.
 			buildCustomPanelWriting = true;
 			setModeValue('build-custom', quantities.size === 0
 				? { quantities: null, formula: null, molarMass: null }
 				: {
 					quantities: Object.fromEntries(quantities),
 					formula: buildFormula(quantities),
-					// Rounded at the write site, matching #use-custom's toFixed(3) —
-					// the slot stores a display-precision number, not a raw float.
+					// Rounded at the write site — the slot stores a display-precision
+					// number, not a raw float.
 					molarMass: Number(computeCustomMolarMass(quantities).toFixed(3)),
 				});
 			buildCustomPanelWriting = false;
 		},
 	});
-	// --- Molar Mass "Compounds" panel (stage 4) ---
+
+	// --- Molar Mass "Compounds" panel ---
 	//
-	// The second instance of the compound picker, mounted under the Molar Mass
-	// field (see #molar-mass-compounds-panel). No trigger and no open/close: the
-	// mode dropdown already chose this mode, so the list is simply present while
-	// it is active, and the panel element itself is the focusable listbox that
-	// carries aria-activedescendant.
+	// The compound picker mounted under the Molar Mass field (see
+	// #molar-mass-compounds-panel). No trigger and no open/close: the mode
+	// dropdown already chose this mode, so the list is simply present while it is
+	// active, and the panel element itself is the focusable listbox that carries
+	// aria-activedescendant.
 	//
-	// Selecting writes the compounds slot and stops there — stage 2's
-	// setModeValue() puts the mass in #molar-mass and announces the recalc. The
-	// panel deliberately does NOT close on selection: it is the mode's UI, not a
-	// popup, and there would be no way back to it without changing mode twice.
+	// Selecting writes the compounds slot and stops there — setModeValue() puts
+	// the mass in #molar-mass and announces the recalc. The panel deliberately
+	// does NOT close on selection: it is the mode's UI, not a popup, and there
+	// would be no way back to it without changing mode twice.
 	compoundsPicker = createPresetListbox({
 		listboxEl: molarMassCompoundsPanel,
 		idPrefix: 'molar-mass-compound',
@@ -2635,11 +2077,11 @@ import Layout from '../layouts/Layout.astro';
 		},
 	});
 
-	// Keyboard support for an always-open listbox: the index math is the same as
-	// the accordion trigger's, minus everything about opening and closing
-	// (ArrowUp/Down never have to open it, and Escape/Tab have nothing to
-	// collapse). Typeahead searches from the current highlight rather than the
-	// accordion's open-dependent origin, since here the list is always open.
+	// Keyboard support for an always-open listbox: ARIA APG "Listbox" key
+	// bindings, minus everything about opening and closing (ArrowUp/Down never
+	// have to open it, and Escape/Tab have nothing to collapse). Typeahead
+	// searches from the current highlight, since there is no collapsed state for
+	// it to start from instead.
 	molarMassCompoundsPanel?.addEventListener('keydown', (e) => {
 		if (!compoundsPicker) return;
 		const active = compoundsPicker.getActiveIndex();

@@ -17,7 +17,8 @@
       "Bash(rm -f \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\fd257cd0-3415-4445-aa73-38d2fb307916\\\\scratchpad\\\\select-\"*.png \"C:\\\\Users\\\\sirmi\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Development-Desgin-Development-freechemlab\\\\fd257cd0-3415-4445-aa73-38d2fb307916\\\\scratchpad\\\\input-crop-375.png\")",
       "Bash(python -c ' *)",
       "Bash(grep -n \"GRID_TARGET_COL\\\\|GRID_MIN_COL\\\\|SCROLLBAR_RESERVE\\\\|function createElementGrid\\\\|const { gridEl\\\\|return {\\\\s*$\\\\|layout: layoutElementGrid\" src/pages/index.astro)",
-      "Bash(git commit -m 'feat: wire Compounds panel to Molar Mass field \\(stage 4/5\\) *)"
+      "Bash(git commit -m 'feat: wire Compounds panel to Molar Mass field \\(stage 4/5\\) *)",
+      "Bash(python -)"
     ],
     "additionalDirectories": [
       "\\tmp"

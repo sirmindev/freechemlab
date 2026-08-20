@@ -224,299 +224,21 @@ test.describe('Particle count', () => {
   });
 });
 
-// ─── 6. Browse Panel – Presets ───────────────────────────────────────────────
-
-test.describe('Browse panel – Presets', () => {
-  test('panel is hidden on load', async ({ page }) => {
-    await goto(page);
-    await expect(page.locator('#browse-panel')).toBeHidden();
-  });
-
-  test('clicking trigger opens panel', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await expect(page.locator('#browse-panel')).toBeVisible();
-  });
-
-  test('selecting Water from the listbox fills Molar Mass with 18.015 and collapses panel', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-    await page.getByRole('option', { name: /^Water/ }).click();
-    // Molar Mass field should now show 18.015
-    const mmVal = await page.locator('#molar-mass').inputValue();
-    expect(parseFloat(mmVal)).toBeCloseTo(18.015, 3);
-    // Panel should be collapsed
-    await expect(page.locator('#browse-panel')).toBeHidden();
-  });
-
-  test('selecting Carbon Dioxide fills Molar Mass with 44.01', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-    await page.getByRole('option', { name: /^Carbon Dioxide/ }).click();
-    const mmVal = await page.locator('#molar-mass').inputValue();
-    expect(parseFloat(mmVal)).toBeCloseTo(44.01, 2);
-  });
-
-  test('trigger shows the last-picked compound (not the placeholder) after selection, in sync with its accessible name', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-    await page.getByRole('option', { name: /^Water/ }).click();
-
-    // Visible label reflects the pick — shorter than the option row's own
-    // text (which also carries "— <mass> g/mol"), since Molar Mass itself
-    // already shows that once filled. Checked via text content rather than
-    // accessible name here: selecting also collapses #browse-panel (hidden),
-    // and a hidden element has no accessible name to check yet — that's
-    // covered below once the panel is reopened.
-    await expect(page.locator('#preset-trigger')).toHaveText('Water (H₂O)');
-
-    // Reopening pre-highlights the same compound rather than starting over,
-    // and — now that the trigger is visible again — its accessible name
-    // (aria-labelledby="preset-label preset-trigger-label") tracks the same
-    // text automatically, not just the visible label.
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-    await expect(page.locator('#preset-trigger')).toHaveAccessibleName(/Water \(H₂O\)/);
-    const waterOption = page.getByRole('option', { name: /^Water/ });
-    const waterId = await waterOption.getAttribute('id');
-    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-activedescendant', waterId!);
-    await expect(waterOption).toHaveAttribute('aria-selected', 'true');
-
-    // A second selection replaces the label, not stacks onto it.
-    await page.getByRole('option', { name: /^Carbon Dioxide/ }).click();
-    await expect(page.locator('#preset-trigger')).toHaveText('Carbon Dioxide (CO₂)');
-  });
-
-  test('listbox is closed until the trigger is clicked, and shows a placeholder', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await expect(page.locator('#preset-listbox')).toBeHidden();
-    await expect(page.locator('#preset-trigger')).toHaveText('Select a compound…');
-    await page.click('#preset-trigger');
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-  });
-
-  test('keyboard flow: Enter opens the listbox, arrows move, Enter selects', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.locator('#preset-trigger').focus();
-    await page.keyboard.press('Enter');
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-    // First option (Water) is highlighted on open
-    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-activedescendant', 'preset-option-0');
-    await page.keyboard.press('ArrowDown');
-    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-activedescendant', 'preset-option-1');
-    await page.keyboard.press('Enter');
-    // Table Salt (index 1) — 58.44 g/mol
-    const mmVal = await page.locator('#molar-mass').inputValue();
-    expect(parseFloat(mmVal)).toBeCloseTo(58.44, 2);
-    await expect(page.locator('#browse-panel')).toBeHidden();
-  });
-
-  test('Escape closes the listbox without selecting', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.locator('#preset-listbox')).toBeHidden();
-    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-expanded', 'false');
-    // Panel itself stays open — only the listbox closed
-    await expect(page.locator('#browse-panel')).toBeVisible();
-  });
-
-  test('clicking outside the listbox closes it', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-    await page.mouse.click(10, 10);
-    await expect(page.locator('#preset-listbox')).toBeHidden();
-  });
-
-  // Regression test: mouse hover over an option produced no visual feedback
-  // at all — option elements were built with no `hover:` class and no
-  // mouse/pointer listener of any kind, so nothing updated on mouseover.
-  // Uses a real `hover()` (mousemove-driven), not a click or keyboard path,
-  // since that's specifically what was broken.
-  test('hovering an option highlights it (bg-surface-2) and updates aria-activedescendant', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-
-    const target = page.getByRole('option', { name: /^Nitric Acid/ });
-    const targetId = await target.getAttribute('id');
-    await target.hover();
-
-    await expect(target).toHaveClass(/bg-surface-2/);
-    await expect(page.locator('#preset-trigger')).toHaveAttribute('aria-activedescendant', targetId!);
-
-    // Moving to a different option moves the highlight, not just adds to it.
-    const other = page.getByRole('option', { name: /^Water/ });
-    await other.hover();
-    await expect(target).not.toHaveClass(/bg-surface-2/);
-    await expect(other).toHaveClass(/bg-surface-2/);
-  });
-
-  // Regression test for a real bug: #browse-panel (an ancestor of the
-  // listbox, several levels up) carries overflow-hidden for its own rounded
-  // corners. An earlier version of the listbox was `position: absolute`,
-  // whose containing block sat *inside* that clipping box, so the popup
-  // rendered but was cut off after ~1 option. `toBeVisible()`/`boundingBox()`
-  // on the listbox container itself did NOT catch this — Playwright's
-  // visibility check doesn't account for a clipping ancestor, only for the
-  // element's own display/visibility/opacity and whether it has a non-empty
-  // layout box. Catching it for real requires checking the popup renders at
-  // its intended full size, and that content far from the trigger is
-  // actually painted and hit-testable at its own coordinates — not just
-  // that it has a computed bounding box.
-  test('listbox is not clipped by an ancestor: it renders at full height and the last option is reachable and hit-testable', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-
-    const listbox = page.locator('#preset-listbox');
-    await expect(listbox).toBeVisible();
-    await expect(page.locator('#preset-listbox [role="option"]')).toHaveCount(20);
-
-    // Under the old bug the popup was clipped to ~1 row instead of its
-    // intended max-h-72 (288px) — a box height this close to that cap is
-    // direct evidence it's rendering at full size, not truncated by an
-    // ancestor's overflow:hidden.
-    const box = (await listbox.boundingBox())!;
-    expect(box.height).toBeGreaterThan(250);
-
-    // The definitive check: scroll to and hit-test the last option's own
-    // center point. If an ancestor were still clipping the popup, this
-    // coordinate would either paint whatever sits behind the clip (e.g.
-    // #browse-panel or the page background) or nothing at all — not the
-    // option itself.
-    const lastOption = page.getByRole('option', { name: /^Copper\(II\) Sulfate/ });
-    await lastOption.scrollIntoViewIfNeeded();
-    const optionId = await lastOption.getAttribute('id');
-    const optBox = (await lastOption.boundingBox())!;
-    const cx = optBox.x + optBox.width / 2;
-    const cy = optBox.y + optBox.height / 2;
-    const isHitTestable = await page.evaluate(
-      ({ x, y, id }) => {
-        const el = document.elementFromPoint(x, y);
-        return !!el && (el.id === id || !!el.closest(`#${CSS.escape(id!)}`));
-      },
-      { x: cx, y: cy, id: optionId }
-    );
-    expect(isHitTestable).toBe(true);
-
-    // Selecting that last, previously-clipped option still works end to end.
-    await lastOption.click();
-    const mmVal = await page.locator('#molar-mass').inputValue();
-    expect(parseFloat(mmVal)).toBeCloseTo(159.602, 2);
-  });
-
-  test('listbox stays open and repositions (rather than closing) when the page scrolls or resizes', async ({ page }) => {
-    await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    await page.click('#preset-trigger');
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-
-    // Dispatched directly rather than relying on the page actually having
-    // scrollable overflow at this viewport size — what matters here is that
-    // a scroll/resize tick doesn't close the popup (it used to: closing on
-    // scroll raced with the Browse Elements panel's own open-time
-    // smooth-scroll animation and could close a listbox the instant it
-    // opened — see the handlePresetViewportChange comment).
-    await page.evaluate(() => window.dispatchEvent(new Event('scroll')));
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-
-    await page.evaluate(() => window.dispatchEvent(new Event('resize')));
-    await expect(page.locator('#preset-listbox')).toBeVisible();
-  });
-});
-
-// ─── 7. Browse Panel – Build Custom ──────────────────────────────────────────
-
-test.describe('Browse panel – Build custom', () => {
-  async function openCustomTab(page: Page) {
-    await page.click('#browse-trigger');
-    await page.click('#tab-custom');
-    // Wait for element grid to render
-    await page.waitForSelector('#element-grid button', { state: 'visible' });
-  }
-
-  test('switching to Build custom tab shows element grid', async ({ page }) => {
-    await goto(page);
-    await openCustomTab(page);
-    await expect(page.locator('#element-grid')).toBeVisible();
-    // Should have 63 element cards (full IUPAC/CIAAW 2024 dataset, Tc omitted)
-    const cards = page.locator('#element-grid > div');
-    await expect(cards).toHaveCount(63);
-  });
-
-  test('H2O formula: 2x Hydrogen + 1x Oxygen = 18.015 g/mol', async ({ page }) => {
-    await goto(page);
-    await openCustomTab(page);
-
-    // Click Hydrogen card (adds qty 1), then click plus to make it 2
-    const hCard = page.locator('#element-grid > div').filter({ hasText: 'H' }).first();
-    await hCard.locator('button').first().click(); // info area click → qty 1
-
-    // The body click above mounted the stepper; + is only reachable after it
-    await hCard.locator('[data-step="plus"]').click();
-
-    // Click Oxygen card
-    const oCard = page.locator('#element-grid > div').filter({ hasText: 'Oxygen' }).first();
-    await oCard.locator('button').first().click();
-
-    // Check formula bar shows ~18.015
-    const massText = await page.locator('#custom-molar-mass-val').textContent();
-    const massNum = parseFloat(massText?.replace(/[^\d.]/g, '') ?? 'NaN');
-    expect(massNum).toBeCloseTo(18.015, 2);
-  });
-
-  test('"Use this molar mass" applies custom molar mass and collapses panel', async ({ page }) => {
-    await goto(page);
-    await openCustomTab(page);
-
-    // Add 1x Carbon
-    const cCard = page.locator('#element-grid > div').filter({ hasText: 'Carbon' }).first();
-    await cCard.locator('button').first().click();
-
-    // Apply
-    await page.click('#use-custom');
-
-    // Molar mass should now be ~12.011
-    const mmVal = await page.locator('#molar-mass').inputValue();
-    expect(parseFloat(mmVal)).toBeCloseTo(12.011, 2);
-    // Panel collapsed
-    await expect(page.locator('#browse-panel')).toBeHidden();
-  });
-});
-
-// ─── 7b. Element Tile – Selection Model ──────────────────────────────────────
+// ─── 6. Element Tile – Selection Model ───────────────────────────────────────
+//
+// The element grid's tile/stepper rendering, exercised through the Build custom
+// mode panel — the only place it is mounted. These assertions are about the
+// shared createElementGrid() component, not about that panel's wiring (which
+// section 11 covers), so they only need one instance to run against.
 
 test.describe('Element tile – selection model', () => {
   async function openCustomTab(page: Page) {
-    await page.click('#browse-trigger');
-    await page.click('#tab-custom');
-    await page.waitForSelector('#element-grid button', { state: 'visible' });
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Build custom', exact: true }).click();
+    await page.waitForSelector('#molar-mass-element-grid button', { state: 'visible' });
   }
 
-  const hTile = (page: Page) => page.locator('#element-grid > div[data-symbol="H"]');
+  const hTile = (page: Page) => page.locator('#molar-mass-element-grid > div[data-symbol="H"]');
 
   test('unselected tile has no stepper and is not in the formula', async ({ page }) => {
     await goto(page);
@@ -527,7 +249,7 @@ test.describe('Element tile – selection model', () => {
     // the whole point of this test, so it must stay a count-zero check.
     await expect(tile.locator('[data-step]')).toHaveCount(0);
     await expect(tile.locator('button').first()).not.toHaveAttribute('aria-current');
-    await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
+    await expect(page.locator('#molar-mass-custom-mass')).toHaveText('—');
   });
 
   test('clicking the tile body reveals the stepper at 1 and selects', async ({ page }) => {
@@ -543,7 +265,7 @@ test.describe('Element tile – selection model', () => {
     await expect(tile.locator('[data-step]')).toHaveCount(2);
     await expect(tile.getByText('1', { exact: true })).toBeVisible();
     await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
-    const mass = await page.locator('#custom-molar-mass-val').textContent();
+    const mass = await page.locator('#molar-mass-custom-mass').textContent();
     expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
   });
 
@@ -567,7 +289,7 @@ test.describe('Element tile – selection model', () => {
     await expect
       .poll(() => tile.evaluate(n => getComputedStyle(n).boxShadow))
       .toContain('rgb(229, 226, 218) 0px 0px 0px 1px inset');
-    await expect(page.locator('#custom-molar-mass-val')).toHaveText('—');
+    await expect(page.locator('#molar-mass-custom-mass')).toHaveText('—');
   });
 
   test('minus at 2 or above decrements and stays selected', async ({ page }) => {
@@ -582,7 +304,7 @@ test.describe('Element tile – selection model', () => {
 
     await expect(tile.locator('[data-step]')).toHaveCount(2);
     await expect(tile.locator('button').first()).toHaveAttribute('aria-current', 'true');
-    const mass = await page.locator('#custom-molar-mass-val').textContent();
+    const mass = await page.locator('#molar-mass-custom-mass').textContent();
     expect(parseFloat(mass?.replace(/[^\d.]/g, '') ?? 'NaN')).toBeCloseTo(1.008, 2);
   });
 
@@ -691,7 +413,7 @@ test.describe('Element tile – selection model', () => {
     await openCustomTab(page);
 
     const geo = await page.evaluate(() => {
-      const g = document.getElementById('element-grid')!;
+      const g = document.getElementById('molar-mass-element-grid')!;
       const tiles = [...g.querySelectorAll('div[data-symbol]')];
       const cs = getComputedStyle(g);
       return {
@@ -739,21 +461,21 @@ test.describe('Element tile – selection model', () => {
   });
 });
 
-// ─── 8. Element Search Filter ────────────────────────────────────────────────
+// ─── 7. Element Search Filter ────────────────────────────────────────────────
 
 test.describe('Element search filter', () => {
   async function openCustomTab(page: Page) {
-    await page.click('#browse-trigger');
-    await page.click('#tab-custom');
-    await page.waitForSelector('#element-grid > div', { state: 'visible' });
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Build custom', exact: true }).click();
+    await page.waitForSelector('#molar-mass-element-grid > div', { state: 'visible' });
   }
 
   test('"sod" filters to show only Sodium', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
-    await page.fill('#element-search', 'sod');
+    await page.fill('#molar-mass-element-search', 'sod');
     // Only Sodium should be in the grid
-    const cards = page.locator('#element-grid > div');
+    const cards = page.locator('#molar-mass-element-grid > div');
     await expect(cards).toHaveCount(1);
     await expect(cards.first()).toContainText('Na');
   });
@@ -761,8 +483,8 @@ test.describe('Element search filter', () => {
   test('"iron" filters to show only Iron', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
-    await page.fill('#element-search', 'iron');
-    const cards = page.locator('#element-grid > div');
+    await page.fill('#molar-mass-element-search', 'iron');
+    const cards = page.locator('#molar-mass-element-grid > div');
     await expect(cards).toHaveCount(1);
     await expect(cards.first()).toContainText('Fe');
   });
@@ -770,21 +492,21 @@ test.describe('Element search filter', () => {
   test('clearing search restores all 63 elements', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
-    await page.fill('#element-search', 'sod');
-    await page.fill('#element-search', '');
-    const cards = page.locator('#element-grid > div');
+    await page.fill('#molar-mass-element-search', 'sod');
+    await page.fill('#molar-mass-element-search', '');
+    const cards = page.locator('#molar-mass-element-grid > div');
     await expect(cards).toHaveCount(63);
   });
 
   test('no-match query shows empty state message', async ({ page }) => {
     await goto(page);
     await openCustomTab(page);
-    await page.fill('#element-search', 'zzz');
-    await expect(page.locator('#element-grid-empty')).toBeVisible();
+    await page.fill('#molar-mass-element-search', 'zzz');
+    await expect(page.locator('#molar-mass-element-grid-empty')).toBeVisible();
   });
 });
 
-// ─── 9. Touch Target Sizes (mobile) ──────────────────────────────────────────
+// ─── 8. Touch Target Sizes (mobile) ──────────────────────────────────────────
 
 test.describe('Touch targets – 44px minimum', () => {
   test.use({
@@ -804,19 +526,19 @@ test.describe('Touch targets – 44px minimum', () => {
     }
   });
 
-  test('stepper +/- buttons in Browse custom tab are at least 44px tall', async ({ page }) => {
+  test('stepper +/- buttons in the Build custom panel are at least 44px tall', async ({ page }) => {
     await goto(page);
-    await page.click('#browse-trigger');
-    await page.click('#tab-custom');
-    await page.waitForSelector('#element-grid > div', { state: 'visible' });
+    await page.click('#molar-mass-mode-trigger');
+    await page.getByRole('option', { name: 'Build custom', exact: true }).click();
+    await page.waitForSelector('#molar-mass-element-grid > div', { state: 'visible' });
 
     // REQUIRED: the stepper does not exist until the tile is selected, so this
     // click is a prerequisite, not a convenience. Removing it makes the loop
     // below iterate zero elements and pass vacuously.
-    await page.locator('#element-grid > div').first().locator('button').first().click();
+    await page.locator('#molar-mass-element-grid > div').first().locator('button').first().click();
     await page.waitForTimeout(100);
 
-    const stepperButtons = page.locator('#element-grid > div').first().locator('[data-step]');
+    const stepperButtons = page.locator('#molar-mass-element-grid > div').first().locator('[data-step]');
     const count = await stepperButtons.count();
     expect(count).toBe(2);
     for (let i = 0; i < count; i++) {
@@ -828,11 +550,10 @@ test.describe('Touch targets – 44px minimum', () => {
   });
 });
 
-// ─── 10. Molar Mass Mode Dropdown ────────────────────────────────────────────
-// Stage 1 of the mode-selector rebuild: dropdown shell + mode-switching state
-// only. "Build custom"/"Compounds" don't wire up their panels yet (stages
-// 3-4), so these tests cover the dropdown itself, not what a selected mode
-// does beyond updating its own label and the "+" stepper's visibility.
+// ─── 9. Molar Mass Mode Dropdown ────────────────────────────────────────────
+// The dropdown itself: its ARIA listbox behaviour, its label, and the "+"
+// stepper's visibility. What each selected mode then SHOWS is covered by the
+// per-mode state and panel sections below.
 
 test.describe('Molar Mass mode dropdown', () => {
   test('default mode is "Type in" on load, and the "+" button is visible', async ({ page }) => {
@@ -945,12 +666,11 @@ test.describe('Molar Mass mode dropdown', () => {
     await expect(page.getByRole('option', { name: 'Compounds' })).toHaveAttribute('aria-selected', 'true');
   });
 
-  // Stage 1 asserted the mode dropdown left #molar-mass untouched. Stage 2
-  // deliberately changed that: the field is now a view onto the active mode's
-  // own slot, so switching to an untouched mode shows that mode's empty slot.
-  // What still must hold is that the TYPED value is preserved (not destroyed)
-  // and comes back intact — covered in depth in the per-mode state section
-  // below; kept here as the dropdown-level guarantee.
+  // The field is a view onto the active mode's own slot, so switching to an
+  // untouched mode shows that mode's EMPTY slot, not the outgoing value. What
+  // must hold is that the typed value is preserved rather than destroyed, and
+  // comes back intact — covered in depth in the per-mode state section below;
+  // kept here as the dropdown-level guarantee.
   test('the mode dropdown preserves the typed Molar Mass and restores it on return', async ({ page }) => {
     await goto(page);
     await setMolarMass(page, '18.015');
@@ -968,17 +688,17 @@ test.describe('Molar Mass mode dropdown', () => {
   });
 });
 
-// ─── 11. Molar Mass Per-Mode State ───────────────────────────────────────────
-// Stage 2: each mode owns an independent value slot, and #molar-mass is a view
-// onto whichever slot is active. The Build-custom and Compounds panels that
-// will eventually write those slots don't exist yet (stages 3-4), so these
-// drive the documented window.molarMassMode hook directly — the same entry
-// point those panels are meant to use.
+// ─── 10. Molar Mass Per-Mode State ───────────────────────────────────────────
+// Each mode owns an independent value slot, and #molar-mass is a view onto
+// whichever slot is active. These drive the documented window.molarMassMode
+// hook directly rather than going through a panel — the hook is the same entry
+// point the panels use, and it can also write a slot for a mode that is not
+// active, which no UI path can do.
 
 test.describe('Molar Mass per-mode state', () => {
   type Mode = 'type-in' | 'build-custom' | 'compounds';
 
-  /** Write a mode's slot through the exposed hook, as a stage 3/4 panel would. */
+  /** Write a mode's slot through the exposed hook, as a mode panel would. */
   async function setModeValue(page: Page, mode: Mode, data: unknown) {
     await page.evaluate(
       ({ mode, data }) => (window as any).molarMassMode.set(mode, data),
@@ -1196,12 +916,12 @@ test.describe('Molar Mass per-mode state', () => {
   });
 });
 
-// ─── 12. Molar Mass "Build custom" panel ─────────────────────────────────────
-// Stage 3: the element picker mounted under the Molar Mass field. A second,
-// independent instance of the same element-grid component the old "Browse
-// elements" accordion renders — these cover the new instance and the fact that
-// the two don't share a selection. There is no confirm button here: the field
-// is a live view onto the build-custom slot, so every tile click lands in it.
+// ─── 11. Molar Mass "Build custom" panel ─────────────────────────────────────
+// The element picker mounted under the Molar Mass field: this section covers the
+// panel's own wiring — overlay geometry, slot writes, restore-on-return — while
+// section 6 covers the grid component it hosts. There is no confirm button: the
+// field is a live view onto the build-custom slot, so every tile click lands
+// in it.
 
 test.describe('Molar Mass Build custom panel', () => {
   const PANEL = '#molar-mass-build-panel';
@@ -1256,6 +976,9 @@ test.describe('Molar Mass Build custom panel', () => {
     await pickMode(page, 'Build custom');
     await expect(tile(page, 'H')).toBeVisible();
     await expect(tile(page, 'U')).toBeAttached();
+    // The whole dataset, not a prefix of it: 63 element cards (full
+    // IUPAC/CIAAW 2024 seed set, Tc omitted).
+    await expect(page.locator(`${GRID} > div`)).toHaveCount(63);
 
     await page.locator('#molar-mass-element-search').fill('oxy');
     await expect(page.locator(`${GRID} [data-symbol]`)).toHaveCount(1);
@@ -1335,8 +1058,8 @@ test.describe('Molar Mass Build custom panel', () => {
     await goto(page);
     await page.setViewportSize({ width: 1100, height: 805 });
     await pickMode(page, 'Build custom');
-    // The panel is inset to the card's content box and so is narrower than the
-    // accordion's — it carries its own targetCol to hold three columns here.
+    // The panel is inset to the field card's content box, so GRID_TARGET_COL is
+    // tuned to that width (232) rather than to the card's full span.
     const cols = await page.evaluate(() =>
       getComputedStyle(document.getElementById('molar-mass-element-grid')!)
         .gridTemplateColumns.trim().split(/\s+/).length
@@ -1469,38 +1192,13 @@ test.describe('Molar Mass Build custom panel', () => {
     await expect(page.locator('#molar-mass')).toHaveValue('180.156');
     await expect(page.locator('#molar-mass-custom-formula')).toHaveText('C6H12O6');
   });
-
-  test('this grid and the old accordion grid are independent pickers', async ({ page }) => {
-    await goto(page);
-    await pickMode(page, 'Build custom');
-    await buildWater(page);
-
-    // Back to Type in first: the panel is an overlay anchored under the Molar
-    // Mass field, so while it is open it covers the accordion's trigger.
-    await pickMode(page, 'Type in');
-
-    // The old Build custom tab is untouched by the new panel's selection
-    await page.click('#browse-trigger');
-    await expect(page.locator('#custom-formula')).toHaveText('—');
-    await expect(page.locator('#use-custom')).toBeHidden();
-    await expect(page.locator('#element-grid [data-symbol="H"] [data-step="plus"]')).toHaveCount(0);
-
-    // ...and selecting there doesn't disturb the new panel or its slot
-    await page.locator('#element-grid [data-symbol="C"]').getByRole('button').first().click();
-    await expect(page.locator('#custom-formula')).toHaveText('C');
-    await expect(tile(page, 'C').locator('[data-step="plus"]')).toHaveCount(0);
-    expect(await getBuildCustom(page)).toEqual({
-      quantities: { H: 2, O: 1 }, formula: 'H2O', molarMass: 18.015,
-    });
-  });
 });
 
-// ─── 13. Molar Mass "Compounds" panel ────────────────────────────────────────
-// Stage 4: the compound picker mounted under the Molar Mass field. A second
-// instance of the same createPresetListbox() component the old "Browse
-// elements" accordion's Presets tab renders, minus the combobox lifecycle —
-// this one has no trigger and no open/close, so the panel element IS the
-// focusable listbox. Selecting writes the compounds slot; stage 2 does the rest.
+// ─── 12. Molar Mass "Compounds" panel ────────────────────────────────────────
+// The compound picker mounted under the Molar Mass field: createPresetListbox()
+// with no combobox lifecycle around it — no trigger and no open/close, so the
+// panel element IS the focusable listbox. Selecting writes the compounds slot
+// and setModeValue() does the rest.
 
 test.describe('Molar Mass Compounds panel', () => {
   const PANEL = '#molar-mass-compounds-panel';
@@ -1549,22 +1247,31 @@ test.describe('Molar Mass Compounds panel', () => {
     await expect(option(page, /^Water/)).toHaveText('Water (H₂O) — 18.015 g/mol');
   });
 
-  test('option ids are namespaced per instance — no duplicates in the document', async ({ page }) => {
+  // Every option id in the document has to be unique, because
+  // aria-activedescendant resolves by id — a duplicate leaves the reference
+  // ambiguous and the AT following the wrong element. Two separate listboxes
+  // are live here (the mode dropdown and this panel), each namespacing its own
+  // option ids via its own prefix, so this sweeps the whole document rather
+  // than just this panel.
+  test('option ids are unique across every listbox in the document', async ({ page }) => {
     await goto(page);
     await pickMode(page, 'Compounds');
-    const dupes = await page.evaluate(() => {
+    const { dupes, total } = await page.evaluate(() => {
       const seen = new Set<string>();
       const dup: string[] = [];
-      document.querySelectorAll('[role="option"][id]').forEach((el) => {
+      const all = document.querySelectorAll('[role="option"][id]');
+      all.forEach((el) => {
         if (seen.has(el.id)) dup.push(el.id);
         seen.add(el.id);
       });
-      return dup;
+      return { dupes: dup, total: all.length };
     });
     expect(dupes).toEqual([]);
-    // The accordion keeps its original ids; this instance gets its own prefix
-    await expect(page.locator('#preset-option-0')).toHaveCount(1);
+    // 20 compounds + 3 modes — proves the sweep above actually had both
+    // listboxes to compare, rather than passing on an empty document.
+    expect(total).toBe(23);
     await expect(page.locator('#molar-mass-compound-option-0')).toHaveCount(1);
+    await expect(page.locator('#molar-mass-mode-option-0')).toHaveCount(1);
   });
 
   test('clicking a compound writes the slot and fills the read-only field', async ({ page }) => {
@@ -1626,10 +1333,10 @@ test.describe('Molar Mass Compounds panel', () => {
     await expect(page.locator(PANEL)).toHaveAttribute('aria-activedescendant', 'molar-mass-compound-option-4');
   });
 
-  // Same trap stage 3 fell into: the picker instance is never torn down, so it
-  // would keep its own selectedIndex across a hide/show regardless of where the
-  // restore reads from. Overwriting the slot while the mode is INACTIVE is what
-  // separates "restored from the store" from "never lost it".
+  // The same trap the Build-custom panel has: the picker instance is never torn
+  // down, so it would keep its own selectedIndex across a hide/show regardless
+  // of where the restore reads from. Overwriting the slot while the mode is
+  // INACTIVE is what separates "restored from the store" from "never lost it".
   test('returning restores from the slot, not from the picker\'s own leftovers', async ({ page }) => {
     await goto(page);
     await pickMode(page, 'Compounds');
@@ -1719,27 +1426,66 @@ test.describe('Molar Mass Compounds panel', () => {
     })).toBe(0);
   });
 
-  test('this picker and the old accordion picker are independent', async ({ page }) => {
+  // Mouse hover shares the "active" highlight with keyboard nav, and moves
+  // aria-activedescendant with it — one state, not a second visual-only one.
+  // Uses a real hover() (mousemove-driven), not a click or a keypress, since a
+  // missing pointer listener is exactly what this guards against: the option
+  // elements carry no `hover:` class, so nothing paints without the JS.
+  test('hovering an option highlights it and moves aria-activedescendant', async ({ page }) => {
     await goto(page);
     await pickMode(page, 'Compounds');
-    await option(page, /^Methane/).click();
-    expect(await getCompounds(page)).toEqual({
-      name: 'Methane', formula: 'CH₄', molarMass: 16.043,
-    });
 
-    // Back to Type in first — the overlay covers the accordion's trigger
-    await pickMode(page, 'Type in');
-    await page.click('#browse-trigger');
-    await page.click('#tab-presets');
-    // The accordion's trigger never saw this panel's selection
-    await expect(page.locator('#preset-trigger')).toHaveText('Select a compound…');
+    const target = option(page, /^Nitric Acid/);
+    const targetId = await target.getAttribute('id');
+    await target.hover();
 
-    // ...and picking there doesn't disturb the compounds slot
-    await page.click('#preset-trigger');
-    await page.locator('#preset-listbox [role="option"]').filter({ hasText: /^Water/ }).click();
-    await expect(page.locator('#preset-trigger')).toHaveText('Water (H₂O)');
-    expect(await getCompounds(page)).toEqual({
-      name: 'Methane', formula: 'CH₄', molarMass: 16.043,
-    });
+    await expect(target).toHaveClass(/bg-surface-2/);
+    await expect(page.locator(PANEL)).toHaveAttribute('aria-activedescendant', targetId!);
+
+    // Moving to a different option moves the highlight, not just adds to it.
+    const other = option(page, /^Ammonia/);
+    await other.hover();
+    await expect(target).not.toHaveClass(/bg-surface-2/);
+    await expect(other).toHaveClass(/bg-surface-2/);
+  });
+
+  // The panel is an out-of-flow overlay anchored under a field inside a card
+  // that clips its own rounded corners. `toBeVisible()`/`boundingBox()` do NOT
+  // catch a clipping ancestor — Playwright's visibility check only looks at the
+  // element's own display/visibility/opacity and whether it has a non-empty
+  // layout box. Catching it for real means checking the panel renders at its
+  // intended full height AND that content far from the anchor is actually
+  // painted and hit-testable at its own coordinates.
+  test('the panel is not clipped: full height, and the last option is hit-testable', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+
+    const panel = page.locator(PANEL);
+    await expect(panel).toBeVisible();
+
+    // max-h-72 is 288px; a box this close to the cap is direct evidence the
+    // panel is rendering at full size rather than truncated by an ancestor.
+    const box = (await panel.boundingBox())!;
+    expect(box.height).toBeGreaterThan(250);
+
+    // The definitive check: hit-test the LAST option's own centre point. Under
+    // a clip this coordinate would paint whatever sits behind it — the card, or
+    // the page background — rather than the option.
+    const lastOption = option(page, /^Copper\(II\) Sulfate/);
+    await lastOption.scrollIntoViewIfNeeded();
+    const optionId = await lastOption.getAttribute('id');
+    const optBox = (await lastOption.boundingBox())!;
+    const isHitTestable = await page.evaluate(
+      ({ x, y, id }) => {
+        const el = document.elementFromPoint(x, y);
+        return !!el && (el.id === id || !!el.closest(`#${CSS.escape(id!)}`));
+      },
+      { x: optBox.x + optBox.width / 2, y: optBox.y + optBox.height / 2, id: optionId }
+    );
+    expect(isHitTestable).toBe(true);
+
+    // And selecting that last, furthest option still works end to end.
+    await lastOption.click();
+    await expect(page.locator('#molar-mass')).toHaveValue('159.602');
   });
 });
