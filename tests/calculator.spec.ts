@@ -1196,9 +1196,10 @@ test.describe('Molar Mass Build custom panel', () => {
 
 // ─── 12. Molar Mass "Compounds" panel ────────────────────────────────────────
 // The compound picker mounted under the Molar Mass field: createPresetListbox()
-// with no combobox lifecycle around it — no trigger and no open/close, so the
-// panel element IS the focusable listbox. Selecting writes the compounds slot
-// and setModeValue() does the rest.
+// with no combobox trigger around it — no collapsed row, so the panel element
+// IS the focusable listbox. Selecting writes the compounds slot, and
+// setModeValue() does the rest; the panel then auto-closes (see section 13,
+// which covers open/close across both mode panels).
 
 test.describe('Molar Mass Compounds panel', () => {
   const PANEL = '#molar-mass-compounds-panel';
@@ -1284,8 +1285,9 @@ test.describe('Molar Mass Compounds panel', () => {
     expect(await getCompounds(page)).toEqual({
       name: 'Glucose', formula: 'C₆H₁₂O₆', molarMass: 180.16,
     });
-    // Single click, no confirm step — and the panel stays: it is the mode's UI
-    await expect(page.locator(PANEL)).toBeVisible();
+    // Single click, no confirm step — and it auto-closes; see section 13 for
+    // the dismiss paths, including why this one doesn't return to Type in.
+    await expect(page.locator(PANEL)).toBeHidden();
     await expect(option(page, /^Glucose/)).toHaveAttribute('aria-selected', 'true');
   });
 
@@ -1327,6 +1329,12 @@ test.describe('Molar Mass Compounds panel', () => {
     await expect(page.locator(PANEL)).toBeHidden();
 
     await pickMode(page, 'Compounds');
+    // Park the pointer off the list before asserting the highlight: reopening
+    // leaves the real cursor sitting wherever the dropdown's "Compounds"
+    // option was, which can land over a DIFFERENT row of this (differently
+    // laid out) panel underneath and fire a genuine hover — same reasoning as
+    // the keyboard-select test above, pre-existing and unrelated to auto-close.
+    await page.mouse.move(5, 5);
     await expect(option(page, /^Ethanol/)).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('#molar-mass')).toHaveValue('46.07');
     // The highlight lands on the restored selection, not back at option 0
@@ -1492,15 +1500,27 @@ test.describe('Molar Mass Compounds panel', () => {
 
 // ─── 13. Molar Mass mode panels – dismissal ──────────────────────────────────
 // Both mode panels used to be leavable only by picking a different mode from
-// the dropdown. This section covers the three dismiss paths added on top of
-// that — Escape, clicking outside the panel, and each panel's own close (X)
-// button — which all converge on the same closeMolarMassModePanel(), so all
-// three have the same effect: switch back to Type in. Restoration of a
-// closed-and-reopened slot is not re-proven per path here: every path calls
-// the identical function section 11/12's "leaving and returning restores..."
-// tests already exercise via the dropdown, so one round-trip per mode below
-// (via a different path each) is enough to confirm these paths are wired to
-// that same function, not a parallel one that merely hides the panel.
+// the dropdown. Four dismiss paths now exist:
+//   - Escape and click-outside, both wired to closeMolarMassModePanel(),
+//     which switches activeMode back to Type in without touching either
+//     mode's stored slot (see the regression test below — a real bug in an
+//     earlier revision briefly broke this).
+//   - Toggle-close: re-picking the ALREADY-active mode's own option in the
+//     dropdown closes its panel the same way Escape/click-outside do. For
+//     Compounds, if its panel is currently auto-closed (see next bullet),
+//     the same click reopens it instead of closing further.
+//   - Auto-close on pick, Compounds only: selecting a compound closes the
+//     panel immediately, but — unlike every other close path — stays in
+//     Compounds mode rather than switching to Type in, so the field keeps
+//     showing the just-picked value instead of Type in's unrelated slot.
+//     Build custom deliberately has no equivalent: a tile pick is one of
+//     several in progress, not a complete answer on its own, so its panel
+//     only closes via Escape/click-outside/toggle-close.
+// Restoration of a closed-and-reopened slot is not re-proven per path: every
+// full-close path funnels through the same closeMolarMassModePanel(), already
+// covered by section 11/12's "leaving and returning restores..." tests via
+// the dropdown, so one round-trip per mode below (via a different path each)
+// is enough to confirm these paths are wired to it too.
 
 test.describe('Molar Mass mode panels – dismissal', () => {
   const BUILD_PANEL = '#molar-mass-build-panel';
@@ -1627,106 +1647,135 @@ test.describe('Molar Mass mode panels – dismissal', () => {
     expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('build-custom');
   });
 
-  // ── Close (X) button ──
-
-  test('the Build custom panel\'s close button closes it, returns to Type in, and refocuses the trigger', async ({ page }) => {
+  // ── Regression: Escape must never touch the slot it's leaving behind ──
+  // This is the literal bug report: an earlier revision of closeMolarMassModePanel()
+  // was observed to wipe the build-custom slot (and the visible field) instead
+  // of merely re-pointing the view to Type in. Root cause, for the record: it
+  // wasn't reproducible from reading or exercising the actual committed close
+  // path — molarMassInput's own 'input' listener that feeds a slot is guarded
+  // to `activeMolarMassMode === 'type-in'` and only ever fires AFTER
+  // activeMolarMassMode has already been reassigned, so it can only ever write
+  // back into Type in's own (already-current) slot, never build-custom's or
+  // compounds'. Kept as a permanent regression guard regardless, since it's
+  // exactly the failure mode the "switching modes never discards state" rule
+  // exists to prevent, and the most likely place a future change could
+  // reintroduce it.
+  test('Escape does not wipe the build-custom slot: select O, add 2 H, Escape, switch back — the exact same tiles are still selected', async ({ page }) => {
     await goto(page);
     await pickMode(page, 'Build custom');
-
-    await page.click('#molar-mass-build-panel-close');
-
-    await expect(page.locator(BUILD_PANEL)).toBeHidden();
-    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Type in');
-    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('type-in');
-    expect(await activeElementId(page)).toBe('molar-mass-mode-trigger');
-  });
-
-  test('the Compounds panel\'s close button closes it, returns to Type in, and refocuses the trigger', async ({ page }) => {
-    await goto(page);
-    await pickMode(page, 'Compounds');
-
-    await page.click('#molar-mass-compounds-panel-close');
-
-    await expect(page.locator(COMPOUNDS_PANEL)).toBeHidden();
-    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Type in');
-    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('type-in');
-    expect(await activeElementId(page)).toBe('molar-mass-mode-trigger');
-  });
-
-  // The trickiest part of this implementation: the Compounds close button is a
-  // non-option child sitting inside a role="listbox" (see the markup comment
-  // above #molar-mass-compounds-panel). This proves clicking it is not
-  // mistaken for an option click by createPresetListbox()'s delegated
-  // listener — no commit, no slot write.
-  test('clicking the Compounds panel\'s close button does not commit a selection', async ({ page }) => {
-    await goto(page);
-    await pickMode(page, 'Compounds');
-    expect(await getCompounds(page)).toEqual({ name: null, formula: null, molarMass: null });
-
-    await page.click('#molar-mass-compounds-panel-close');
-
-    expect(await getCompounds(page)).toEqual({ name: null, formula: null, molarMass: null });
-  });
-
-  // ── State survives a close/reopen round trip ──
-  // Only one path per mode: every path funnels through the same
-  // closeMolarMassModePanel() → setActiveMolarMassMode('type-in'), which is
-  // exactly the dropdown's own path, already covered by section 11/12's
-  // restore-on-return tests — this just confirms the new paths are wired to
-  // it too, not to a lookalike that skips the state store.
-
-  test('closing the Build custom panel via Escape preserves its slot; reopening restores it', async ({ page }) => {
-    await goto(page);
-    await pickMode(page, 'Build custom');
+    await selectElement(page, 'O');
     await selectElement(page, 'H');
     await tile(page, 'H').locator('[data-step="plus"]').click(); // 2 H
-    await selectElement(page, 'O');
-    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    const before = await getBuildCustom(page);
+    expect(before).toEqual({ quantities: { O: 1, H: 2 }, formula: 'H2O', molarMass: 18.015 });
 
     await page.locator('#molar-mass-element-search').focus();
     await page.keyboard.press('Escape');
     await expect(page.locator(BUILD_PANEL)).toBeHidden();
+    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('type-in');
+    // The slot itself, checked BEFORE reopening — not just what repaints once
+    // a reopen forces a repaint from it.
+    expect(await getBuildCustom(page)).toEqual(before);
 
     await pickMode(page, 'Build custom');
     await expect(page.locator('#molar-mass')).toHaveValue('18.015');
-    expect(await getBuildCustom(page)).toEqual({ quantities: { H: 2, O: 1 }, formula: 'H2O', molarMass: 18.015 });
+    expect(await getBuildCustom(page)).toEqual(before);
+    await expect(tile(page, 'O').locator('[data-step="plus"]')).toBeVisible();
+    await expect(tile(page, 'H').getByText('2', { exact: true })).toBeVisible();
   });
 
-  test('closing the Compounds panel via its close button preserves its slot; reopening restores it', async ({ page }) => {
+  // ── Toggle-close: re-picking the active mode's own dropdown option ──
+
+  test('clicking "Build custom" again while it is open closes it and returns to Type in', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await expect(page.locator(BUILD_PANEL)).toBeVisible();
+
+    await pickMode(page, 'Build custom'); // same option, already active
+
+    await expect(page.locator(BUILD_PANEL)).toBeHidden();
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Type in');
+    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('type-in');
+  });
+
+  test('clicking "Compounds" again while it is open (nothing picked) closes it cleanly and returns to Type in', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+    await expect(page.locator(COMPOUNDS_PANEL)).toBeVisible();
+
+    await pickMode(page, 'Compounds'); // same option, already active, no pick yet
+
+    await expect(page.locator(COMPOUNDS_PANEL)).toBeHidden();
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Type in');
+    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('type-in');
+  });
+
+  // Toggle-close reuses the exact same closeMolarMassModePanel() Escape and
+  // click-outside call — this just confirms the new path is wired to it, not
+  // to a lookalike that merely hides the panel.
+  test('closing Build custom via toggle-close preserves its slot; reopening restores it', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+    await selectElement(page, 'C');
+    for (let i = 0; i < 5; i++) await tile(page, 'C').locator('[data-step="plus"]').click();
+    await expect(page.locator('#molar-mass')).toHaveValue('72.066');
+
+    await pickMode(page, 'Build custom'); // toggle-close
+
+    await pickMode(page, 'Build custom'); // reopen
+    await expect(page.locator('#molar-mass')).toHaveValue('72.066');
+    expect(await getBuildCustom(page)).toEqual({ quantities: { C: 6 }, formula: 'C6', molarMass: 72.066 });
+  });
+
+  // ── Auto-close on pick, Compounds only ──
+
+  test('selecting a compound closes the Compounds panel and fills Molar Mass in the same action', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Compounds');
+
+    await option(page, /^Water/).click();
+
+    await expect(page.locator(COMPOUNDS_PANEL)).toBeHidden();
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    // Unlike Escape/click-outside/toggle-close, auto-close does NOT return to
+    // Type in — the trigger keeps showing "Compounds" and the field stays a
+    // view onto the compounds slot, which is what's actually holding the
+    // value that's now visible.
+    await expect(page.locator('#molar-mass-mode-label')).toHaveText('Compounds');
+    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('compounds');
+    expect(await getCompounds(page)).toEqual({ name: 'Water', formula: 'H₂O', molarMass: 18.015 });
+  });
+
+  test('after auto-close, picking "Compounds" from the dropdown again reopens the panel rather than closing further', async ({ page }) => {
     await goto(page);
     await pickMode(page, 'Compounds');
     await option(page, /^Water/).click();
-    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
-
-    await page.click('#molar-mass-compounds-panel-close');
     await expect(page.locator(COMPOUNDS_PANEL)).toBeHidden();
 
-    await pickMode(page, 'Compounds');
-    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
+    await pickMode(page, 'Compounds'); // same option — panel is collapsed, not open, so this reopens
+
+    await expect(page.locator(COMPOUNDS_PANEL)).toBeVisible();
+    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('compounds');
+    // Reopening shows the prior pick, not a fresh list.
     expect(await option(page, /^Water/).getAttribute('aria-selected')).toBe('true');
+    await expect(page.locator('#molar-mass')).toHaveValue('18.015');
   });
 
-  // ── Normal interaction inside a panel must not trigger any close path ──
-
-  test('clicking an element tile does not close the Build custom panel', async ({ page }) => {
+  // Explicit contrast with Compounds' auto-close above: a tile pick — and an
+  // adjustment to one already picked — must both leave the panel open, since
+  // Build custom is built for several selections in a row.
+  test('build custom does NOT auto-close when selecting or adjusting an element', async ({ page }) => {
     await goto(page);
     await pickMode(page, 'Build custom');
 
     await selectElement(page, 'C');
-
+    await expect(page.locator(BUILD_PANEL)).toBeVisible();
+    await tile(page, 'C').locator('[data-step="plus"]').click();
     await expect(page.locator(BUILD_PANEL)).toBeVisible();
     expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('build-custom');
   });
 
-  test('clicking a compound option does not close the Compounds panel', async ({ page }) => {
-    await goto(page);
-    await pickMode(page, 'Compounds');
-
-    await option(page, /^Water/).click();
-
-    await expect(page.locator(COMPOUNDS_PANEL)).toBeVisible();
-    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('compounds');
-  });
+  // ── Normal interaction inside a panel must not trigger a full-close path ──
 
   test('typing in the element search box does not close the Build custom panel', async ({ page }) => {
     await goto(page);

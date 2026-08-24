@@ -351,23 +351,6 @@ import Layout from '../layouts/Layout.astro';
 				     is z-10, under the mode listbox's z-20, so opening the mode dropdown
 				     still draws over it. -->
 				<div id="molar-mass-build-panel" class="hidden fixed z-10 bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-[16px] mobile:p-5">
-					<!-- Close (X): all three dismiss paths (this button, Escape, click-outside)
-					     converge on closeMolarMassModePanel(), which just switches back to Type
-					     in — see that function for why a dedicated dismiss no longer means
-					     "hide the panel" on its own. Same hit-area/painted-box split as every
-					     other icon button here (24px circle, 44px touch target below `mobile:`). -->
-					<div class="flex justify-end mb-2">
-						<button
-							type="button"
-							id="molar-mass-build-panel-close"
-							aria-label="Close and return to Type in"
-							class="group flex items-center justify-center shrink-0 p-2.5 mobile:p-0 cursor-pointer focus:outline-none"
-						>
-							<span class="flex h-6 w-6 items-center justify-center rounded-full text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
-								<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-							</span>
-						</button>
-					</div>
 					<input
 						type="search"
 						id="molar-mass-element-search"
@@ -429,40 +412,20 @@ import Layout from '../layouts/Layout.astro';
 				     pointer-only case.
 
 				     There is no confirm step: a click or Enter writes the compounds slot,
-				     which setModeValue() pushes straight into #molar-mass. Selecting a
-				     compound does NOT close the panel — only Escape, click-outside, or the
-				     close button do (see closeMolarMassModePanel()), since a selection and
-				     a dismissal are different intents; conflating them would turn picking a
-				     second compound into a two-step "reopen, then pick" action. -->
+				     which setModeValue() pushes straight into #molar-mass. Selecting DOES
+				     close the panel here — unlike Build custom, where a selection is one of
+				     several tile picks in progress, a compound pick is a complete answer on
+				     its own, so it auto-closes while staying in Compounds mode (the field
+				     keeps showing what was just picked, not Type in's own unrelated slot —
+				     see compoundsPanelOpen / isModePanelOpen() and the auto-close note on
+				     compoundsPicker's onSelect below). -->
 				<div
 					id="molar-mass-compounds-panel"
 					role="listbox"
 					aria-label="Common compounds"
 					tabindex="0"
 					class="hidden fixed z-10 max-h-72 overflow-y-auto bg-surface-1 inset-ring-1 inset-ring-hairline rounded-[8px] py-1 focus:outline-none focus-visible:inset-ring-2 focus-visible:inset-ring-primary"
-				>
-					<!-- Close (X), static markup rather than something createPresetListbox()
-					     appends: the component only owns option/group rows (see its lifecycle
-					     split note above), so a dismiss control is the caller's, not its. Sticky
-					     so it stays pinned above the option list as this panel scrolls — it is
-					     itself the `overflow-y-auto` element, not a wrapper around one. Not a
-					     `role="option"`, so it is inert to the ARIA listbox's own option-index
-					     math (arrow keys, typeahead, the option-id sweep test) and only reachable
-					     by its own click handler or by Tab. Same dismiss path as the Build
-					     custom panel's close button — see closeMolarMassModePanel(). -->
-					<div class="sticky top-0 z-10 flex justify-end bg-surface-1 px-1.5 py-1">
-						<button
-							type="button"
-							id="molar-mass-compounds-panel-close"
-							aria-label="Close and return to Type in"
-							class="group flex items-center justify-center shrink-0 p-2.5 mobile:p-0 cursor-pointer focus:outline-none"
-						>
-							<span class="flex h-6 w-6 items-center justify-center rounded-full text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
-								<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2L10 10M10 2L2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-							</span>
-						</button>
-					</div>
-				</div>
+				></div>
 
 				<!-- result-slot: permanent shell (card-result, no tint, no box on the value).
 				     Receives whichever of Mass/Moles is currently the calculated output. The
@@ -1165,6 +1128,17 @@ import Layout from '../layouts/Layout.astro';
 	let activeMolarMassMode: MolarMassMode = 'type-in';
 	let molarMassModeOpen = false;
 	let molarMassModeActiveIndex = -1;
+	// Compounds-only: whether its panel is currently shown while Compounds is
+	// the active mode. Build custom has no equivalent — it is always shown
+	// whenever it's the active mode, full stop — because only Compounds
+	// auto-closes on a pick (see compoundsPicker's onSelect below). Auto-close
+	// deliberately does NOT switch activeMolarMassMode back to Type in the way
+	// every other dismiss path does: doing so would immediately replace the
+	// field's just-picked compound value with Type in's own (unrelated) slot,
+	// undoing the fill in the same tick it happened. This flag is what lets
+	// the panel collapse while #molar-mass keeps showing the compounds slot.
+	// See isModePanelOpen().
+	let compoundsPanelOpen = true;
 
 	// --- Per-mode state store ---
 	//
@@ -1350,8 +1324,25 @@ import Layout from '../layouts/Layout.astro';
 		panel.style.width = `${rowRect.width - outerPad * 2}px`;
 	}
 
+	/**
+	 * Whether `mode`'s panel should currently be showing. Almost always just
+	 * "is this the active mode" — Build custom has no separate open/collapsed
+	 * concept — except for Compounds, which can be the active mode with its
+	 * panel collapsed (auto-close on pick; see compoundsPanelOpen above).
+	 * Centralised here rather than duplicated: everything that decides panel
+	 * visibility (show/hide, which panel scroll/outside-click listeners
+	 * protect, and the toggle-close vs. reopen branch in selectMolarMassMode)
+	 * reads this one function, so those three can never disagree.
+	 */
+	function isModePanelOpen(mode: MolarMassMode): boolean {
+		if (mode !== activeMolarMassMode) return false;
+		if (mode === 'compounds') return compoundsPanelOpen;
+		return mode !== 'type-in';
+	}
+
 	function activeMolarMassModePanel(): HTMLElement | null {
-		return MOLAR_MASS_MODE_PANELS.find(p => p.mode === activeMolarMassMode)?.el ?? null;
+		const entry = MOLAR_MASS_MODE_PANELS.find(p => p.mode === activeMolarMassMode);
+		return entry && isModePanelOpen(entry.mode) ? entry.el : null;
 	}
 
 	// Same reposition-don't-close handling the mode listbox uses: a panel is
@@ -1389,7 +1380,7 @@ import Layout from '../layouts/Layout.astro';
 	/** Show/hide the mode panels for the active mode, restoring their contents. */
 	function syncMolarMassModePanels() {
 		for (const { mode, el } of MOLAR_MASS_MODE_PANELS) {
-			el?.classList.toggle('hidden', mode !== activeMolarMassMode);
+			el?.classList.toggle('hidden', !isModePanelOpen(mode));
 		}
 		const panel = activeMolarMassModePanel();
 		if (!panel) {
@@ -1422,19 +1413,23 @@ import Layout from '../layouts/Layout.astro';
 	}
 
 	/**
-	 * The one place all three dismiss paths (Escape, click-outside, the panel's
-	 * own close button) converge. Switching to Type in — not merely hiding the
-	 * panel — is what keeps the mode trigger's label, #molar-mass's readOnly
-	 * state, and the stepper's visibility in sync with what's on screen; see
-	 * setActiveMolarMassMode(). A no-op while Type in is already active (the
-	 * Escape/outside-click listeners are only attached while a panel is open,
-	 * but the close button's own handler calls this directly and gets this
-	 * guard for free).
+	 * The one place a FULL dismiss (as opposed to Compounds' auto-close, which
+	 * deliberately stays in Compounds mode — see compoundsPanelOpen) converges:
+	 * Escape, click-outside, and toggle-close (re-clicking the active mode's
+	 * own dropdown option) all call this. Switching to Type in — not merely
+	 * hiding the panel — is what keeps the mode trigger's label,
+	 * #molar-mass's readOnly state, and the stepper's visibility in sync with
+	 * what's on screen; see setActiveMolarMassMode(). A no-op while Type in is
+	 * already active (the Escape/outside-click listeners are only attached
+	 * while a panel is open, but a stray call — e.g. from a toggle-close guard
+	 * that already checked — gets this for free rather than needing its own).
 	 *
 	 * Does NOT touch molarMassModeStates: closing only re-points which slot
 	 * #molar-mass views, exactly like picking "Type in" from the dropdown
 	 * always has — the build-custom/compounds slot the user leaves behind is
 	 * untouched and is what restores their exact prior selection on return.
+	 * This is the one rule every dismiss path in this file must hold: closing
+	 * a panel is a mode switch, never a reset.
 	 */
 	function closeMolarMassModePanel() {
 		if (activeMolarMassMode === 'type-in') return;
@@ -1530,7 +1525,31 @@ import Layout from '../layouts/Layout.astro';
 	function selectMolarMassMode(index: number) {
 		const opt = molarMassModeOptions[index];
 		if (!opt) return;
+
+		// Toggle-close: picking the ALREADY-active mode's own option again is
+		// not a mode change (activeMolarMassMode wouldn't move), so it means
+		// something else instead. For a mode whose panel is open, that's
+		// "close it" — same effect as Escape/click-outside. For Compounds
+		// specifically, its panel can be active-but-collapsed (auto-closed on
+		// a pick — see compoundsPanelOpen), and re-picking "Compounds" there
+		// has nothing open to toggle closed, so it reopens instead. Build
+		// custom has no collapsed state, so it only ever takes the close leg.
+		if (opt.mode === activeMolarMassMode && opt.mode !== 'type-in') {
+			if (isModePanelOpen(opt.mode)) {
+				closeMolarMassModePanel();
+			} else {
+				compoundsPanelOpen = true;
+				syncMolarMassModePanels();
+			}
+			closeMolarMassModeListbox();
+			return;
+		}
+
 		activeMolarMassMode = opt.mode;
+		// Entering Compounds fresh (from a different mode) always starts
+		// expanded — compoundsPanelOpen only ever gets set false by an
+		// auto-close, and a fresh entry has nothing to have auto-closed yet.
+		if (opt.mode === 'compounds') compoundsPanelOpen = true;
 		if (molarMassModeLabel) molarMassModeLabel.textContent = opt.label;
 		// The stepper ("+") only makes sense while typing a value directly —
 		// hidden for Build custom/Compounds, whose panels (stages 3-4) will
@@ -2145,15 +2164,20 @@ import Layout from '../layouts/Layout.astro';
 	// #molar-mass-compounds-panel). No trigger and no open-on-demand: the mode
 	// dropdown already chose this mode, so the list is simply present while it is
 	// active, and the panel element itself is the focusable listbox that carries
-	// aria-activedescendant. It IS dismissible, though — see
-	// closeMolarMassModePanel() below, wired to Escape, click-outside, and the
-	// panel's own close button.
+	// aria-activedescendant. It IS dismissible — see closeMolarMassModePanel(),
+	// wired to Escape, click-outside, and toggle-close (re-picking "Compounds"
+	// from the dropdown while it's already active).
 	//
-	// Selecting writes the compounds slot and stops there — setModeValue() puts
-	// the mass in #molar-mass and announces the recalc. Selecting deliberately
-	// does NOT close the panel on its own: a selection and a dismissal are
-	// different intents, and closing on every pick would turn "compare two
-	// compounds" into a two-step "reopen, then pick" action each time.
+	// Selecting writes the compounds slot AND auto-closes, unlike Build custom:
+	// a compound pick is a complete answer on its own (unlike a tile pick, one
+	// of several in progress), so there's nothing left to stay open for. The
+	// close here is deliberately NOT closeMolarMassModePanel() — that switches
+	// back to Type in, which would show Type in's own (unrelated, possibly
+	// empty) slot and undo the fill in the same tick it happened. Collapsing
+	// compoundsPanelOpen instead keeps activeMolarMassMode on 'compounds', so
+	// #molar-mass keeps showing exactly what was just picked. Re-picking
+	// "Compounds" from the dropdown reopens it — see the toggle-close branch
+	// in selectMolarMassMode().
 	compoundsPicker = createPresetListbox({
 		listboxEl: molarMassCompoundsPanel,
 		idPrefix: 'molar-mass-compound',
@@ -2169,6 +2193,8 @@ import Layout from '../layouts/Layout.astro';
 				molarMass: preset.molarMass,
 			});
 			compoundsPanelWriting = false;
+			compoundsPanelOpen = false;
+			syncMolarMassModePanels();
 		},
 	});
 
@@ -2221,31 +2247,15 @@ import Layout from '../layouts/Layout.astro';
 	// the same "innermost popup closes first" reasoning as the trigger's own
 	// Escape case: there's no nested popup to prefer here, so it always reaches
 	// the panel. Deliberately not scoped to the search input's own keydown
-	// (which would miss Escape while focus is on a tile or the close button) or
-	// suppressed while the search box has text (which would take two Escapes
-	// to leave a filtered panel) — a single Escape from anywhere in the panel
-	// always dismisses it, matching the compounds panel and the mode dropdown.
-	// The search text itself isn't lost: it's DOM state on the input, not part
-	// of the build-custom slot, so it's still there if this mode is reopened.
+	// (which would miss Escape while focus is on a tile) or suppressed while
+	// the search box has text (which would take two Escapes to leave a
+	// filtered panel) — a single Escape from anywhere in the panel always
+	// dismisses it, matching the compounds panel and the mode dropdown. The
+	// search text itself isn't lost: it's DOM state on the input, not part of
+	// the build-custom slot, so it's still there if this mode is reopened.
 	molarMassBuildPanel?.addEventListener('keydown', (e) => {
 		if (e.key !== 'Escape') return;
 		e.preventDefault();
-		closeMolarMassModePanel();
-		molarMassModeTrigger?.focus();
-	});
-
-	// Close (X) buttons. Click only (Enter/Space already reach them as native
-	// <button> activation) — refocus the trigger afterward so keyboard focus
-	// lands somewhere real rather than on a button that just hid itself, same
-	// as the Escape handlers above. Click-outside deliberately does NOT do
-	// this: handleMolarMassModePanelOutsideClick() fires because the user's
-	// click landed somewhere else on the page, and that's where their focus
-	// should stay.
-	document.getElementById('molar-mass-build-panel-close')?.addEventListener('click', () => {
-		closeMolarMassModePanel();
-		molarMassModeTrigger?.focus();
-	});
-	document.getElementById('molar-mass-compounds-panel-close')?.addEventListener('click', () => {
 		closeMolarMassModePanel();
 		molarMassModeTrigger?.focus();
 	});
