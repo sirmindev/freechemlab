@@ -257,6 +257,7 @@ components:
     boxShadow: "inset 0 0 0 0.5px {colors.hairline}"
     zIndex: 10
     position: "fixed — an overlay, out of flow, placed off the Molar Mass control's rect in JS"
+    maxHeight: "computed in JS from remaining viewport space below the control (not a fixed value) — see 'Reachability at short viewports' below"
   panel-mode-compounds:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
@@ -555,6 +556,17 @@ The deduction chain from `main` is: `896 − 32 (main px-4) − 0 (card edge, bo
 - Measure this by narrowing the column until `scrollWidth > clientWidth` on the name, not by summing the parts. The name span reports its *content* width whenever there is room to spare, so reading its rendered width tells you nothing about remaining headroom — that mistake made an 8px gain look like no gain at all.
 - **4-up does not fit and cannot be made to fit by shrinking type.** At 4-up the panel yields 183px columns, of which the fixed furniture (chip, stepper, padding, gaps) consumes 152px, leaving **31px** for the name against the 85px it needs. Fitting "Molybdenum" into 31px requires roughly a 5.1px font — well under half the system's 12px floor. Even deleting the stepper's border and shrinking it to 60px only buys a 8.6px font. 4-up needs a grid about **924px** wide; this grid is **712px** — further from 4-up than the old accordion panel was, not closer. The 4-column mockup is drawn on a wider canvas than the app's actual panel and only ever shows "Hydrogen", which is 62px — comfortably inside a width that "Molybdenum" overruns by 23px. (These 183px/924px figures predate the conversion and were not re-measured — the conclusion "4-up does not fit" is unaffected by a 4px shift of this size, but the exact numbers are not re-verified.)
 - If the column rule is ever revisited, measure against **"Molybdenum" with the stepper mounted**, not against "Hydrogen" and not against the unselected tile. Sizing to either of those is exactly the error that produced a 5-up, then a 3-up, then a 4-up estimate that each failed on contact with real content.
+
+#### Reachability at short viewports
+
+This was a real, reproducible bug, not theoretical: at a 1280×768 or 1280×800 viewport — common laptop heights — the Build custom panel's natural content height (search + grid + readout + button, up to **~560px measured**) put "Use this molar mass" below the fold, with `locator.click()` failing with "element is outside of the viewport." Since that button is the **only** way to close this panel (see Dismissal), an unreachable button was a dead end, not a cosmetic clip.
+
+The panel does not grow the document to make room (it is `position: fixed`, per "Mode panels" under Collapsing Strategy below), so the fix is the same shape as `SCROLLBAR_RESERVE` above: cap and scroll internally rather than let content dictate the box.
+
+- `positionMolarMassModePanel()` sets an inline `max-height` on `#molar-mass-build-panel` itself — live-measured as `window.innerHeight − (panel's own top) − 16px bottom gutter`, recomputed on every open/scroll/resize alongside its top/left/width. On a viewport tall enough that content already fits, this number exceeds the content's natural height, so it has **no visible effect** — it only ever binds when space is actually tight.
+- The panel is `flex flex-col`. Everything **except** the button (search input, element grid, formula/mass readout) lives inside `#molar-mass-build-panel-scroll`, a flex child with `min-h-0 overflow-y-auto` — `min-h-0` because a flex item's default `min-height: auto` refuses to shrink below its content size, the standard trap that would otherwise make the outer `max-height` cap useless. The button is a **sibling** of that wrapper, not inside it, with `shrink-0` so it can never lose height to the scroll region competing for space — it is pinned, not scrolled.
+- The element grid's own `max-h-[320px]` (`element-grid-scroll`, see "The scrollbar reserve" above) is untouched and nests inside the new scroll wrapper; the two scroll regions don't conflict because at any given content size at most one of them is actually scrollable.
+- **Compounds' `panel-mode-compounds` was deliberately left alone.** Its `max-h-72` is a plain, static Tailwind class, and it wasn't reported as a reachability problem — it has no button to strand, since selecting a compound both fills the value and (via toggle-click / click-outside) is not the only way to dismiss it. Don't generalize this fix onto it without a reason.
 
 ### Whitespace Philosophy
 The warm canvas is the whitespace. Sections separate by lifting onto a surface, not by large gaps. There are two separate rhythm tiers, and they are not interchangeable:

@@ -1565,9 +1565,13 @@ test.describe('Molar Mass mode panels – dismissal', () => {
   }
 
   // The panel's own content (search + grid + readout + button) can exceed a
-  // short viewport, and it doesn't grow the document to compensate (see the
-  // "overlays, not in-flow blocks" note in DESIGN.md) — so any test that
-  // needs to actually click the button sets a tall enough viewport first.
+  // short viewport, and the panel doesn't grow the document to compensate
+  // (see the "overlays, not in-flow blocks" note in DESIGN.md) — the panel
+  // now caps its own height and scrolls #molar-mass-build-panel-scroll
+  // internally instead, keeping the button pinned and reachable at any
+  // viewport height (see the short-viewport test below). TALL is used in the
+  // tests below anyway: they aren't testing that behavior, and a viewport
+  // with obviously enough room keeps them from having to think about it.
   const TALL = { width: 1280, height: 1000 };
 
   // ── Build custom: "Use this molar mass" is the ONLY close path ──
@@ -1686,6 +1690,32 @@ test.describe('Molar Mass mode panels – dismissal', () => {
     await page.locator('#molar-mass-element-search').press('o');
 
     await expect(page.locator(BUILD_PANEL)).toBeVisible();
+    expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('build-custom');
+  });
+
+  // At a short viewport the panel's natural content height (up to ~560px)
+  // doesn't fit below the control, and the button is the ONLY way to close
+  // the panel — this is the regression test for that: the button must stay
+  // visible and clickable without the test itself resizing the window mid-
+  // way to work around it. astro-dev-toolbar is a dev-server-only overlay
+  // (not present in a production build — see `npx astro build`'s output)
+  // that also pins itself to the bottom of the viewport and, at this height,
+  // sits over the same area; it's a test-environment artifact of running
+  // against `astro dev`, not part of the app, so it's removed here rather
+  // than worked around in app code.
+  test('"Use this molar mass" stays visible and clickable at a short (768px) viewport', async ({ page }) => {
+    await goto(page);
+    await page.setViewportSize({ width: 1280, height: 768 });
+    await page.evaluate(() => document.querySelector('astro-dev-toolbar')?.remove());
+    await pickMode(page, 'Build custom');
+    await selectElement(page, 'O');
+
+    const button = page.locator('#molar-mass-build-panel-use');
+    await expect(button).toBeVisible();
+    await expect(button).toBeInViewport();
+    await button.click();
+
+    await expect(page.locator(BUILD_PANEL)).toBeHidden();
     expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('build-custom');
   });
 

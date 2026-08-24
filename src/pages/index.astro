@@ -349,39 +349,54 @@ import Layout from '../layouts/Layout.astro';
 				     slot, so every tile click already lands in the field — "Use this
 				     molar mass" below is a close action, not a commit. The Formula /
 				     Molar Mass readout and the button are both z-10, under the mode
-				     listbox's z-20, so opening the mode dropdown still draws over them. -->
-				<div id="molar-mass-build-panel" class="hidden fixed z-10 bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-[16px] mobile:p-5">
-					<input
-						type="search"
-						id="molar-mass-element-search"
-						aria-label="Search elements"
-						placeholder="Search by name or symbol…"
-						class="w-full bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] pl-3 pr-3 py-[12px] mobile:py-[10px] mb-4 focus:outline-none focus:inset-ring-primary focus:ring-1 focus:ring-brand-green transition-all"
-					/>
+				     listbox's z-20, so opening the mode dropdown still draws over them.
 
-					<div id="molar-mass-element-grid-scroll" class="element-grid-scroll max-h-[320px] overflow-y-auto rounded-[8px] mb-4">
-						<!-- Columns are computed to whole pixels by this instance's layout() -->
-						<div id="molar-mass-element-grid" class="grid gap-2">
-							<!-- Rendered by JS -->
-						</div>
-					</div>
-					<p id="molar-mass-element-grid-empty" class="hidden text-xs text-stone text-center py-4">No elements match your search.</p>
+				     `flex flex-col` + the inline `max-height` positionMolarMassModePanel()
+				     sets on this element (live-measured against the actual remaining
+				     viewport space below it, same idea as its top/left/width): on a short
+				     viewport the panel's natural content height (up to ~560px) can put
+				     the button below the fold, and that button is now the ONLY way to
+				     close the panel — unreachable is a dead end, not cosmetic. The cap
+				     applies to this element; #molar-mass-build-panel-scroll below (a flex
+				     item with min-h-0, the standard trick to let a flex child actually
+				     shrink under its content size) is what visibly scrolls, while the
+				     button — a sibling, not inside it — stays pinned below. On any
+				     viewport tall enough for the content to already fit, the computed cap
+				     is larger than the content ever gets, so this has no visible effect. -->
+				<div id="molar-mass-build-panel" class="hidden fixed z-10 flex flex-col bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-[16px] mobile:p-5">
+					<div id="molar-mass-build-panel-scroll" class="min-h-0 overflow-y-auto">
+						<input
+							type="search"
+							id="molar-mass-element-search"
+							aria-label="Search elements"
+							placeholder="Search by name or symbol…"
+							class="w-full bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] pl-3 pr-3 py-[12px] mobile:py-[10px] mb-4 focus:outline-none focus:inset-ring-primary focus:ring-1 focus:ring-brand-green transition-all"
+						/>
 
-					<!-- Formula / Molar Mass readout. Only two items, so they fit side by
-					     side at every width — no `flex-col mobile:flex-row` stack is needed
-					     below 520px. The button below is its own row rather than a third
-					     item here, on purpose: folding it into this row is what forced the
-					     old accordion's version of it to go full-width and stack below
-					     520px, which this design deliberately avoided when the row was
-					     simplified down to two items. -->
-					<div class="mt-4 pt-4 border-t border-hairline-soft flex items-center justify-between gap-3">
-						<div>
-							<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Formula</span>
-							<span id="molar-mass-custom-formula" class="text-base font-medium font-mono text-ink">—</span>
+						<div id="molar-mass-element-grid-scroll" class="element-grid-scroll max-h-[320px] overflow-y-auto rounded-[8px] mb-4">
+							<!-- Columns are computed to whole pixels by this instance's layout() -->
+							<div id="molar-mass-element-grid" class="grid gap-2">
+								<!-- Rendered by JS -->
+							</div>
 						</div>
-						<div class="text-right">
-							<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Molar Mass</span>
-							<span id="molar-mass-custom-mass" class="text-base font-medium font-mono text-ink">—</span>
+						<p id="molar-mass-element-grid-empty" class="hidden text-xs text-stone text-center py-4">No elements match your search.</p>
+
+						<!-- Formula / Molar Mass readout. Only two items, so they fit side by
+						     side at every width — no `flex-col mobile:flex-row` stack is needed
+						     below 520px. The button below is its own row rather than a third
+						     item here, on purpose: folding it into this row is what forced the
+						     old accordion's version of it to go full-width and stack below
+						     520px, which this design deliberately avoided when the row was
+						     simplified down to two items. -->
+						<div class="mt-4 pt-4 border-t border-hairline-soft flex items-center justify-between gap-3">
+							<div>
+								<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Formula</span>
+								<span id="molar-mass-custom-formula" class="text-base font-medium font-mono text-ink">—</span>
+							</div>
+							<div class="text-right">
+								<span class="block text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle mb-2">Molar Mass</span>
+								<span id="molar-mass-custom-mass" class="text-base font-medium font-mono text-ink">—</span>
+							</div>
 						</div>
 					</div>
 
@@ -394,11 +409,13 @@ import Layout from '../layouts/Layout.astro';
 					     custom" from the dropdown are all explicitly wired to leave this
 					     panel open — see handleMolarMassModePanelOutsideClick() and the
 					     toggle-click branch in selectMolarMassMode() — because several tile
-					     picks in a row, not one, is the normal flow here. -->
+					     picks in a row, not one, is the normal flow here. `shrink-0`: it is
+					     a flex item of the panel too, and must never lose height to the
+					     scroll region above it fighting for space. -->
 					<button
 						type="button"
 						id="molar-mass-build-panel-use"
-						class="mt-4 w-full py-3 px-5 rounded-full bg-brand-green text-on-primary text-sm font-medium hover:bg-brand-green-deep cursor-pointer transition-all"
+						class="mt-4 w-full shrink-0 py-3 px-5 rounded-full bg-brand-green text-on-primary text-sm font-medium hover:bg-brand-green-deep cursor-pointer transition-all"
 					>
 						Use this molar mass
 					</button>
@@ -1348,6 +1365,28 @@ import Layout from '../layouts/Layout.astro';
 		panel.style.top = `${wrapRect.bottom}px`;
 		panel.style.left = `${wrapRect.left}px`;
 		panel.style.width = `${rowRect.width - outerPad * 2}px`;
+
+		// Build custom only: its own content (search + element grid + formula
+		// readout) can be taller than a short viewport has room for below the
+		// control, and its "Use this molar mass" button is the ONLY way to
+		// close the panel — unreachable is a dead end, not cosmetic. Cap the
+		// panel's own height to whatever room is actually left below it (minus
+		// a bottom gutter matching the panel's own 16px base padding), same
+		// live-measured approach as top/left/width above. The cap lands on
+		// #molar-mass-build-panel itself; its flex-col + the scroll wrapper's
+		// min-h-0 (see the markup comment) is what turns "panel capped" into
+		// "the scroll region shrinks, the button doesn't". On a viewport tall
+		// enough for the content to already fit, this number is larger than
+		// the content ever gets, so it has no visible effect — recomputed here
+		// (not a fixed Tailwind max-h-*, unlike element-grid-scroll's own
+		// max-h-[320px]) because, unlike that inner grid, THIS panel's on-page
+		// position moves with page scroll instead of being fixed at 0.
+		// Compounds is deliberately left alone: its max-h-72 is a plain
+		// Tailwind class and was not reported as a reachability problem.
+		if (panel.id === 'molar-mass-build-panel') {
+			const bottomGutter = 16;
+			panel.style.maxHeight = `${Math.max(window.innerHeight - wrapRect.bottom - bottomGutter, 0)}px`;
+		}
 	}
 
 	/**
