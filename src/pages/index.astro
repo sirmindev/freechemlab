@@ -580,6 +580,108 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 
 		</section>
+
+		<!-- Explainer / theory section. Four teaching blocks in learning order:
+		     definition + formula, then the formula as a visual, then a live worked
+		     example that reads the calculator's own state (see the script at the
+		     end of this file), then the common mistakes, which are placed last
+		     because they only land once the mechanism is understood. -->
+		<!-- Horizontal padding mirrors the calculator card's own p-[16px]/mobile:p-6
+		     so the section's content edge lines up with the card's interior content
+		     (the h1), not the card's outer edge. -->
+		<section class="mt-12 px-4 mobile:px-6" aria-labelledby="understanding-moles-heading">
+			<h2 id="understanding-moles-heading" class="text-xl font-semibold text-ink">
+				Understanding Moles
+			</h2>
+
+			<div class="mt-6 flex flex-col">
+				<!-- 1 · Definition + formula -->
+				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
+						What a mole is
+					</h3>
+					<p class="text-base text-ink-muted">
+						A mole is 6.022 &times; 10<sup>23</sup> particles of a substance. It is the
+						bridge between a mass you can weigh and the number of molecules that
+						actually react. To find how many moles you have, divide the mass in grams
+						by the molar mass in grams per mole.
+					</p>
+					<p class="font-mono text-[15px] font-medium text-ink">n = m / M</p>
+				</div>
+
+				<!-- 2 · The formula as a visual + scale anchor -->
+				<div class="flex flex-col gap-4 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
+						The formula as a triangle
+					</h3>
+					<div class="bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-5 flex flex-col gap-5">
+						<div class="flex flex-col mobile:flex-row mobile:items-center gap-4">
+							<svg class="shrink-0" width="116" height="100" viewBox="0 0 116 100" fill="none" aria-hidden="true">
+								<path d="M58 6 L110 94 L6 94 Z" stroke="var(--color-hairline-tertiary)" stroke-width="1.5" stroke-linejoin="round" />
+								<line x1="32" y1="50" x2="84" y2="50" stroke="var(--color-hairline-tertiary)" stroke-width="1.5" />
+								<line x1="58" y1="50" x2="58" y2="94" stroke="var(--color-hairline-tertiary)" stroke-width="1.5" />
+								<text x="58" y="38" text-anchor="middle" class="font-mono" font-size="18" font-weight="500" fill="var(--color-ink)">m</text>
+								<text x="40" y="80" text-anchor="middle" class="font-mono" font-size="18" font-weight="500" fill="var(--color-ink)">n</text>
+								<text x="76" y="80" text-anchor="middle" class="font-mono" font-size="18" font-weight="500" fill="var(--color-ink)">M</text>
+							</svg>
+							<p class="text-sm text-ink-muted">Cover the quantity you want and what is left is the formula. Cover <span class="font-mono text-ink">n</span> and you get <span class="font-mono text-ink">m / M</span>.</p>
+						</div>
+						<div class="border-t border-hairline pt-5">
+							<div class="font-mono text-[18px] font-medium text-ink whitespace-nowrap">6.022 &times; 10<sup>23</sup></div>
+							<p class="text-sm text-ink-muted mt-1">particles in one mole. One mole of water is about 18&nbsp;mL, roughly a tablespoon, and that spoonful holds 6.022&nbsp;&times;&nbsp;10<sup>23</sup> molecules.</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- 3 · Live worked example. Reads the calculator's current state. -->
+				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
+						A worked example, live
+					</h3>
+					<p class="text-base text-ink-muted">
+						This uses the values in the calculator above. Change the mass or the
+						molar mass and it updates.
+					</p>
+					<div class="rounded-[8px] bg-surface inset-ring-1 inset-ring-hairline p-4 font-mono text-ink overflow-x-auto">
+						<div id="xp1-formula" class="text-[18px] font-medium leading-snug whitespace-nowrap text-ink-tertiary">n = m / M</div>
+					</div>
+					<p id="xp1-note" class="text-sm text-ink-subtle">
+						Enter a mass and a molar mass above to see this worked out.
+					</p>
+				</div>
+
+				<!-- 4 · Common mistakes -->
+				<div class="flex flex-col gap-4 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-xs font-semibold uppercase tracking-[0.4px] text-ink-muted">
+						Common mistakes
+					</h3>
+					<p class="text-base text-ink-muted">
+						The formula <span class="font-mono text-ink">n = m / M</span> is simple.
+						Three things still trip people up.
+					</p>
+					<div class="flex flex-col gap-2">
+						<div class="flex items-start gap-2 rounded-[8px] bg-warning-soft px-3 py-2.5 text-sm text-brand-warning">
+							<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 3.5 1.5 21h21L12 3.5z M12 10v4 M12 17h.01" />
+							</svg>
+							<span>Atomic mass is one atom from the periodic table. Molar mass is the whole formula added up, so for a compound you cannot just read one element&rsquo;s value.</span>
+						</div>
+						<div class="flex items-start gap-2 rounded-[8px] bg-warning-soft px-3 py-2.5 text-sm text-brand-warning">
+							<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 3.5 1.5 21h21L12 3.5z M12 10v4 M12 17h.01" />
+							</svg>
+							<span>Subscripts multiply through the whole group: H&#8322;O has 2 hydrogens, so it&rsquo;s 2&times;1.008 + 16.00, not 1.008 + 16.00.</span>
+						</div>
+						<div class="flex items-start gap-2 rounded-[8px] bg-warning-soft px-3 py-2.5 text-sm text-brand-warning">
+							<svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 3.5 1.5 21h21L12 3.5z M12 10v4 M12 17h.01" />
+							</svg>
+							<span>Units have to match: type 500&nbsp;mg into a grams field and the answer is off by 1000&times; with no error shown.</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
 	</main>
 
 	<!-- Footer -->
@@ -2342,4 +2444,117 @@ import Layout from '../layouts/Layout.astro';
 	onBuildCustomStateChanged();
 	onCompoundsStateChanged();
 	syncMolarMassModePanels();
+</script>
+
+<script>
+	// ==========================================================================
+	// EXPLAINER SECTION, "A worked example, live" (subsection 3 of Understanding
+	// Moles). Reads the calculator's current state straight from the DOM, the same
+	// sources its own recalculate() reads:
+	//   • #molar-mass.value   raw string, incl. the value the mode dropdown writes
+	//                         for Compounds / Build custom
+	//   • #mass-input.value   the mass operand in g->mol mode
+	//   • #moles-input.value  the moles operand in mol->g mode
+	//   • the active unit pill in each set (.unit-pill-*.bg-brand-green -> data-unit)
+	//   • which direction toggle carries .bg-brand-green (#toggle-g-to-mol)
+	// then recomputes the substitution with the same units.ts helpers the
+	// calculator uses. It never writes calculator state.
+	// ==========================================================================
+	import {
+		calculateMolesWithUnits,
+		calculateMassWithUnits,
+		format6Decimals,
+		type MassUnit,
+		type MolesUnit,
+		type MolarMassUnit,
+	} from '../utils/units';
+
+	const xpFormula = document.getElementById('xp1-formula');
+	const xpNote = document.getElementById('xp1-note');
+
+	const xpMolarMass = document.getElementById('molar-mass') as HTMLInputElement | null;
+	const xpMass = document.getElementById('mass-input') as HTMLInputElement | null;
+	const xpMoles = document.getElementById('moles-input') as HTMLInputElement | null;
+	const xpGToMolToggle = document.getElementById('toggle-g-to-mol');
+
+	function xpSelectedUnit(marker: string, fallback: string): string {
+		return document.querySelector(`.${marker}.bg-brand-green`)?.getAttribute('data-unit') ?? fallback;
+	}
+
+	function renderWorkedExample() {
+		if (!xpFormula || !xpNote) return;
+
+		const gToMol = xpGToMolToggle?.classList.contains('bg-brand-green') ?? true;
+		const mmRaw = (xpMolarMass?.value ?? '').trim();
+		const mmVal = parseFloat(mmRaw);
+		const mmOk = mmRaw !== '' && !isNaN(mmVal) && mmVal > 0;
+		const mmUnit = xpSelectedUnit('unit-pill-mm', 'g/mol') as MolarMassUnit;
+		const massUnit = xpSelectedUnit('unit-pill-mass', 'g') as MassUnit;
+		const molesUnit = xpSelectedUnit('unit-pill-moles', 'mol') as MolesUnit;
+
+		// Empty state: show the plain formula, greyed, and let the note carry the
+		// prompt. No placeholder glyphs in the equation itself.
+		function showEmpty(symbolic: string, prompt: string) {
+			xpFormula!.textContent = symbolic;
+			xpFormula!.classList.add('text-ink-tertiary');
+			xpNote!.textContent = prompt;
+		}
+
+		if (gToMol) {
+			const massRaw = (xpMass?.value ?? '').trim();
+			const massVal = parseFloat(massRaw);
+			const massOk = massRaw !== '' && !isNaN(massVal) && massVal >= 0;
+
+			if (!mmOk || !massOk) {
+				showEmpty('n = m / M', 'Enter a mass and a molar mass above to see this worked out.');
+				return;
+			}
+
+			const n = calculateMolesWithUnits(massVal, massUnit, mmVal, mmUnit, molesUnit);
+			xpFormula.classList.remove('text-ink-tertiary');
+			xpFormula.innerHTML =
+				`n = ${massRaw} ${massUnit} / ${mmRaw} ${mmUnit} = ` +
+				`<span class="text-primary">${format6Decimals(n)} ${molesUnit}</span>`;
+			xpNote.textContent = 'Updates as you type or change units above.';
+		} else {
+			const molesRaw = (xpMoles?.value ?? '').trim();
+			const molesVal = parseFloat(molesRaw);
+			const molesOk = molesRaw !== '' && !isNaN(molesVal) && molesVal >= 0;
+
+			if (!mmOk || !molesOk) {
+				showEmpty('m = n × M', 'Enter a molar mass and a number of moles above to see this worked out.');
+				return;
+			}
+
+			const m = calculateMassWithUnits(molesVal, molesUnit, mmVal, mmUnit, massUnit);
+			xpFormula.classList.remove('text-ink-tertiary');
+			xpFormula.innerHTML =
+				`m = ${molesRaw} ${molesUnit} × ${mmRaw} ${mmUnit} = ` +
+				`<span class="text-primary">${format6Decimals(m)} ${massUnit}</span>`;
+			xpNote.textContent = 'Updates as you type or change units above.';
+		}
+	}
+
+	// Binding, belt-and-suspenders:
+	//  • direct 'input' listeners on the three calculator fields, so a value change
+	//    reaches this even if the bubbled event never gets to document;
+	//  • direct 'click' on the direction toggle and every unit pill;
+	//  • document-level 'input'/'click' as a catch-all (covers the mode dropdown,
+	//    which dispatches a bubbling 'input' on #molar-mass — see its own script);
+	//  • 'pageshow', so a Back/Forward bfcache restore re-syncs against the
+	//    restored input values without the module re-running.
+	// The calculator's own handlers are bound in an earlier module, so in the
+	// bubble phase they run first and the toggle/pill .bg-brand-green classes and
+	// #molar-mass value are already current by the time this fires.
+	[xpMolarMass, xpMass, xpMoles].forEach(el => el?.addEventListener('input', renderWorkedExample));
+	document
+		.querySelectorAll('#toggle-g-to-mol, #toggle-mol-to-g, .unit-pill-mm, .unit-pill-mass, .unit-pill-moles')
+		.forEach(el => el.addEventListener('click', renderWorkedExample));
+	['input', 'click'].forEach(evt => document.addEventListener(evt, renderWorkedExample));
+	window.addEventListener('pageshow', renderWorkedExample);
+
+	// Run now, and again next frame in case the calculator's init (earlier module)
+	// writes a restored/default value into a field after this point.
+	renderWorkedExample();
+	requestAnimationFrame(renderWorkedExample);
 </script>

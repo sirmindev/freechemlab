@@ -44,11 +44,14 @@
   --color-muted: #A8A498;
 
   /* ── Semantic ─────────────────────────────────────────────────── */
-  --color-error:      #C23B3B;
-  --color-error-soft: #FBEAEA;
+  --color-error:        #C23B3B;
+  --color-error-soft:   #FBEAEA;
+  --color-warning:      #8A5300;
+  --color-warning-soft: #FBF1E2;
 
-  /* Alias used by component classes */
-  --color-brand-error: #C23B3B;
+  /* Aliases used by component classes */
+  --color-brand-error:   #C23B3B;
+  --color-brand-warning: #8A5300;
 
   /* ── Typography ───────────────────────────────────────────────── */
   --font-sans: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

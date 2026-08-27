@@ -27,6 +27,8 @@ colors:
 
   error: "#C23B3B"
   error-soft: "#FBEAEA"
+  warning: "#8A5300"
+  warning-soft: "#FBF1E2"
 
 typography:
   page-title:
@@ -441,6 +443,8 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 ### Semantic
 - **Error** (`{colors.error}` #C23B3B): Validation error borders and inline error messages. 5.4:1 contrast on white, passes WCAG AA for normal text. Red appears nowhere else in the system.
 - **Error Soft** (`{colors.error-soft}` #FBEAEA): Tint background for error message blocks, if a filled treatment is ever needed.
+- **Warning** (`{colors.warning}` #8A5300): Advisory / caution copy and icons that are *not* validation errors — the explainer-section common-mistake callouts. A dark warm amber, held clearly apart from `{colors.error}` red so "watch out" never reads as "you did something wrong". 6.2:1 on white and 5.2:1 on `{colors.warning-soft}`, both pass WCAG AA for normal text. Never used on an input edge or a validation message — that is Error's exclusive role.
+- **Warning Soft** (`{colors.warning-soft}` #FBF1E2): Tint background for warning callout blocks, paired with `{colors.warning}` text and icon.
 
 ## Typography
 
@@ -911,7 +915,8 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 
 - Dark mode is not defined. The product ships light-only for now.
 - Animation and transition timings are not specified; 150–200ms ease is a reasonable default for state changes.
-- Success and warning semantic states are not defined, since the calculator has no success confirmation or warning condition. Add them only if a real use case appears.
+- A **success** semantic state is not defined — the calculator has no success confirmation. Add one only if a real use case appears.
+- A **warning** semantic state (`{colors.warning}` / `{colors.warning-soft}`) is now defined, for non-error advisory copy in the explainer/theory section (common-mistake callouts). It is deliberately not an input/validation state — see Semantic under Colors.
 - The explainer/theory section below the calculator has no component definitions yet — that section's design is deliberately deferred.
 - `{colors.surface-3}` and `{colors.surface-4}` both have consumers again and are no longer listed as unused headroom: `surface-3` fills `molar-mass-mode-trigger` (the left half of the fused Molar Mass control, one step up from the input beside it), and `surface-4` fills the element tile's symbol chip and stepper hover circle.
 - `{colors.primary-soft}` has exactly one consumer: the committed (`aria-selected="true"`) row in `compound-listbox`, paired with `{colors.primary-pressed}` text. That is the whole of its licensed use. Do not reach for it to "balance" the element tile's selected state — that state is deliberately edge-only — and do not reintroduce it on a single stepper button.
