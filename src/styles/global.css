@@ -144,4 +144,20 @@ input[type="search"]::-webkit-search-cancel-button {
     box-shadow: none;
     border: 1px solid CanvasText;
   }
+
+  /* Restore a keyboard focus indicator. Every interactive control in the app
+     sets `focus:outline-none` and signals focus with a `box-shadow: inset`
+     ring, which forced-colors mode drops — leaving no visible focus state at
+     all. This rule is unlayered (like the one above), so it outranks both
+     Tailwind's layered `outline-none` utility and the layered `focus:` ring
+     utilities regardless of their specificity. `Highlight` is the system
+     focus color. The offset is negative so the outline paints *inside* the
+     control: a positive offset would be clipped by `overflow: hidden`
+     ancestors (e.g. #molar-mass-mode-wrapper) and would also miss the app's
+     all-inset ring language. Sitting just inside the 1px CanvasText edge, the
+     2px Highlight band reads as a distinct colour against it. */
+  :focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
