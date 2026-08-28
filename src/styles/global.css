@@ -126,6 +126,30 @@ input[type="search"]::-webkit-search-cancel-button {
   display: none;
 }
 
+/* #molar-mass-mode-wrapper is a fused control: the opaque mode-trigger button
+   and the molar-mass input sit flush against its edges (flex, no padding), so
+   an `inset` box-shadow on the wrapper itself is painted underneath them and
+   never shows. The ring is carried by an ::after overlay instead — generated
+   last, so it paints on top of both children — pinned to the border box and
+   inheriting the shared radius. Rest / focus / error mirror the inset-ring
+   ladder used elsewhere; the error state keys off `inset-ring-error`, toggled
+   by the validation JS (which no longer needs a width class alongside it). */
+#molar-mass-mode-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--color-hairline);
+  transition: box-shadow 0.15s;
+}
+#molar-mass-mode-wrapper:focus-within::after {
+  box-shadow: inset 0 0 0 2px var(--color-primary);
+}
+#molar-mass-mode-wrapper.inset-ring-error::after {
+  box-shadow: inset 0 0 0 2px var(--color-error);
+}
+
 /* Windows High Contrast Mode (forced-colors) fallback for the site's
    border -> box-shadow:inset conversion (see DESIGN.md). `box-shadow` is
    treated as decorative and computes to `none` in forced-colors mode, while
@@ -138,9 +162,15 @@ input[type="search"]::-webkit-search-cancel-button {
    this fallback — none of them are safe to skip. A flat 1px CanvasText
    border is used regardless of which width/color state was active, since
    state no longer needs to reserve box-model space and there is nothing to
-   gain from reproducing the 1px/2px distinction here. */
+   gain from reproducing the 1px/2px distinction here.
+
+   #molar-mass-mode-wrapper is listed explicitly: its edge is painted by an
+   ::after box-shadow overlay (see above), not an inset-ring-* utility, so the
+   attribute selector alone would miss it and the fused control would lose its
+   boundary here. */
 @media (forced-colors: active) {
-  [class*="inset-ring-"] {
+  [class*="inset-ring-"],
+  #molar-mass-mode-wrapper {
     box-shadow: none;
     border: 1px solid CanvasText;
   }

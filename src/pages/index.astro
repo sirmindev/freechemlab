@@ -113,7 +113,7 @@ import Layout from '../layouts/Layout.astro';
 								     in the second <script> block below (activeMolarMassMode).
 								     Each non-typing mode has an overlay panel below this card:
 								     #molar-mass-build-panel and #molar-mass-compounds-panel. -->
-								<div id="molar-mass-mode-wrapper" class="flex items-stretch w-full rounded-[8px] overflow-hidden inset-ring-1 inset-ring-hairline focus-within:inset-ring-2 focus-within:inset-ring-primary transition-all">
+								<div id="molar-mass-mode-wrapper" class="relative flex items-stretch w-full rounded-[8px] overflow-hidden">
 									<button
 										type="button"
 										id="molar-mass-mode-trigger"
@@ -936,8 +936,9 @@ import Layout from '../layouts/Layout.astro';
 	// class, not a pseudo-class.
 	function clearAllErrors() {
 		molarMassError?.classList.add('hidden');
-		molarMassFieldWrapper?.classList.remove('inset-ring-error', 'inset-ring-2');
-		molarMassFieldWrapper?.classList.add('inset-ring-hairline', 'inset-ring-1');
+		// The wrapper's ring is an ::after overlay (see global.css) — resting vs
+		// error is just the presence of `inset-ring-error`, no width class needed.
+		molarMassFieldWrapper?.classList.remove('inset-ring-error');
 
 		// Only reset the hairline ring on mass/moles when they're the editable
 		// text-input — the readonly result-value has no box, and re-adding a
@@ -1040,8 +1041,7 @@ import Layout from '../layouts/Layout.astro';
 			if (molarMassError) {
 				molarMassError.classList.remove('hidden');
 			}
-			molarMassFieldWrapper?.classList.add('inset-ring-error', 'inset-ring-2');
-			molarMassFieldWrapper?.classList.remove('inset-ring-hairline', 'inset-ring-1');
+			molarMassFieldWrapper?.classList.add('inset-ring-error');
 			hasError = true;
 		}
 
