@@ -117,14 +117,28 @@ export const SEED_ELEMENTS: Element[] = [
 
 /**
  * Builds a chemical formula string from a map of element symbol → quantity.
- * Elements are ordered by atomic number (z), matching SEED_ELEMENTS order.
+ *
+ * Ordering:
+ *  - Formulas containing carbon use Hill notation: carbon first, then hydrogen,
+ *    then every remaining element alphabetically by symbol (e.g. C₆H₁₂O₆).
+ *  - Formulas without carbon keep atomic-number order (SEED_ELEMENTS order),
+ *    which leaves common compounds in their conventional, recognisable form
+ *    (H2O, NH3, NaCl) rather than the strict-alphabetical Hill form (ClNa, …).
  */
 export function buildFormula(quantities: Map<string, number>): string {
-  return SEED_ELEMENTS
+  const symbols = SEED_ELEMENTS
     .filter(el => (quantities.get(el.symbol) ?? 0) > 0)
-    .map(el => {
-      const qty = quantities.get(el.symbol)!;
-      return qty === 1 ? el.symbol : `${el.symbol}${qty}`;
+    .map(el => el.symbol);
+
+  if (symbols.includes('C')) {
+    const key = (sym: string) => (sym === 'C' ? '0' : sym === 'H' ? '1' : '2' + sym);
+    symbols.sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0));
+  }
+
+  return symbols
+    .map(sym => {
+      const qty = quantities.get(sym)!;
+      return qty === 1 ? sym : `${sym}${qty}`;
     })
     .join('');
 }

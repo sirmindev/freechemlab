@@ -1005,6 +1005,23 @@ test.describe('Molar Mass Build custom panel', () => {
     await expect(page.locator('#molar-mass-custom-mass')).toHaveText('18.015 g/mol');
   });
 
+  test('a carbon compound built in the grid renders in Hill order (C, then H)', async ({ page }) => {
+    await goto(page);
+    await pickMode(page, 'Build custom');
+
+    await selectElement(page, 'C');          // C ×1
+    await selectElement(page, 'H');          // H ×1
+    await stepElement(page, 'H', 'plus', 3); // H ×4
+
+    // Atomic-number order would give "H4C"; Hill notation puts carbon first.
+    await expect(page.locator('#molar-mass-custom-formula')).toHaveText('CH4');
+    expect(await getBuildCustom(page)).toEqual({
+      quantities: { C: 1, H: 4 },
+      formula: 'CH4',
+      molarMass: 16.043,
+    });
+  });
+
   test('the Molar Mass readout restores the trailing zeros the slot drops', async ({ page }) => {
     await goto(page);
     await pickMode(page, 'Build custom');
