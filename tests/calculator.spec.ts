@@ -323,8 +323,10 @@ test.describe('Element tile – selection model', () => {
     await expect
       .poll(() => tile.evaluate(n => getComputedStyle(n).boxShadow))
       .toContain('rgb(196, 192, 178) 0px 0px 0px 1px inset'); // hairline-tertiary
-    // Hover is edge-only — no fill, same as the selected state
-    expect(await tile.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgb(255, 255, 255)');
+    // Hover is edge-only — no fill, same as the selected state. The tile's
+    // resting fill is {colors.canvas} #FAF9F5 (a step below the #ffffff Build
+    // custom panel — see DESIGN.md Elevation & Depth), and hover must not touch it.
+    expect(await tile.evaluate(n => getComputedStyle(n).backgroundColor)).toBe('rgb(250, 249, 245)');
 
     // A selected tile must NOT fall back to the neutral hover edge
     await tile.locator('button').first().click();
@@ -453,9 +455,11 @@ test.describe('Element tile – selection model', () => {
       .toContain('rgb(2, 97, 62) 0px 0px 0px 1px inset');
     const bgAfter = await tile.evaluate(n => getComputedStyle(n).backgroundColor);
 
-    // Background is untouched white in both states
-    expect(bgBefore).toBe('rgb(255, 255, 255)');
-    expect(bgAfter).toBe('rgb(255, 255, 255)');
+    // Background is untouched in both states — {colors.canvas} #FAF9F5, the
+    // tile's resting fill (see DESIGN.md Elevation & Depth); selection moves
+    // the edge only.
+    expect(bgBefore).toBe('rgb(250, 249, 245)');
+    expect(bgAfter).toBe('rgb(250, 249, 245)');
     // Only the edge moves, hairline -> primary green
     expect(edgeBefore).toContain('rgb(229, 226, 218) 0px 0px 0px 1px inset');
   });

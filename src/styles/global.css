@@ -167,10 +167,16 @@ input[type="search"]::-webkit-search-cancel-button {
    #molar-mass-mode-wrapper is listed explicitly: its edge is painted by an
    ::after box-shadow overlay (see above), not an inset-ring-* utility, so the
    attribute selector alone would miss it and the fused control would lose its
-   boundary here. */
+   boundary here.
+
+   #molar-mass-build-panel is listed explicitly for the same reason: it carries
+   no edge in normal rendering (a drop shadow does the elevating — see the
+   overlay note in DESIGN.md), and a drop shadow computes to `none` here, so
+   without this it would render as an edgeless block floating over the card. */
 @media (forced-colors: active) {
   [class*="inset-ring-"],
-  #molar-mass-mode-wrapper {
+  #molar-mass-mode-wrapper,
+  #molar-mass-build-panel {
     box-shadow: none;
     border: 1px solid CanvasText;
   }

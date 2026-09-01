@@ -363,7 +363,7 @@ import Layout from '../layouts/Layout.astro';
 				     button — a sibling, not inside it — stays pinned below. On any
 				     viewport tall enough for the content to already fit, the computed cap
 				     is larger than the content ever gets, so this has no visible effect. -->
-				<div id="molar-mass-build-panel" class="hidden fixed z-10 flex flex-col bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-[16px] mobile:p-5">
+				<div id="molar-mass-build-panel" class="hidden fixed z-10 flex flex-col bg-surface-1 rounded-[12px] p-[16px] mobile:p-5 shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
 					<div id="molar-mass-build-panel-scroll" class="min-h-0 overflow-y-auto">
 						<input
 							type="search"
@@ -2076,17 +2076,17 @@ import Layout from '../layouts/Layout.astro';
 			// unselected state's — so neither state has to grow into the
 			// other. Desktop's 52px is unaffected; verified no height change
 			// there (the 24px stepper never exceeds the 52px floor).
-			card.className = 'flex min-h-[60px] mobile:min-h-[52px] items-center justify-between gap-2 rounded-md inset-ring-1 bg-surface p-2 transition-colors';
+			card.className = 'flex min-h-[60px] mobile:min-h-[52px] items-center justify-between gap-2 rounded-md inset-ring-1 bg-canvas p-2 transition-colors';
 
 			// Tile body — clicking it is the select action
 			const body = document.createElement('button');
 			body.type = 'button';
 			body.className = 'flex flex-1 min-w-0 items-center gap-3 text-left cursor-pointer select-none focus:outline-none';
 			body.innerHTML = `
-				<span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xs bg-surface-4 font-sans text-base font-medium leading-none text-ink">${el.symbol}</span>
+				<span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xs bg-surface-3 font-sans text-base font-medium leading-none text-ink">${el.symbol}</span>
 				<span class="flex min-w-0 flex-col gap-1">
 					<span class="truncate font-sans text-sm leading-none text-ink">${el.name}</span>
-					<span class="font-mono text-xs font-medium leading-none text-ink-subtle">${el.atomicWeight}</span>
+					<span class="font-mono text-xs font-medium leading-none text-ink-muted">${el.atomicWeight}</span>
 				</span>
 			`;
 
