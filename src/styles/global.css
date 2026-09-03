@@ -133,7 +133,14 @@ input[type="search"]::-webkit-search-cancel-button {
    last, so it paints on top of both children — pinned to the border box and
    inheriting the shared radius. Rest / focus / error mirror the inset-ring
    ladder used elsewhere; the error state keys off `inset-ring-error`, toggled
-   by the validation JS (which no longer needs a width class alongside it). */
+   by the validation JS (which no longer needs a width class alongside it).
+
+   Focus uses `:has(:focus-visible)`, not `:focus-within`: the app-wide focus
+   convention is a keyboard-only 2px inset primary ring (see DESIGN.md States &
+   Interaction). This wrapper IS the fused trigger+input control's ring — a
+   keyboard focus on EITHER child lights one ring around the whole control,
+   rather than each half drawing its own. A pointer click therefore shows no
+   ring here, matching every other control. */
 #molar-mass-mode-wrapper::after {
   content: "";
   position: absolute;
@@ -143,7 +150,7 @@ input[type="search"]::-webkit-search-cancel-button {
   box-shadow: inset 0 0 0 1px var(--color-hairline);
   transition: box-shadow 0.15s;
 }
-#molar-mass-mode-wrapper:focus-within::after {
+#molar-mass-mode-wrapper:has(:focus-visible)::after {
   box-shadow: inset 0 0 0 2px var(--color-primary);
 }
 #molar-mass-mode-wrapper.inset-ring-error::after {

@@ -152,6 +152,12 @@ components:
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     padding: "8px 12px"
+  pill-active-hover:
+    backgroundColor: "{colors.primary-hover}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "8px 12px"
   pill-active-pressed:
     backgroundColor: "{colors.primary-pressed}"
     textColor: "{colors.on-primary}"
@@ -184,6 +190,12 @@ components:
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     padding: "8px 12px"
+  toggle-direction-segment-active-hover:
+    backgroundColor: "{colors.primary-hover}"
+    textColor: "{colors.on-primary}"
+  toggle-direction-segment-active-pressed:
+    backgroundColor: "{colors.primary-pressed}"
+    textColor: "{colors.on-primary}"
   toggle-direction-segment-inactive:
     backgroundColor: "transparent"
     textColor: "{colors.ink-muted}"
@@ -193,6 +205,12 @@ components:
 
   button-primary:
     backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    padding: "12px 20px"
+  button-primary-hover:
+    backgroundColor: "{colors.primary-hover}"
     textColor: "{colors.on-primary}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
@@ -236,14 +254,15 @@ components:
   molar-mass-mode-wrapper:
     backgroundColor: "none — the wrapper holds the edge; its two children carry their own fills"
     rounded: "{rounded.md}"
-    boxShadow: "inset 0 0 0 1px {colors.hairline} at rest, 2px {colors.primary} on focus-within, 2px {colors.error} on error"
+    boxShadow: "inset 0 0 0 1px {colors.hairline} at rest, 2px {colors.primary} on `:has(:focus-visible)` (keyboard focus of the trigger OR the input — this wrapper is the fused control's single focus ring), 2px {colors.error} on error. Painted by an `::after` overlay, not an inset-ring utility — see global.css."
     overflow: "hidden — clips the trigger's square corners into the wrapper's radius"
   molar-mass-mode-trigger:
-    backgroundColor: "{colors.surface-3}"
+    backgroundColor: "{colors.surface-3} at rest, {colors.surface-2} on hover (hover-capable pointers only)"
     textColor: "{colors.ink}"
     typography: "{typography.body-sm}"
     padding: "12px left/12px right below 520px vertical 12px; 10px vertical at `mobile:` (≥520px) and up — pl-3 pr-2.5"
     border: "1px {colors.hairline} solid on the RIGHT edge only — the seam against the input, deliberately a real border, see Elevation & Depth"
+    focus: "no ring of its own — keyboard focus lights the shared wrapper ring above"
   molar-mass-mode-listbox:
     backgroundColor: "{colors.surface-1}"
     rounded: "{rounded.md}"
@@ -313,6 +332,12 @@ components:
     rounded: "50%"
     size: "24px"
     touchPadding: "10px"
+  element-tile-stepper-button-pressed:
+    backgroundColor: "{colors.hairline-strong} — one step darker than the surface-4 hover fill"
+    iconColor: "{colors.ink-muted} — unchanged, only the fill moves"
+    scope: "hover-capable pointers only — `[@media(hover:hover)]:group-active:`, matching field-stepper-pill-button-pressed"
+  element-tile-stepper-button-focus:
+    boxShadow: "inset 0 0 0 2px {colors.primary} — the app-wide focus-visible ring, carried on the painted chip (`group-focus-visible:`), not the transparent hit-box button"
 
   text-input:
     backgroundColor: "{colors.surface-1}"
@@ -362,6 +387,8 @@ components:
     iconColor: "{colors.ink-muted}"
     contrastVsIcon: "3.67:1"
     scope: "desktop/hover-capable only, but NOT free the way hover is — Tailwind's `active:`/`group-active:` compile to plain `&:active` with no media scoping, so pressed is wrapped explicitly: `[@media(hover:hover)]:group-active:`"
+  field-stepper-pill-button-focus:
+    boxShadow: "inset 0 0 0 2px {colors.primary} — the app-wide focus-visible ring (see States & Interaction). Carried on the inner painted span via `group-focus-visible:`, not on the transparent outer `<button>`, so it follows the chip's half-capsule shape rather than boxing the oversized hit area. Appears instantly (the span's `transition-colors` does not cover box-shadow) — standard for a focus ring."
   field-stepper-pill-button-disabled:
     iconColor: "{colors.ink-tertiary}"
     backgroundColor: "{colors.surface-4} — unchanged; only the icon color and cursor change, since a real `disabled` button never matches `:hover`/`:active` in any browser"
@@ -419,9 +446,9 @@ The accent is a deep forest green (`{colors.primary}` #02613E), chosen for its a
 ## Colors
 
 ### Brand & Accent
-- **Primary Green** (`{colors.primary}` #02613E): Active fills — direction toggle, active unit pills, primary buttons, focused input/wrapper edges, and the committed option in a listbox. White text on top (7.4:1 contrast, passes WCAG AAA).
-- **Primary Hover** (`{colors.primary-hover}` #0B7A4F): Lighter green for hover states on green fills.
-- **Primary Pressed** (`{colors.primary-pressed}` #04442C): Darker green for pressed/active states, and for text sitting on `{colors.primary-soft}`.
+- **Primary Green** (`{colors.primary}` #02613E): Active fills — direction toggle, active unit pills, primary buttons, the committed option in a listbox — and the keyboard `focus-visible` ring on every control (see States & Interaction). White text on top (7.4:1 contrast, passes WCAG AAA).
+- **Primary Hover** (`{colors.primary-hover}` #0B7A4F): Lighter green for **hover** on solid-fill green controls — direction toggle active segment, selected unit pills, `button-primary`. Distinct from Primary Pressed; do not wire `hover:` to the pressed token (an earlier build did).
+- **Primary Pressed** (`{colors.primary-pressed}` #04442C): Darker green for the **pressed** (`:active`) state of those same solid-fill green controls, and for text sitting on `{colors.primary-soft}`.
 - **Primary Soft** (`{colors.primary-soft}` #DCEEE4): **Currently unused — no consumers.** It previously tinted selected element tiles and, before that, the calculated-result field; both now signal state without a fill (see `element-tile-selected` and the Don't about the read-only signal below). It was also briefly the element tile's **+** hover fill, which was reverted so both stepper buttons hover identically. Retained as a token for a future selected-surface need — text on top would use `{colors.primary-pressed}`, never white.
 
 ### Surface
@@ -588,12 +615,12 @@ Prior to this being made consistent, the header row used a bespoke `pb-5` (20px)
 | 1 (card lift) | `{colors.surface-1}` on canvas, `box-shadow: inset 0 0 0 0.5px {colors.hairline}` | Calculator card, input interiors |
 | 2 (nested lift) | `{colors.surface-2}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}` | Field containers, result card |
 | 3 (sub-panel lift) | `{colors.surface-3}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}` | `molar-mass-mode-trigger`'s fill (no ring — its edge is the seam `border-right`) and the element tile's symbol chip (`element-tile-symbol`, no ring); the ring form is otherwise unused |
-| 4 (focus) | `box-shadow: inset 0 0 0 2px {colors.primary}` | Focused input |
+| 4 (focus) | `box-shadow: inset 0 0 0 2px {colors.primary}`, keyboard-only (`focus-visible:inset-ring-2 focus-visible:inset-ring-primary`) | The app-wide focus indicator — every focusable control, including `button-copy` (the ring is transient and keyboard-only, so it doesn't undermine the button's box-less *resting* state). The one exclusion is `result-value`, a read-only display value whose whole signal is the absence of a box; it and text links keep the native outline. See States & Interaction. |
 | 4 (error) | `box-shadow: inset 0 0 0 2px {colors.error}` | Errored input |
 | Overlay | `{colors.surface-1}` (#ffffff), `box-shadow: 0 4px 16px rgba(0,0,0,0.10)`, no border, no resting inset ring | Both mode panels — `panel-mode-build-custom` and `panel-mode-compounds`. The shared overlay treatment. (`panel-mode-compounds` additionally keeps a `focus-visible` 2px `{colors.primary}` inset ring, because it is itself the focusable listbox — see its component note.) |
 | Recess (inside the overlay) | `{colors.canvas}` (#FAF9F5), `box-shadow: inset 0 0 0 1px {colors.hairline}` (→ primary selected, → hairline-tertiary hover) | Element tiles inside the Build custom panel — the tile sits one step *below* its #ffffff panel, so it reads as a well rather than a lift. Its symbol chip is `{colors.surface-3}` (#EFEDE7), one step *below* the tile again — a shallow inset within the well, no ring. |
 
-**There are no drop shadows in this system, with one deliberate exception: the two Molar Mass mode panels.** Depth is otherwise carried entirely by the surface ladder plus hairline edges — if something needs to feel raised, it moves up a surface step, it does not gain a shadow. The mode panels (`panel-mode-build-custom`, `panel-mode-compounds`) are the exception because neither is a *nested* surface at all: each is a `position: fixed` overlay that floats out of flow over the calculator card, the unit pills, and the result block (see Cards & Panels → Mode panels). A surface step communicates "one level deeper in the same plane"; a mode panel is on a different plane, temporarily, and a soft drop shadow — `0 4px 16px rgba(0,0,0,0.10)` (started from `0 4px 12px rgba(0,0,0,0.08)` and nudged up slightly so it still reads on its own) — is what says so without reading as heavy. Both carry the shadow *instead of* a resting edge — no border, no resting inset ring. **The one difference:** `panel-mode-compounds` also keeps a `focus-visible:inset-ring-2 focus-visible:inset-ring-primary` ring, because that panel element *is* the focusable listbox (`tabindex="0" role="listbox"`) and needs a keyboard-focus cue of its own; the Build custom panel is never itself focused (focus lives on its inner search input and buttons) so it needs none. See the deviation note further down for the focus-visible rationale.
+**There are no drop shadows in this system, with one deliberate exception: the two Molar Mass mode panels.** Depth is otherwise carried entirely by the surface ladder plus hairline edges — if something needs to feel raised, it moves up a surface step, it does not gain a shadow. The mode panels (`panel-mode-build-custom`, `panel-mode-compounds`) are the exception because neither is a *nested* surface at all: each is a `position: fixed` overlay that floats out of flow over the calculator card, the unit pills, and the result block (see Cards & Panels → Mode panels). A surface step communicates "one level deeper in the same plane"; a mode panel is on a different plane, temporarily, and a soft drop shadow — `0 4px 16px rgba(0,0,0,0.10)` (started from `0 4px 12px rgba(0,0,0,0.08)` and nudged up slightly so it still reads on its own) — is what says so without reading as heavy. Both carry the shadow *instead of* a resting edge — no border, no resting inset ring. **The one difference:** `panel-mode-compounds` also carries the app-wide `focus-visible:inset-ring-2 focus-visible:inset-ring-primary` ring, because that panel element *is* the focusable listbox (`tabindex="0" role="listbox"`) — keyboard focus lands on the whole panel. The Build custom panel is never itself focused (focus lives on its inner search input and buttons, each of which carries the ring individually) so the container needs none. See the Compounds panel note under Cards & Panels for why this ring is load-bearing there specifically.
 
 **The Build custom panel is `{colors.surface-1}` (#ffffff), not a surface-ladder step.** When it was surface-2 the element tiles inside it (then #ffffff) sat *above* their container — tiles-on-a-darker-ground, the normal direction. The panel is now #ffffff and the tiles are `{colors.canvas}` (#FAF9F5): the relationship is inverted — the tile is a shallow well in the panel, its 1px hairline edge doing the separating, and the symbol chip (`{colors.surface-3}` #EFEDE7) is a further shallow inset within the tile. So inside this panel the ladder runs *downward* — #ffffff panel → #FAF9F5 tile → #EFEDE7 chip — which keeps the panel visually quiet (one flat white plane carrying the content) while the shadow alone marks it as the floating layer.
 
@@ -605,9 +632,11 @@ Prior to this being made consistent, the header row used a bespoke `pb-5` (20px)
 
 **A third exception existed here, and is now retired: `preset-select`'s real `border`.** The Presets dropdown was converted to `inset-ring-1 inset-ring-hairline` along with everything else, but native `<select>` chrome (`appearance: auto`) was found to override the box-shadow on real mobile engines, leaving the control edgeless there. A real `border border-hairline` was added back as the fix. A later pass added `appearance: none` (plus `-webkit-`/`-moz-` prefixes) to remove native chrome at the root cause, but the `border` was left in place rather than removed, and the two rendering together (a 1px border immediately followed by a 1px inset shadow, same hairline color, adjacent) doubled the visible edge to ~2px against every other converted control's 1px — fixed at the time by dropping `inset-ring-*` and keeping `border` as the sole edge mechanism, since that was the one already confirmed to survive native `<select>` chrome. **The native `<select>` itself is gone now** — it was replaced by a scripted `role="listbox"` (see `compound-listbox` under Inputs & Validation), which has no native chrome to fight in the first place. The Compounds mode panel that now hosts it no longer carries a resting `inset-ring` at all — it took the shared mode-panel drop shadow (see Elevation & Depth), keeping only a `focus-visible` primary ring. This paragraph is kept as a historical record of why the carve-out existed — if a real `<select>` (or any element with browser-owned chrome) is ever reintroduced, treat its edge as a fresh decision rather than assuming `inset-ring` will render reliably.
 
-**Implementation: Tailwind's `inset-ring-*` utilities, not a hand-rolled `shadow-[inset_...]` class.** Tailwind v4 composes `inset-ring-*` into the element's `box-shadow` via its own `--tw-inset-ring-shadow` variable, alongside (not overwriting) `shadow-*` and `ring-*`'s variables — confirmed by inspecting the compiled CSS, not assumed. This matters concretely on the element search input: it carries a focus `ring-1 ring-brand-green` (Tailwind's outset ring, a different box-shadow layer), and `inset-ring-1 inset-ring-hairline` → `focus:inset-ring-primary` composes with that ring cleanly. A hand-written `shadow-[inset_0_0_0_1px_...]` would instead have silently overwritten (or been overwritten by) the ring's own `box-shadow` declaration, since both would target the same CSS property directly with no shared variable to compose through. Width is `inset-ring-1`/`inset-ring-2`; color is `inset-ring-{hairline|hairline-tertiary|primary|error}`, reusing this file's existing color tokens (already wired into `@theme` in `global.css`, the same way `border-hairline` etc. worked before). `preset-select` no longer exists (see the retired border exception above), and nothing that replaced it carries a real border.
+**Implementation: Tailwind's `inset-ring-*` utilities, not a hand-rolled `shadow-[inset_...]` class.** Tailwind v4 composes `inset-ring-*` into the element's `box-shadow` via its own `--tw-inset-ring-shadow` variable, alongside (not overwriting) `shadow-*` and `ring-*`'s variables — confirmed by inspecting the compiled CSS, not assumed. A hand-written `shadow-[inset_0_0_0_1px_...]` would instead silently overwrite (or be overwritten by) any `shadow-*`/`ring-*` declaration on the same element, since both target the `box-shadow` property directly with no shared variable to compose through. Width is `inset-ring-1`/`inset-ring-2`; color is `inset-ring-{hairline|hairline-tertiary|primary|error}`, reusing this file's existing color tokens (already wired into `@theme` in `global.css`, the same way `border-hairline` etc. worked before). The rest and focus edges compose through one variable: `inset-ring-1 inset-ring-hairline` at rest, `focus-visible:inset-ring-2 focus-visible:inset-ring-primary` on keyboard focus. (The element search input briefly also carried an *outset* `focus:ring-1 ring-brand-green` on top of its inset ring — a second box-shadow layer — which was the original concrete example here; it was dropped when the focus indicator was unified to the single 2px inset ring. `preset-select` no longer exists either — see the retired border exception above.)
 
 **Windows High Contrast Mode (`forced-colors: active`).** `box-shadow` is treated as decorative and computes to `none` in this mode; `border` is treated as structural and is preserved. Every element converted above would lose its visible edge here — and since forced-colors mode also collapses this app's surface ladder (canvas/surface-1/surface-2/etc. all resolve toward the same system background), the edge is doing double duty as the only remaining cue that a container boundary exists at all. **All of them needed the fallback; none were safe to skip.** `global.css` adds one rule, `[class*="inset-ring-"] { box-shadow: none; border: 1px solid CanvasText; }`, scoped to `@media (forced-colors: active)` only — a flat 1px `CanvasText` border regardless of which width/color state was active, since state no longer needs to reserve box-model space and there's nothing to gain from reproducing the 1px/2px distinction in a mode where colors are already system-controlled. Two elements are added to that selector by id because they carry a real edge that is *also* a `box-shadow` (so it also computes to `none` here) without an `inset-ring-*` class for the attribute selector to catch: `#molar-mass-mode-wrapper` (its ring is painted by an `::after` overlay) and `#molar-mass-build-panel` (its edge is the drop shadow — the Elevation & Depth exception above; the fallback border is the WHCM-only substitute for that shadow, and does not contradict the "no border on this panel" rule, which is about normal rendering). `#molar-mass-compounds-panel` also elevates by drop shadow with no resting ring, but it is *not* added by id: it still carries `focus-visible:inset-ring-2 focus-visible:inset-ring-primary`, which the `[class*="inset-ring-"]` selector already matches, so it gets the WHCM `CanvasText` boundary for free. The excluded elements (`molar-mass-mode-trigger`'s real `border-right` and the structural dividers) need no fallback — they already render a real border natively, same as before. (`preset-select`'s real `border` used to be excluded here too; it's retired along with the element itself — see above.)
+
+**One consequence of unifying the focus indicator:** the `[class*="inset-ring-"]` selector matches on the class-name *substring*, so elements that carry only a `focus-visible:inset-ring-*` / `group-focus-visible:inset-ring-*` class — the two stepper chip families, the element-tile body button, the element search input, both `button-copy` buttons, `panel-mode-compounds` — now also get the flat `CanvasText` border in forced-colors mode, permanently, not just while focused. For a control that's the intended reading (a border communicates "interactive" in a mode with no surface ladder), and it's consistent with "every `inset-ring-*` user gets the fallback." It does mean a few more `CanvasText` outlines in WHCM than before the unification; that was accepted, not overlooked. (`button-copy` is the one place this slightly rubs against a resting-state rule — no box on the copy button — but only in forced-colors mode, where the surface ladder is gone and an outline on an actionable control is the right call anyway.)
 
 ## Shapes
 
@@ -628,11 +657,41 @@ Prior to this being made consistent, the header row used a bespoke `pb-5` (20px)
 
 > Hover states are documented only where they carry meaning. Default, active, pressed, focused, and error states are the priority.
 
+### States & Interaction
+
+Interactive controls follow **one** state system. A control belongs to one of three families and takes that family's hover/pressed treatment; the focus indicator and the transition are the same for all three.
+
+**1 · Solid-fill green controls** — direction toggle *active* segment, *selected* unit pills, `button-primary` ("Use this molar mass").
+- Rest `{colors.primary}` · hover `{colors.primary-hover}` (lighter) · pressed `{colors.primary-pressed}` (darker).
+- `{colors.primary-hover}` exists for exactly this — it is *not* `{colors.primary-pressed}`. An earlier build wired `hover:` straight to the pressed token and had no distinct pressed state; both are now correct.
+- Plain `active:` (not `@media (hover: hover)`-scoped) — a brief press flash on tap is correct button feedback.
+
+**2 · Hairline / chip controls** — *unselected* unit pills, field-stepper `+`/`−`, element-tile quantity `+`/`−`.
+- Unselected pills: rest transparent + hairline ring · hover `{colors.surface-2}` fill + `{colors.ink}` text.
+- Field steppers: chip rest `{colors.surface-4}` · hover `{colors.hairline-tertiary}` · pressed `{colors.ink-tertiary}`.
+- Element-tile steppers: chip rest transparent · hover `{colors.surface-4}` circle · pressed `{colors.hairline-strong}` (one step darker than the hover fill).
+- Hover is plain `hover:`/`group-hover:` (Tailwind already scopes those to `@media (hover: hover)` in this version). Pressed is `active:`/`group-active:`, which Tailwind does **not** scope, so it is wrapped explicitly: `[@media(hover:hover)]:group-active:` — a touch tap must not leave a stuck pressed fill.
+
+**3 · Listbox rows** — mode-dropdown options, compound options, element tiles.
+- Rows: highlighted (keyboard-active **or** hovered — one shared state, JS-driven, no `hover:` class) gets `{colors.surface-2}`; a committed compound row gets `{colors.primary-soft}` / `{colors.primary-pressed}` text; a selected element tile gets a `{colors.primary}` **edge only** (no fill — deliberately different from a flat row; it is a card).
+- All three carry a transition (see below) so the highlight fades rather than snaps.
+
+**Focus indicator — one convention, no per-control variation.**
+- `focus-visible:inset-ring-2 focus-visible:inset-ring-primary` — a 2px `{colors.primary}` inset ring, **keyboard-only** (`:focus-visible`, so a pointer click shows nothing).
+- Carried on the control itself, or — where the control is a transparent oversized hit-box around a smaller painted element (both stepper families) — on the painted child via `group-focus-visible:`, so the ring follows the visible shape.
+- The fused Molar Mass control's ring is the wrapper's `::after` (`#molar-mass-mode-wrapper:has(:focus-visible)`): keyboard focus on **either** the mode trigger or the input lights one ring around the whole control.
+- **One deliberate exclusion**: `result-value`, a read-only display value (implemented as `<input readonly>`) whose only read-only signal is the *absence* of a box. It keeps the browser's native focus outline. `button-copy` is **not** excluded — it is a real action button, so it takes the ring like every other button; the ring is keyboard-only and transient, so it does not compromise the button's box-less *resting* appearance (the read-only signal Don't is about the resting state).
+- **Links** (nav, breadcrumb, wordmark) also keep the native outline — the inset ring is for controls, not text links.
+- `:focus` is never used for a ring. `focus:outline-none` stays everywhere (it only suppresses the native outline; harmless under `:focus-visible`).
+
+**Transitions.** State changes animate over **150ms** with Tailwind's default ease (`cubic-bezier(0.4, 0, 0.2, 1)`); the hand-written `#molar-mass-mode-wrapper::after` ring uses `0.15s` CSS-default `ease`. No `duration-*`/`ease-*` utilities anywhere. Pick the transition property precisely: `transition-all` for fill/ring controls, `transition-colors` for text/background-only rows, `transition-shadow` for the element tile (its only animated property is the inset-ring edge, which is a `box-shadow` — `transition-colors` does not cover it). A focus-visible ring on a `transition-colors` element appears instantly, which is standard. Do not put a `transition-*` class on an element with no animated state change.
+
 ### Pills & Toggles
 
-**`pill-active`** — Selected state for unit selectors.
+**`pill-active`** — Selected state for unit selectors. A solid-fill green control — see States & Interaction.
 - Background `{colors.primary}`, text `{colors.on-primary}`, type `{typography.button}`, padding 8px 12px, rounded `{rounded.pill}`.
-- Pressed state `pill-active-pressed` darkens to `{colors.primary-pressed}`.
+- Hover state `pill-active-hover` lightens to `{colors.primary-hover}`; pressed state `pill-active-pressed` darkens to `{colors.primary-pressed}`.
+- `updatePillStyles()` rewrites the whole `className`, so the selected recipe (with its `hover:`/`active:` variants) and the unselected recipe never coexist on one pill.
 
 **`pill-inactive`** — Unselected state.
 - Transparent background, text `{colors.ink-muted}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, same padding and radius.
@@ -642,15 +701,16 @@ Prior to this being made consistent, the header row used a bespoke `pb-5` (20px)
 
 **`toggle-direction`** — The g→mol / mol→g mode switch in the card header. This is a distinct component, not a reuse of `pill-active`/`pill-inactive` — those toggle a single value (a unit); this toggles calculation direction and each segment always shows both units of that direction, joined by a chevron (e.g. "g › mol").
 - Container: transparent, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, rounded `{rounded.pill}`, 4px padding, 4px gap between the two segments.
-- `toggle-direction-segment-active`: background `{colors.primary}`, text `{colors.on-primary}`, padding 8px 12px, rounded `{rounded.pill}`.
-- `toggle-direction-segment-inactive`: transparent background, text `{colors.ink-muted}`, same padding and radius.
+- `toggle-direction-segment-active`: background `{colors.primary}`, text `{colors.on-primary}`, padding 8px 12px, rounded `{rounded.pill}`. Solid-fill green control (States & Interaction): hover `{colors.primary-hover}`, pressed `{colors.primary-pressed}`.
+- `toggle-direction-segment-inactive`: transparent background, text `{colors.ink-muted}`, same padding and radius. Hairline/chip control: hover fills `{colors.surface-2}`, text darkens to `{colors.ink}`.
+- `updateModeUI()` swaps the active and inactive class sets via a shared `setToggleSegment()` helper — the two sets are mutually exclusive, so the inactive hover fill can't compete with the active hover fill on whichever segment is currently active.
 - Icon: chevron-right, 16px box, between the two unit words. Its stroke inherits the segment's text color — white on the active segment, `{colors.ink-muted}` on the inactive one. It is not a separate color token.
 
 ### Buttons
 
 **`button-primary`** — Green pill. Its one consumer is the Build custom panel's "Use this molar mass" button — the same literal button that first defined this recipe, retired when the panel briefly had no confirm step, and brought back with a different job (see the panel-model note under Cards & Panels): closing the panel deliberately, not confirming a value.
 - Background `{colors.primary}`, text `{colors.on-primary}`, padding 12px 20px, rounded `{rounded.pill}`.
-- Pressed state darkens to `{colors.primary-pressed}`.
+- Solid-fill green control (States & Interaction): hover `button-primary-hover` lightens to `{colors.primary-hover}`, pressed `button-primary-pressed` darkens to `{colors.primary-pressed}`.
 
 **`button-secondary`** — Outlined pill for secondary actions (Clear, Reset).
 - Transparent background, text `{colors.ink}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`.
@@ -658,10 +718,13 @@ Prior to this being made consistent, the header row used a bespoke `pb-5` (20px)
 **`button-icon`** — 32×32px circular utility button (collapse, close).
 - Background `{colors.surface-2}`, icon `{colors.ink-subtle}`, `box-shadow: inset 0 0 0 0.5px {colors.hairline}`, rounded `{rounded.full}`.
 
-**`button-copy`** — Bare icon button aligned with the result *value* row, vertically centered on the big number — not the label row above it. Figma's exact node position confirms this (the icon sits centered on the value line's height, not the label's). No background, no border, no fill, and no badge or lock icon beside it — see the read-only signal Don't below.
+**`button-copy`** — Bare icon button aligned with the result *value* row, vertically centered on the big number — not the label row above it. Figma's exact node position confirms this (the icon sits centered on the value line's height, not the label's). No resting background, no border, no badge or lock icon beside it — see the read-only signal Don't below.
 - Icon: copy/duplicate glyph, outline style, matching the app's existing stroke-based icon set (`stroke="currentColor"`).
 - Empty state: `{colors.ink-tertiary}` #A8A498.
 - Filled state: `{colors.ink-muted}` #4A4842.
+- Hover (`button-copy-hover`, enabled state only, hover-capable pointers only): a `{colors.surface-2}` fill behind the icon — the same neutral hover token the listbox rows use. This is the one *resting-adjacent* fill on this button; there is still no fill at rest. The disabled/empty state stays flat.
+- Focus: takes the app-wide `focus-visible:inset-ring-2 focus-visible:inset-ring-primary` ring like every other button (`rounded-md`, keyboard-only). It's a real action button — the "no fill / no box" rule is about its *resting* state, and a transient keyboard-only ring doesn't touch that. (When empty the button is `disabled`, so it's out of the tab order and the ring can't appear anyway.)
+- The hover fill and the focus ring are independent: hover on click, ring on keyboard focus — a control needs both.
 - On click, copies the current result value (plain number, no unit label) to the clipboard. Disabled/non-interactive in the empty state, since there is nothing to copy.
 
 ### Cards & Panels
@@ -679,11 +742,12 @@ Prior to this being made consistent, the header row used a bespoke `pb-5` (20px)
 
 **Molar Mass mode selector** (`molar-mass-mode-wrapper` + `molar-mass-mode-trigger` + `molar-mass-mode-listbox`) — the fused dropdown on the left of the Molar Mass input. It replaces the earlier implicit "molar mass is always typed in" assumption with three explicit modes: **Type in**, **Build custom**, **Compounds**. This is the only way into the element picker and the compound picker; there is no separate entry point.
 
-- **Fused, not adjacent.** The wrapper is one rounded box carrying one edge (`inset-ring-1 inset-ring-hairline`, `focus-within:inset-ring-2 focus-within:inset-ring-primary`, `rounded-[8px]`, `overflow-hidden`), with the trigger and the input as its two children. Neither child carries a radius or an edge of its own — the wrapper's `overflow-hidden` is what rounds the trigger's outer corners. **The error ring moved with it:** validation styling targets `#molar-mass-mode-wrapper`, not `#molar-mass`. Retargeting it back to the input would draw a ring around the right-hand half only.
+- **Fused, not adjacent.** The wrapper is one rounded box carrying one edge (`rounded-[8px]`, `overflow-hidden`) whose ring is painted by an `::after` overlay in `global.css` — `inset 0 0 0 1px {colors.hairline}` at rest, 2px `{colors.primary}` on `:has(:focus-visible)`, 2px `{colors.error}` on the `.inset-ring-error` class. The `::after` mechanism (not an `inset-ring-*` utility) is required because the trigger and input sit flush against the wrapper's edges with opaque fills, so a shadow on the wrapper itself would paint underneath them. Neither child carries a radius or an edge of its own — the wrapper's `overflow-hidden` is what rounds the trigger's outer corners. **The error ring moved with it:** validation styling targets `#molar-mass-mode-wrapper`, not `#molar-mass`. Retargeting it back to the input would draw a ring around the right-hand half only.
+- **The wrapper ring is the fused control's single focus indicator.** `:has(:focus-visible)`, not `:focus-within` — keyboard focus on *either* the trigger or the input lights one 2px ring around the whole control; a pointer click shows nothing. The trigger and input carry no `focus-visible:` ring of their own; a ring on just one half would break the "reads as one control" intent. This is the app-wide focus convention (States & Interaction) applied to a two-element control.
 - **The seam between the two halves is a real `border-right` on the trigger**, deliberately not an inset shadow — see the exception note under Elevation & Depth.
-- Trigger: `{colors.surface-3}` fill (one step up from the input's `{colors.surface-1}`, so the two halves read as distinct controls), `{typography.body-sm}` in `{colors.ink}`, `pl-3 pr-2.5`, vertical padding matching `text-input` exactly (12px below 520px, 10px at `mobile:` and up) so both halves resolve to the same height. Trailing chevron is the same 6×10.5px glyph as everywhere else, permanently rotated 90°; it does not animate.
+- Trigger: `{colors.surface-3}` fill (one step up from the input's `{colors.surface-1}`, so the two halves read as distinct controls), `{colors.surface-2}` on hover (hover-capable pointers only — the one state fill on this control), `{typography.body-sm}` in `{colors.ink}`, `pl-3 pr-2.5`, vertical padding matching `text-input` exactly (12px below 520px, 10px at `mobile:` and up) so both halves resolve to the same height. Trailing chevron is the same 6×10.5px glyph as everywhere else, permanently rotated 90°; it does not animate.
 - **Pattern:** ARIA APG "Collapsible Dropdown Listbox" (select-only combobox). `<button role="combobox" aria-haspopup="listbox" aria-controls aria-expanded aria-activedescendant>`; the popup is `role="listbox"` with three `role="option"` rows. DOM focus never moves into the popup — it stays on the trigger, and `aria-activedescendant` tracks the highlight. Same deviation-from-the-reference note as the compound listbox: a real `<button>` is used rather than the APG's `<div role="combobox">`.
-- **Option states:** highlighted (keyboard-active *or* hovered) gets `bg-surface-2`; the currently selected mode gets `text-primary font-medium` and `aria-selected="true"`. Reopening pre-highlights the selected mode rather than starting at the top.
+- **Option states:** a listbox row (States & Interaction). Highlighted (keyboard-active *or* hovered) gets `bg-surface-2`; the currently selected mode gets `text-primary font-medium` and `aria-selected="true"`. The rows carry `transition-colors` so the highlight fades. Reopening pre-highlights the selected mode rather than starting at the top.
 - **Keyboard:** ArrowDown/Up open the popup or move the highlight; Home/End jump to first/last; Enter/Space opens or commits; Escape closes without changing the mode; Tab closes and lets focus leave. A capture-phase document click listener dismisses it, attached only while open.
 - **Positioning:** `position: fixed`, `top`/`left`/`min-width` computed from the trigger's own `getBoundingClientRect()` on open and **re-read on every scroll/resize while open** rather than closing. It sits **4px below** the trigger's bottom edge — a deliberate small gap so it reads as a popup floating clear of the field. This is the opposite of the two mode panels, which are placed *flush* with the control's bottom edge to read as an extension of it (see "One geometry, shared" under Cards & Panels); the difference is intentional, not drift. `z-20` — above both mode panels, so opening the dropdown always draws over whichever panel is showing.
 - **The stepper is Type-in only.** The `+`/`−` capsule inside the Molar Mass input is hidden in Build custom and Compounds, because there is nothing meaningful to increment: the value is derived from a selection, not typed.
@@ -715,10 +779,10 @@ The two panels do NOT share one set of dismiss rules — each earned its own, de
 
 Because `activeMolarMassMode` is off the table entirely for a dismiss, there's no focus-management asymmetry left to document either: nothing displaces focus by closing, so nothing needs to reclaim it.
 
-**Two documented deviations, both deliberate:**
+**Two things about this panel worth calling out, both deliberate:**
 
-1. **Compounds has no trigger row.** Every other listbox in the app is the popup half of a combobox with a collapsed trigger showing the current value. This one has neither: the mode dropdown has already chosen "Compounds", and a second collapsed control to expand would be a redundant step. So the panel is `tabindex="0" role="listbox"` and carries `aria-activedescendant` itself (ARIA APG "Listbox", not "Combobox"), and the last selection is shown by `aria-selected` plus the pre-highlight on return rather than by a trigger label.
-2. **`panel-mode-compounds`'s focus ring is `focus-visible:`, the only one in an app that is otherwise all `focus:`.** Every other focusable element here is an input or a button, where a ring on click reads as normal. Clicking an option focuses this whole ~280px panel, and a 2px green ring around all of it is both louder than anything else on the page and absent from the mockup. `focus-visible:` keeps the keyboard affordance and drops the pointer-only case. **Do not "normalise" this back to `focus:`** without re-checking what a click actually looks like — and **do not remove it entirely.** It is the *only* thing that changes when keyboard focus lands on this panel: the active-option `bg-surface-2` highlight is painted on open (and never cleared on blur), so without the ring, tabbing into the panel produces no visible change at all — a WCAG 2.4.7 failure. When the panel's resting inset hairline ring was dropped for the shared mode-panel drop shadow, this `focus-visible` ring was deliberately kept for exactly this reason; the Build custom panel needed no equivalent because its container is never itself focused. In `forced-colors` mode the retained `focus-visible:inset-ring-*` classes still match the `[class*="inset-ring-"]` fallback selector in `global.css`, so the panel keeps a `CanvasText` boundary there without needing to be named explicitly the way `#molar-mass-build-panel` is.
+1. **Compounds has no trigger row (a deviation).** Every other listbox in the app is the popup half of a combobox with a collapsed trigger showing the current value. This one has neither: the mode dropdown has already chosen "Compounds", and a second collapsed control to expand would be a redundant step. So the panel is `tabindex="0" role="listbox"` and carries `aria-activedescendant` itself (ARIA APG "Listbox", not "Combobox"), and the last selection is shown by `aria-selected` plus the pre-highlight on return rather than by a trigger label.
+2. **`panel-mode-compounds` carries the app-wide `focus-visible` ring, and here it is load-bearing.** Every focusable control in the app takes `focus-visible:inset-ring-2 focus-visible:inset-ring-primary` (States & Interaction) — on this panel that is not just consistency, it is the *only* thing that changes when keyboard focus lands: the active-option `bg-surface-2` highlight is painted on open and never cleared on blur, so without the ring, Tab into the panel produces no visible change at all — a WCAG 2.4.7 failure. **Do not remove it**, and do not "simplify" it to plain `focus:` — a pointer click focuses this whole ~280px panel, and `:focus-visible` is what keeps that click from drawing a 2px green ring around the entire thing while still serving keyboard users. When the panel's resting inset hairline ring was dropped for the shared mode-panel drop shadow, this ring was deliberately kept for exactly this reason; the Build custom panel needs no container ring because it is never itself focused (its inner controls each carry their own). In `forced-colors` mode the `focus-visible:inset-ring-*` classes match the `[class*="inset-ring-"]` fallback selector in `global.css`, so the panel keeps a `CanvasText` boundary there without being named explicitly the way `#molar-mass-build-panel` is.
 
 **`element-tile`** / **`element-tile-selected`** — Individual elements in the Build custom grid.
 
@@ -734,6 +798,7 @@ The tile is a **horizontal** row, not a centered stack. Left to right: symbol ch
   - **Above 999 the digits overflow the box rather than widening it.** Quantity is uncapped (+ has no ceiling), so four digits is reachable by clicking. At 1000 the 33.6px of text overflows the 28px span by 6px total, 3px each side, spilling into the 4px gaps without reaching either button; the stepper stays 84px and + stays whole-pixel. This is a deliberate trade — layout stability over a legible 4-digit count — on the grounds that a 4-digit subscript is not a real formula. If it ever needs to read correctly, add a 4-digit width (36px) rather than restoring content sizing.
 - **Hover (unselected only)**: edge color shifts from `{colors.hairline}` to `{colors.hairline-tertiary}`. No fill, no drop shadow, width stays 1px so nothing reflows — it's a `box-shadow: inset` color swap, not a width change, so this was already reflow-free even before the border → box-shadow conversion. It signals "clickable", not "selected" — which is why it is neutral rather than a lighter green. Three edge states coexist and stay distinguishable: `hairline` #E5E2DA resting → `hairline-tertiary` #C4C0B2 hover → `primary` #02613E selected. The first two differ by value, the third by hue.
 - **Selected**: edge only. The background stays `{colors.canvas}` #FAF9F5 and the edge changes to `box-shadow: inset 0 0 0 1px {colors.primary}`. Nothing else moves — no fill, no text-color shift.
+- **The edge animates.** Both the hover and selected edge changes transition over 150ms — but the tile carries `transition-shadow`, **not** `transition-colors`: the edge is an `inset-ring` (a `box-shadow`), which `transition-colors` does not cover, so it used to snap. `transition-shadow` covers it; the fill never changes, so no color transition is needed. The focus-visible ring on the tile *body button* appears instantly (that button carries no transition), which is standard for a focus ring.
 - The hover edge applies to **unselected tiles only**. A hover variant outranks the resting edge-color class, so if it is left active on a selected tile it will grey out the green edge on hover — mount and unmount it with the selected state, don't declare it once and forget it.
 
 The selected state is carried by the edge alone. This is a deliberate lightening: the previous `{colors.primary-soft}` fill plus recolored text was too heavy for a control that can appear 63 times at once on screen, and it competed with the result value for the eye's attention. Green stays scarce.
@@ -747,8 +812,9 @@ The stepper **appears on selection** and unmounts on deselection. It is therefor
 - **The 1.5px stroke is deliberately soft, and that is not a defect to fix.** Centred on a whole pixel it spans 9.25–10.75 and straddles two device pixels, so it antialiases rather than snapping crisp. The goal here is symmetry between the two glyphs and consistency across tiles, not a crisp edge. **Do not chase crispness** by adjusting the stroke width, nudging path coordinates, or adding translate offsets — every one of those breaks the symmetry that the shared geometry buys.
 - **Glyph centring is a layout property, not an icon property.** The per-column inconsistency that once made the **+** look off-centre came from fractional `1fr` columns, and is fixed by the integer-column algorithm under Grid & Container — not by touching the icons. With the scale-1 geometry the plus ink offset measures exactly `[0, 0]` in the first, middle and last column of a row (it was a constant `[−0.35, −0.35]` under the old 13.3 box). Do not "fix" a residual by nudging one glyph: the measurements show no asymmetry between + and −, so a nudge would create one.
 - **Never give the minus a viewBox sized to its own ink** (e.g. `0 0 14 1.5`). An SVG root clips to its viewBox, so a 1.5-unit-tall box crops the stroke while the plus renders at full width — the minus then looks thinner than the plus and the pair reads as misaligned. This shipped once and was not obvious from the markup; it is only visible by measuring the rendered stroke.
-- Hover fills a **circle** (`border-radius: 50%`) behind the glyph, sized to the same 24px box, in `{colors.surface-4}` #E8E6DF. The icon color does not change.
-- **Both buttons hover identically** — same fill, same shape, same size. The only difference between them is the glyph. A green `{colors.primary-soft}` tint on **+** was tried and reverted: an asymmetric hover on a two-button pair reads as one control being special rather than as two halves of the same stepper, and "increment" is not a state the accent is meant to mark. `{colors.surface-3}` and `{colors.hairline-strong}` were also considered and rejected — the former too weak to register as an *active* hover affordance (it is fine as a quiet static tint, which is why the symbol chip can use it), the latter too heavy, and `hairline-strong` now has a different job as the tile's hover *border*.
+- Hover fills a **circle** (`border-radius: 50%`) behind the glyph, sized to the same 24px box, in `{colors.surface-4}` #E8E6DF. The icon color does not change. Pressed (`element-tile-stepper-button-pressed`) goes one step darker to `{colors.hairline-strong}` #D3CFC3, still icon-color-unchanged. Pressed is `[@media(hover:hover)]:group-active:` — scoped to hover-capable pointers, matching `field-stepper-pill-button-pressed`, so a touch tap never leaves a stuck fill.
+- **Both buttons behave identically** in hover and pressed — same fill, same shape, same size. The only difference between them is the glyph. A green `{colors.primary-soft}` tint on **+** was tried and reverted: an asymmetric state on a two-button pair reads as one control being special rather than as two halves of the same stepper, and "increment" is not a state the accent is meant to mark. `{colors.surface-3}` was rejected for hover as too weak to register as an *active* affordance (it is fine as the quiet static tint on the symbol chip). `{colors.hairline-strong}` was rejected for *hover* as too heavy — but it is exactly right for *pressed*, one step below hover, which is the job it now does here. (Historical note: `hairline-strong` was also tried and dropped as the *tile's* hover border — that role is `{colors.hairline-tertiary}`; see `element-tile` Hover.)
+- Keyboard focus lights the app-wide 2px `{colors.primary}` inset ring (`element-tile-stepper-button-focus`) on the painted chip via `group-focus-visible:`, following the 50% circle.
 - 50% is used literally rather than a radius token. `{rounded.pill}`/`{rounded.full}` (9999px) would render identically on a square box, but the intent here is "circle", not "pill", and the distinction matters if the box ever stops being square.
 - The rest state reserves the hover box's full 24×24 footprint, so hovering fills a background that is already there and never shifts the stepper's layout.
 
@@ -774,12 +840,13 @@ Selected state is carried by **`aria-current="true"`** on the tile body, present
 - Background `{colors.surface-1}`, value in `{typography.input-value}` (DM Mono), rounded `{rounded.md}`, left padding 12px, `box-shadow: inset 0 0 0 1px {colors.hairline}` at rest. Vertical padding is a single value per breakpoint — 12px below 520px / 10px at `mobile:` and up — identical in every state. See `text-input`'s `padding`/`height` entries above for the exact numbers and the Do below for why no state-based split is needed.
 - Trailing chevron-selector-vertical icon, 24px box (two 10×6px chevrons stacked), right-aligned. It is a functional stepper, not decorative: the up chevron is always active (`{colors.ink-muted}`); the down chevron mutes to `{colors.ink-tertiary}` and disables once the value is at its floor (0 for all three fields), active (`{colors.ink-muted}`) otherwise. Each field steps by 1 (whole numbers).
 
-**`text-input-focused`** — Edge color changes to `{colors.primary}` and width steps from the 1px resting shadow to 2px. Padding does not change — `box-shadow: inset` paints inside the padding box rather than adding to it, so the width step never touches the field's total height.
+**`text-input-focused`** — On **`:focus-visible`** (keyboard focus only — the app-wide convention, see States & Interaction), edge color changes to `{colors.primary}` and width steps from the 1px resting shadow to 2px. A pointer click into the field shows no ring — but browsers treat an editable text field as always warranting a focus indicator, so `:focus-visible` still matches a mouse click on the *editable* Molar Mass field in Type-in mode; the read-only Molar Mass modes and the read-only result field do not get it on click. Padding does not change — `box-shadow: inset` paints inside the padding box rather than adding to it, so the width step never touches the field's total height. The ring transitions over 150ms (`transition-all`).
 
 **`text-input-error`** — Edge color changes to `{colors.error}`, same 1px→2px width step as focus, same non-event for padding and height. Paired with an `error-message` directly below the field.
 
 **`result-value`** — The calculated result. Not a boxed input — bare typography sitting directly on `card-result`'s background, with no white box, no border, and no badge or lock icon. That absence is the only read-only signal; see the Don't below.
-- Text `{colors.ink-tertiary}` when empty, `{colors.primary}` once a value exists. Type `{typography.result-value}`.
+- Text `{colors.ink-tertiary}` when empty, `{colors.primary}` once a value exists. Type `{typography.result-value}`. The empty→filled color change transitions over 150ms (`transition-all` on the field) — this is the one animated property on the result field, and the reason it keeps a `transition-*` class despite having no hover/focus state.
+- **Excluded from the app-wide `focus-visible` inset ring** — the ring is a box, and this field's whole read-only signal is the *absence* of a box. The `<input>` is still keyboard-focusable (it's `readonly`, not `disabled`); it falls back to the browser's native focus outline.
 
 **`error-message`** — Inline validation message below the errored field.
 - Text `{colors.error}`, type `{typography.body-sm}`, preceded by a 14px alert icon in the same color.
@@ -794,7 +861,7 @@ Validation rules: molar mass must be greater than zero; mass and moles must be n
 - **ARIA:** `role="listbox"`, each compound a `role="option"`, each section a `role="group" aria-label="<section name>"` wrapping its options (`group` is a valid owned element of `listbox` in ARIA 1.2 — the direct analogue of `<optgroup>`).
 - **Data:** reads `PRESETS`/`PRESET_GROUP_ORDER` from `src/utils/browseElements.ts` — the same `Preset[]` the Build custom formula readout's types come from — and builds both the group headings and the option rows from it at script load. There is no second, hardcoded copy of the compound list; `Preset.group` is what used to be each `<optgroup>`'s `label`.
 - **Group headings:** `text-xs font-semibold uppercase tracking-[0.4px] text-ink-subtle`, same type treatment as a field label — `aria-hidden`, since the heading is decorative; the group's accessible name comes from the `role="group"`'s own `aria-label`.
-- **Option rows:** `px-3 py-2 text-sm font-sans text-ink`, text `"<name> (<formula>) — <mass> g/mol"`.
+- **Option rows:** `px-3 py-2 text-sm font-sans text-ink transition-colors`, text `"<name> (<formula>) — <mass> g/mol"`. A listbox row (States & Interaction) — the `transition-colors` is what makes the highlight fade in/out rather than snap.
 - **Option states:** highlighted (keyboard-active **or** hovered) gets `bg-surface-2`, same fill as `pill-inactive-hover`. A committed selection (`aria-selected="true"`) gets `bg-primary-soft` / `text-primary-pressed` — the reserved use for `{colors.primary-soft}` noted under Colors. Hover and keyboard share **one** highlight state, updating `aria-activedescendant` identically; do not layer a second, visual-only hover on top of it. (There is no `hover:` class on the options — the highlight is entirely JS-driven, so a missing pointer listener means no feedback at all. A test hovers with a real mousemove for exactly this reason.)
 - **Keyboard (as the Compounds panel drives it):** ArrowDown/Up move the highlight; Home/End jump to first/last; Enter/Space commits the highlighted option. Escape and Tab both have nothing bound to them here and are left to the browser — dismissal is the host's decision, not the component's (see "Where the split is" above), and the host doesn't give Escape a dismiss role either; see Dismissal under Cards & Panels for why. Typeahead: any single printable keypress buffers into a 500ms-debounced string and jumps the highlight to the next option (wrapping) whose name starts with it, searching from the current highlight.
 - **Selection behavior — no confirm step.** A click, or Enter/Space on the highlight, writes the compounds slot; the store puts the mass into `#molar-mass` and dispatches the recalc. The selection is **not** reset afterward: leaving the mode and coming back shows the same compound `aria-selected` and pre-highlighted rather than starting from the top.
@@ -813,6 +880,7 @@ The particle-count row is the one place in the result block with a visible divid
 
 **`breadcrumb-bar`** — Sits above the calculator card.
 - Transparent, text `{colors.ink-subtle}`, current page in `{colors.ink}`, type `{typography.breadcrumb}`.
+- Breadcrumb links darken to `{colors.ink}` on hover (`transition-colors`, 150ms). All text links (nav, breadcrumb, wordmark) keep the browser's **native focus outline** for keyboard nav — the `focus-visible` inset ring is for controls, not links. The "current page" nav pill has no hover/pressed of its own and carries no `transition-*` (it is a static marker, not an action).
 
 **`footer`** — Single line, copyright only. No cross-links until the product has more than one module.
 - Background `{colors.canvas}`, text `{colors.ink-subtle}`, type `{typography.body-sm}`.
@@ -830,6 +898,8 @@ The particle-count row is the one place in the result block with a visible divid
 - Format all calculated results to 6 decimal places.
 - Empty-state text (result value, particle count value, and the copy icon) uses `{colors.ink-tertiary}`. Filled state restores each element's normal color. Do not invent a separate muted token per element, they all share ink-tertiary.
 - State touch-viewport padding explicitly on every interactive control, per breakpoint. Never rely on it inheriting from desktop padding — that gap is how the 44px minimum was missed before.
+- Follow the one state system (see States & Interaction). A new control is a solid-fill green control, a hairline/chip control, or a listbox row — it takes that family's hover/pressed. Its keyboard focus is `focus-visible:inset-ring-2 focus-visible:inset-ring-primary` (or `group-focus-visible:` on the painted child) — no `:focus`, no per-control ring design. The only ring exclusion is `result-value` (a read-only display value); it and text links keep the native outline.
+- Give a control a `transition-*` class only if it has an animated state change, and pick the property: `transition-all` (fill + ring), `transition-colors` (bg/text only), `transition-shadow` (an `inset-ring` edge — `transition-colors` does not cover `box-shadow`).
 
 ### Don't
 - Don't add drop shadows. Depth comes from the surface ladder. The sole exception is the two `position: fixed` Molar Mass mode panels (`panel-mode-build-custom`, `panel-mode-compounds`), which carry `0 4px 16px rgba(0,0,0,0.10)` *instead of* a resting edge because they float on a different plane from the card — see Elevation & Depth. Don't extend this to any in-flow surface, and don't pair it with a border or resting inset ring on the panels themselves. (Compounds keeps a `focus-visible` ring only — see the deviation note under Cards & Panels.)
@@ -888,6 +958,7 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
     | disabled ("−" at floor) | `{colors.surface-4}` (unchanged) | icon swaps to `{colors.ink-tertiary}` |
 
     All three are non-text/UI-component contrast (WCAG 1.4.11, 3:1 floor) — every state clears it, pressed by the smallest margin. Icon color itself never changes across default/hover/pressed, only the fill does; this was measured post-transition-settle (`transition-colors`, 150ms) — reading the color before the transition finishes returns an intermediate value, not the token. A hover/pressed fill renders as a **half-capsule** (rounded outer edge, square inner edge, matching whichever side that button already owns) — never a full circle or a plain rectangle — since the fill swap never touches the `rounded-*` class, only `background-color`.
+  - **Keyboard focus** lights the app-wide 2px `{colors.primary}` inset ring (`field-stepper-pill-button-focus`) on the inner painted span via `group-focus-visible:` — following the chip's half-capsule shape, not the transparent hit-box `<button>`. It appears instantly (`transition-colors` doesn't cover `box-shadow`), which is standard for a focus ring.
   - **Hover and pressed are desktop/hover-capable-input only — confirmed via `window.matchMedia`, not assumed.** Tailwind's `hover:`/`group-hover:` variants in the installed Tailwind version already compile to `@media (hover: hover) { &:hover }` (confirmed by reading the shipped `tailwindcss` package's compiled variant table directly), so plain `group-hover:bg-hairline-tertiary` was sufficient for hover. `active:`/`group-active:` do **not** get that scoping by default — they compile to plain `&:active`, which real touch browsers can trigger — so pressed is wrapped explicitly: `[@media(hover:hover)]:group-active:bg-ink-tertiary`. Measured: mobile emulation (iPhone 13) reports `matchMedia('(hover: hover)')` **false** and a hover attempt leaves the chip's background byte-identical; desktop reports **true**, and both hover and a held mousedown visibly and correctly change the fill.
   - **Divider**: `#ffffff` literal white (not a surface token — it reads as a cut through the pill exposing the input beneath it, not a themed surface), 1px wide, full painted chip height at each breakpoint (24px at `mobile:` and up, 28px below it — measured equal at both, not approximated), no padding or inset. Stays white in every state, including when the button beside it is hovered or pressed — intentional, not a bug to fix.
   - **Empty/zero state is a single full circle (just "+"); a value greater than 0 expands it into the two-chip capsule.** The condition is `current > 0`, not "any non-empty input" — typing "0" explicitly still collapses to the "+"-only circle, because negative molar mass/mass/moles has no physical meaning and there is nothing to decrement at exactly 0. (A fractional value under 1, e.g. 0.5, does show the capsule, since it's a positive quantity — but "−" renders in its disabled/`ink-tertiary` icon style there too, since decrementing by 1 would go negative; that floor logic is unchanged from the original stepper.)
@@ -918,7 +989,7 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 ## Known Gaps
 
 - Dark mode is not defined. The product ships light-only for now.
-- Animation and transition timings are not specified; 150–200ms ease is a reasonable default for state changes.
+- State-change transitions are **150ms** with Tailwind's default ease; the hand-written wrapper ring uses `0.15s` CSS-default `ease`. See States & Interaction for the per-property choice (`transition-all` / `-colors` / `-shadow`). Larger motion (entrances, layout) is still unspecified; 150–200ms ease remains the default there.
 - A **success** semantic state is not defined — the calculator has no success confirmation. Add one only if a real use case appears.
 - A **warning** semantic state (`{colors.warning}` / `{colors.warning-soft}`) is now defined, for non-error advisory copy in the explainer/theory section (common-mistake callouts). It is deliberately not an input/validation state — see Semantic under Colors.
 - The explainer/theory section below the calculator has no component definitions yet — that section's design is deliberately deferred.

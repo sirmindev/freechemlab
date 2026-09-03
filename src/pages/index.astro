@@ -18,7 +18,7 @@ import Layout from '../layouts/Layout.astro';
 					<li>
 						<a
 							href="/calculators"
-							class="min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 text-sm font-medium text-ink bg-surface rounded-full inset-ring-1 inset-ring-hairline transition-colors flex items-center justify-center"
+							class="min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 text-sm font-medium text-ink bg-surface rounded-full inset-ring-1 inset-ring-hairline flex items-center justify-center"
 							aria-current="page"
 						>
 							Calculator
@@ -66,7 +66,7 @@ import Layout from '../layouts/Layout.astro';
 					<button
 						id="toggle-g-to-mol"
 						type="button"
-						class="min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep rounded-full transition-all cursor-pointer flex items-center gap-1"
+						class="min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 text-sm font-medium bg-brand-green text-on-primary hover:bg-primary-hover active:bg-primary-pressed rounded-full transition-all cursor-pointer flex items-center gap-1"
 					>
 						<span>g</span>
 						<svg class="shrink-0" width="5.5" height="9.5" viewBox="0 0 5.5 9.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -122,7 +122,7 @@ import Layout from '../layouts/Layout.astro';
 										aria-expanded="false"
 										aria-controls="molar-mass-mode-listbox"
 										aria-label="Molar mass input mode"
-										class="shrink-0 flex items-center gap-1.5 bg-surface-3 text-ink text-sm font-sans pl-3 pr-2.5 py-[12px] mobile:py-[10px] border-r border-hairline cursor-pointer focus:outline-none"
+										class="shrink-0 flex items-center gap-1.5 bg-surface-3 text-ink text-sm font-sans pl-3 pr-2.5 py-[12px] mobile:py-[10px] border-r border-hairline cursor-pointer transition-colors hover:bg-surface-2 focus:outline-none"
 									>
 										<span id="molar-mass-mode-label">Type in</span>
 										<svg class="pointer-events-none shrink-0 rotate-90 text-ink-muted" width="6" height="10.5" viewBox="0 0 6 10.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -134,7 +134,7 @@ import Layout from '../layouts/Layout.astro';
 										id="molar-mass"
 										step="1"
 										placeholder="e.g. 18.02"
-										class="flex-1 min-w-0 bg-surface text-ink font-mono text-base pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] focus:outline-none focus:ring-0 transition-all"
+										class="flex-1 min-w-0 bg-surface text-ink font-mono text-base pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] focus:outline-none focus:ring-0"
 									/>
 								</div>
 								<!-- Mode listbox popup. `position: fixed`, placed off the trigger's own
@@ -162,6 +162,9 @@ import Layout from '../layouts/Layout.astro';
 								     (Tailwind's own `hover:`/`group-hover:` already carry that scoping by
 								     default — see DESIGN.md — but `active`/`group-active` do not, so pressed
 								     is scoped explicitly) so touch taps never show a stuck hover/press fill.
+								     Keyboard focus lights a 2px {colors.primary} inset ring on the chip
+								     (`group-focus-visible:` — the app-wide focus convention), carried on
+								     the painted span rather than the transparent hit-box `<button>`.
 								     Right-anchored (not left): the row's width is intrinsic to its visible
 								     children, so hiding/showing "-" and the divider changes the LEFT edge
 								     only — "+" stays pinned to the same x position at every value, by
@@ -175,13 +178,13 @@ import Layout from '../layouts/Layout.astro';
 								     (`element-tile-stepper-button`). -->
 								<div id="molar-mass-stepper" class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
 									<button type="button" id="molar-mass-step-down" aria-label="Decrease molar mass" class="hidden group flex items-center justify-center py-2 mobile:py-2.5 cursor-not-allowed focus:outline-none">
-										<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+										<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-primary">
 											<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
 										</span>
 									</button>
 									<div id="molar-mass-stepper-divider" class="hidden w-px h-8 mobile:h-6 bg-white"></div>
 									<button type="button" id="molar-mass-step-up" aria-label="Increase molar mass" class="group flex items-center justify-center py-2 mobile:py-2.5 cursor-pointer focus:outline-none">
-										<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+										<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-primary">
 											<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
 										</span>
 									</button>
@@ -201,7 +204,7 @@ import Layout from '../layouts/Layout.astro';
 								<button
 									type="button"
 									data-unit="g/mol"
-									class="unit-pill-mm min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-mm min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-primary-hover active:bg-primary-pressed cursor-pointer transition-all flex items-center justify-center"
 								>
 									g/mol
 								</button>
@@ -234,20 +237,20 @@ import Layout from '../layouts/Layout.astro';
 										id="mass-input"
 										step="1"
 										placeholder="e.g. 18.02"
-										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] inset-ring-1 inset-ring-hairline focus:outline-none focus:inset-ring-2 focus:inset-ring-primary focus:ring-0 transition-all"
+										class="w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] inset-ring-1 inset-ring-hairline focus:outline-none focus-visible:inset-ring-2 focus-visible:inset-ring-primary focus:ring-0 transition-all"
 									/>
 									<!-- Functional stepper — hidden while this field is the readonly result.
 									     See molar-mass-stepper above for the capsule-shape/fill/hit-area
 									     rationale — identical component, reused verbatim. -->
 									<div id="mass-input-stepper" class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
 										<button type="button" id="mass-step-down" aria-label="Decrease mass" class="hidden group flex items-center justify-center py-2 mobile:py-2.5 cursor-not-allowed focus:outline-none">
-											<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+											<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-primary">
 												<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
 											</span>
 										</button>
 										<div id="mass-stepper-divider" class="hidden w-px h-8 mobile:h-6 bg-white"></div>
 										<button type="button" id="mass-step-up" aria-label="Increase mass" class="group flex items-center justify-center py-2 mobile:py-2.5 cursor-pointer focus:outline-none">
-											<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+											<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-primary">
 												<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
 											</span>
 										</button>
@@ -258,7 +261,7 @@ import Layout from '../layouts/Layout.astro';
 										id="mass-copy-btn"
 										aria-label="Copy mass result"
 										disabled
-										class="hidden absolute right-0 min-h-[44px] min-w-[44px] items-center justify-center text-ink-tertiary cursor-not-allowed transition-colors"
+										class="hidden absolute right-0 min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-ink-tertiary cursor-not-allowed transition-colors enabled:hover:bg-surface-2 focus:outline-none focus-visible:inset-ring-2 focus-visible:inset-ring-primary"
 									>
 										<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 											<path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -286,7 +289,7 @@ import Layout from '../layouts/Layout.astro';
 									<button
 										type="button"
 										data-unit="g"
-										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
+										class="unit-pill-mass min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-primary-hover active:bg-primary-pressed cursor-pointer transition-all flex items-center justify-center"
 									>
 										g
 									</button>
@@ -370,7 +373,7 @@ import Layout from '../layouts/Layout.astro';
 							id="molar-mass-element-search"
 							aria-label="Search elements"
 							placeholder="Search by name or symbol…"
-							class="w-full bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] pl-3 pr-3 py-[12px] mobile:py-[10px] mb-4 focus:outline-none focus:inset-ring-primary focus:ring-1 focus:ring-brand-green transition-all"
+							class="w-full bg-surface-soft inset-ring-1 inset-ring-hairline text-ink text-sm font-sans rounded-[8px] pl-3 pr-3 py-[12px] mobile:py-[10px] mb-4 focus:outline-none focus-visible:inset-ring-2 focus-visible:inset-ring-primary transition-all"
 						/>
 
 						<div id="molar-mass-element-grid-scroll" class="element-grid-scroll max-h-[320px] overflow-y-auto rounded-[8px] mb-4">
@@ -415,7 +418,7 @@ import Layout from '../layouts/Layout.astro';
 					<button
 						type="button"
 						id="molar-mass-build-panel-use"
-						class="mt-4 w-full shrink-0 py-3 px-5 rounded-full bg-brand-green text-on-primary text-sm font-medium hover:bg-brand-green-deep cursor-pointer transition-all"
+						class="mt-4 w-full shrink-0 py-3 px-5 rounded-full bg-brand-green text-on-primary text-sm font-medium hover:bg-primary-hover active:bg-primary-pressed cursor-pointer transition-all"
 					>
 						Use this molar mass
 					</button>
@@ -442,13 +445,15 @@ import Layout from '../layouts/Layout.astro';
 				     and the last selection is shown by aria-selected + the pre-highlight on
 				     return rather than by a trigger label.
 
-				     Its focus ring is the only `focus-visible:` in the app, which is
-				     otherwise all `focus:`: every other focusable here is an input or a
-				     button, where a ring on click reads as normal, but clicking an option
-				     focuses this whole ~280px panel and a 2px green ring around all of it is
-				     both louder than anything else on the page and absent from the mockup.
-				     `focus-visible:` keeps the keyboard affordance and drops the
-				     pointer-only case.
+				     Its focus ring is the app-wide focus treatment — a 2px {colors.primary}
+				     inset ring, keyboard-only via `focus-visible:` (see DESIGN.md States &
+				     Interaction). It matters most here: clicking an option focuses this
+				     whole ~280px panel, and `focus-visible:` is what keeps a pointer click
+				     from drawing a green ring around all of it while still giving keyboard
+				     users the affordance. Do not remove it: the active-option highlight is
+				     painted whenever the panel is open, not only on focus, so without this
+				     ring a keyboard Tab into the panel produces no visible change at all
+				     (WCAG 2.4.7).
 
 				     There is no confirm step: a click or Enter writes the compounds slot,
 				     which setModeValue() pushes straight into #molar-mass. Selecting does
@@ -494,13 +499,13 @@ import Layout from '../layouts/Layout.astro';
 								     rationale — identical component, reused verbatim. -->
 								<div id="moles-input-stepper" class="hidden absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
 									<button type="button" id="moles-step-down" aria-label="Decrease moles" class="hidden group flex items-center justify-center py-2 mobile:py-2.5 cursor-not-allowed focus:outline-none">
-										<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+										<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-l-full bg-surface-4 text-ink-tertiary transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-primary">
 											<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
 										</span>
 									</button>
 									<div id="moles-stepper-divider" class="hidden w-px h-8 mobile:h-6 bg-white"></div>
 									<button type="button" id="moles-step-up" aria-label="Increase moles" class="group flex items-center justify-center py-2 mobile:py-2.5 cursor-pointer focus:outline-none">
-										<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary">
+										<span class="flex h-8 w-8 mobile:h-6 mobile:w-6 items-center justify-center rounded-full bg-surface-4 text-ink-muted transition-colors group-hover:bg-hairline-tertiary [@media(hover:hover)]:group-active:bg-ink-tertiary group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-primary">
 											<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
 										</span>
 									</button>
@@ -511,7 +516,7 @@ import Layout from '../layouts/Layout.astro';
 									id="moles-copy-btn"
 									aria-label="Copy moles result"
 									disabled
-									class="absolute right-0 flex min-h-[44px] min-w-[44px] items-center justify-center text-ink-tertiary cursor-not-allowed transition-colors"
+									class="absolute right-0 flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-ink-tertiary cursor-not-allowed transition-colors enabled:hover:bg-surface-2 focus:outline-none focus-visible:inset-ring-2 focus-visible:inset-ring-primary"
 								>
 									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -541,7 +546,7 @@ import Layout from '../layouts/Layout.astro';
 								<button
 									type="button"
 									data-unit="mol"
-									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center"
+									class="unit-pill-moles min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-primary-hover active:bg-primary-pressed cursor-pointer transition-all flex items-center justify-center"
 								>
 									mol
 								</button>
@@ -794,7 +799,7 @@ import Layout from '../layouts/Layout.astro';
 		rawResult: number | null;
 	}
 
-	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] inset-ring-1 inset-ring-hairline focus:outline-none focus:inset-ring-2 focus:inset-ring-primary focus:ring-0 transition-all";
+	const EDITABLE_INPUT_CLASS = "w-full bg-surface text-ink font-mono text-base rounded-[8px] pl-3 pr-[80px] mobile:pr-[72px] py-[12px] mobile:py-[10px] inset-ring-1 inset-ring-hairline focus:outline-none focus-visible:inset-ring-2 focus-visible:inset-ring-primary focus:ring-0 transition-all";
 	// result-value: bare typography, no box — the absence of a box is the read-only signal (see DESIGN.md Don't)
 	const READONLY_RESULT_CLASS = "w-full bg-transparent text-ink-tertiary font-mono text-[32px] font-medium rounded-none border-0 px-0 py-0 cursor-not-allowed select-none focus:outline-none transition-all";
 
@@ -892,6 +897,19 @@ import Layout from '../layouts/Layout.astro';
 		}
 	}
 
+	// toggle-direction segment paint. Active is a solid-fill green control:
+	// {colors.primary} rest, {colors.primary-hover} on hover, {colors.primary-pressed}
+	// on press. Inactive is the neutral pill hover (surface-2 fill / ink text). The
+	// two class sets are mutually exclusive — the inactive hover fill would otherwise
+	// compete with the active hover fill on whichever segment is currently active.
+	const TOGGLE_ACTIVE_CLASSES = ['bg-brand-green', 'text-on-primary', 'hover:bg-primary-hover', 'active:bg-primary-pressed'];
+	const TOGGLE_INACTIVE_CLASSES = ['text-ink-muted', 'hover:bg-surface-soft', 'hover:text-ink'];
+	function setToggleSegment(btn: HTMLElement | null, active: boolean) {
+		if (!btn) return;
+		btn.classList.add(...(active ? TOGGLE_ACTIVE_CLASSES : TOGGLE_INACTIVE_CLASSES));
+		btn.classList.remove(...(active ? TOGGLE_INACTIVE_CLASSES : TOGGLE_ACTIVE_CLASSES));
+	}
+
 	function updateModeUI() {
 		clearAllErrors();
 
@@ -900,10 +918,8 @@ import Layout from '../layouts/Layout.astro';
 
 		if (currentMode === 'g_to_mol') {
 			// g -> mol: Mass is input (alongside Molar Mass), Moles is the readonly result
-			toggleGtoMolBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
-			toggleGtoMolBtn?.classList.remove('text-ink-muted');
-			toggleMolToGBtn?.classList.remove('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
-			toggleMolToGBtn?.classList.add('text-ink-muted');
+			setToggleSegment(toggleGtoMolBtn, true);
+			setToggleSegment(toggleMolToGBtn, false);
 
 			setFieldRole(massRefs, 'input');
 			setFieldRole(molesRefs, 'result');
@@ -913,10 +929,8 @@ import Layout from '../layouts/Layout.astro';
 			updateStepperState(massInput, massStepDown, massStepUp, massStepperDivider);
 		} else {
 			// mol -> g: Moles is input (alongside Molar Mass), Mass is the readonly result
-			toggleMolToGBtn?.classList.add('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
-			toggleMolToGBtn?.classList.remove('text-ink-muted');
-			toggleGtoMolBtn?.classList.remove('bg-brand-green', 'text-on-primary', 'hover:bg-brand-green-deep');
-			toggleGtoMolBtn?.classList.add('text-ink-muted');
+			setToggleSegment(toggleMolToGBtn, true);
+			setToggleSegment(toggleGtoMolBtn, false);
 
 			setFieldRole(molesRefs, 'input');
 			setFieldRole(massRefs, 'result');
@@ -931,9 +945,9 @@ import Layout from '../layouts/Layout.astro';
 	// Error and focus both swap the inset-ring width (1px -> 2px) alongside the
 	// color. box-shadow:inset never participates in box sizing, so unlike a
 	// real border this never shifts the input's height — no padding trade
-	// needed. Focus does the swap via pure CSS (`focus:` variants baked into
-	// EDITABLE_INPUT_CLASS); error needs it done in JS because it's a toggled
-	// class, not a pseudo-class.
+	// needed. Focus does the swap via pure CSS (`focus-visible:` variants baked
+	// into EDITABLE_INPUT_CLASS — keyboard-only, the app-wide focus convention);
+	// error needs it done in JS because it's a toggled class, not a pseudo-class.
 	function clearAllErrors() {
 		molarMassError?.classList.add('hidden');
 		// The wrapper's ring is an ::after overlay (see global.css) — resting vs
@@ -1130,7 +1144,7 @@ import Layout from '../layouts/Layout.astro';
 		buttons.forEach(btn => {
 			const unit = btn.getAttribute('data-unit');
 			if (unit === selectedUnit) {
-				btn.className = `${markerClass} min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-brand-green-deep cursor-pointer transition-all flex items-center justify-center`;
+				btn.className = `${markerClass} min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-brand-green text-on-primary hover:bg-primary-hover active:bg-primary-pressed cursor-pointer transition-all flex items-center justify-center`;
 			} else {
 				btn.className = `${markerClass} min-h-[44px] mobile:min-h-0 px-4 py-3 mobile:px-3 mobile:py-2 rounded-full text-sm font-medium bg-transparent inset-ring-1 inset-ring-hairline text-ink-muted hover:bg-surface-soft hover:text-ink cursor-pointer transition-all flex items-center justify-center`;
 			}
@@ -1620,7 +1634,7 @@ import Layout from '../layouts/Layout.astro';
 			const el = document.createElement('div');
 			el.id = `molar-mass-mode-option-${i}`;
 			el.setAttribute('role', 'option');
-			el.className = 'px-3 py-2 text-sm font-sans cursor-pointer whitespace-nowrap';
+			el.className = 'px-3 py-2 text-sm font-sans cursor-pointer whitespace-nowrap transition-colors';
 			el.textContent = label;
 			molarMassModeListbox.appendChild(el);
 			molarMassModeOptions.push({ mode, label, el });
@@ -1936,7 +1950,7 @@ import Layout from '../layouts/Layout.astro';
 					el.id = `${idPrefix}-option-${i}`;
 					el.setAttribute('role', 'option');
 					el.setAttribute('aria-selected', 'false');
-					el.className = 'px-3 py-2 text-sm font-sans text-ink cursor-pointer';
+					el.className = 'px-3 py-2 text-sm font-sans text-ink cursor-pointer transition-colors';
 					el.textContent = `${preset.name} (${preset.formula}) — ${preset.molarMass} g/mol`;
 					group.appendChild(el);
 					options.push({ preset, el });
@@ -2076,12 +2090,17 @@ import Layout from '../layouts/Layout.astro';
 			// unselected state's — so neither state has to grow into the
 			// other. Desktop's 52px is unaffected; verified no height change
 			// there (the 24px stepper never exceeds the 52px floor).
-			card.className = 'flex min-h-[60px] mobile:min-h-[52px] items-center justify-between gap-2 rounded-md inset-ring-1 bg-canvas p-2 transition-colors';
+			// transition-shadow, not transition-colors: the tile's only animated
+			// property is its inset-ring edge (hairline -> hairline-tertiary hover,
+			// -> primary selected), which compiles to box-shadow. transition-colors
+			// does not cover box-shadow, so the edge used to snap; the fill never
+			// changes, so colors aren't needed here.
+			card.className = 'flex min-h-[60px] mobile:min-h-[52px] items-center justify-between gap-2 rounded-md inset-ring-1 bg-canvas p-2 transition-shadow';
 
 			// Tile body — clicking it is the select action
 			const body = document.createElement('button');
 			body.type = 'button';
-			body.className = 'flex flex-1 min-w-0 items-center gap-3 text-left cursor-pointer select-none focus:outline-none';
+			body.className = 'flex flex-1 min-w-0 items-center gap-3 rounded-sm text-left cursor-pointer select-none focus:outline-none focus-visible:inset-ring-2 focus-visible:inset-ring-primary';
 			body.innerHTML = `
 				<span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xs bg-surface-3 font-sans text-base font-medium leading-none text-ink">${el.symbol}</span>
 				<span class="flex min-w-0 flex-col gap-1">
@@ -2107,8 +2126,15 @@ import Layout from '../layouts/Layout.astro';
 				// not Tailwind's stock md at 768 — the touch padding should drop at the
 				// same width the rest of the layout switches to its desktop form.
 				btn.className = 'group flex shrink-0 items-center justify-center p-2.5 mobile:p-0 cursor-pointer focus:outline-none';
+				// Hover fills a surface-4 circle; pressed goes one step darker to
+				// hairline-strong. Pressed is wrapped in an explicit (hover: hover)
+				// media condition — like field-stepper-pill-button-pressed — since
+				// group-active is not hover-scoped by default and a touch tap would
+				// otherwise leave a stuck fill. The focus-visible ring is the
+				// app-wide keyboard-focus treatment (2px inset primary), carried on
+				// the painted chip rather than the transparent hit-box button.
 				btn.innerHTML = `
-					<span class="flex h-6 w-6 items-center justify-center rounded-[50%] text-ink-muted transition-colors group-hover:bg-surface-4">
+					<span class="flex h-6 w-6 items-center justify-center rounded-[50%] text-ink-muted transition-colors group-hover:bg-surface-4 [@media(hover:hover)]:group-active:bg-hairline-strong group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-primary">
 						<span class="flex h-5 w-5 items-center justify-center">${glyph}</span>
 					</span>
 				`;
