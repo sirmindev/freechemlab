@@ -584,6 +584,12 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 			</div>
 
+			<!-- Copy-to-clipboard outcome, announced to screen readers only. One
+			     shared region — only one copy button (Mass or Moles, whichever is the
+			     result) is ever visible at a time. Populated by the copy handlers
+			     below with "Copied to clipboard" / "Copy failed", cleared on revert. -->
+			<div id="copy-status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
 		</section>
 
 		<!-- Explainer / theory section. Four teaching blocks in learning order:
@@ -772,6 +778,7 @@ import Layout from '../layouts/Layout.astro';
 	const molesStepDown = document.getElementById('moles-step-down') as HTMLButtonElement | null;
 	const molesStepperDivider = document.getElementById('moles-stepper-divider');
 	const molesCopyBtn = document.getElementById('moles-copy-btn') as HTMLButtonElement | null;
+	const copyStatus = document.getElementById('copy-status');
 
 	const particleCountRow = document.getElementById('particle-count-row');
 	const particleCountVal = document.getElementById('particle-count-val');
@@ -1190,18 +1197,80 @@ import Layout from '../layouts/Layout.astro';
 		});
 	});
 
-	// Copy result listeners — copies the plain result number only, no unit label
-	massCopyBtn?.addEventListener('click', () => {
-		if (massInput && !massCopyBtn.disabled) {
-			navigator.clipboard.writeText(massInput.value);
-		}
-	});
+	// Copy result — copies the plain result number only, no unit label, with a
+	// brief icon-swap confirmation for BOTH outcomes so a failed copy (insecure
+	// HTTP context, permission denied, unfocused document) never looks identical
+	// to a successful one.
+	//
+	//   success -> checkmark glyph, icon only, no color change (green is scarce /
+	//              reserved and there is no success color token — see DESIGN.md)
+	//   failure -> circle-exclamation glyph (the same one the inline validation
+	//              messages use) in {colors.error} for the same window
+	//
+	// Both also write a visually-hidden aria-live region so the outcome isn't
+	// vision-only. Timing is a plain hold, not a documented convention — 1.5s.
+	const COPY_ICON_CHECK_D = 'M4.5 12.75l6 6 9-13.5';
+	const COPY_ICON_ALERT_D = 'M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+	const COPY_FEEDBACK_MS = 1500;
 
-	molesCopyBtn?.addEventListener('click', () => {
-		if (molesInput && !molesCopyBtn.disabled) {
-			navigator.clipboard.writeText(molesInput.value);
+	// Resting glyph captured per button at wire time rather than hardcoded, so a
+	// markup change to the icon can't silently desync the revert.
+	const copyRestingIconD = new WeakMap<HTMLElement, string>();
+	const copyFeedbackTimers = new WeakMap<HTMLElement, number>();
+
+	async function writeToClipboard(text: string): Promise<void> {
+		// navigator.clipboard is undefined in an insecure context — treat that as
+		// a handled failure, not an uncaught TypeError.
+		const clip = navigator.clipboard;
+		if (!clip || typeof clip.writeText !== 'function') {
+			throw new Error('Clipboard API unavailable');
 		}
-	});
+		await clip.writeText(text);
+	}
+
+	function flashCopyFeedback(button: HTMLButtonElement, kind: 'success' | 'error') {
+		const path = button.querySelector('svg path');
+		if (!path) return;
+
+		const pending = copyFeedbackTimers.get(button);
+		if (pending) window.clearTimeout(pending);
+
+		path.setAttribute('d', kind === 'success' ? COPY_ICON_CHECK_D : COPY_ICON_ALERT_D);
+		// Error borrows the existing {colors.error} token on the icon for its
+		// window; success is icon-only. The button's own colour classes are
+		// otherwise left to setCopyButtonState().
+		button.classList.toggle('text-brand-error', kind === 'error');
+		if (kind === 'error') button.classList.remove('text-ink-muted', 'text-ink-tertiary');
+		if (copyStatus) copyStatus.textContent = kind === 'success' ? 'Copied to clipboard' : 'Copy failed';
+
+		const timer = window.setTimeout(() => {
+			path.setAttribute('d', copyRestingIconD.get(button) ?? '');
+			button.classList.remove('text-brand-error');
+			// Mirror setCopyButtonState()'s resting colour without calling it (its
+			// disabled/enabled logic is out of scope here).
+			button.classList.add(button.disabled ? 'text-ink-tertiary' : 'text-ink-muted');
+			if (copyStatus) copyStatus.textContent = '';
+			copyFeedbackTimers.delete(button);
+		}, COPY_FEEDBACK_MS);
+		copyFeedbackTimers.set(button, timer);
+	}
+
+	function wireCopyButton(button: HTMLButtonElement | null, input: HTMLInputElement | null) {
+		if (!button || !input) return;
+		copyRestingIconD.set(button, button.querySelector('svg path')?.getAttribute('d') ?? '');
+		button.addEventListener('click', async () => {
+			if (button.disabled) return;
+			try {
+				await writeToClipboard(input.value);
+				flashCopyFeedback(button, 'success');
+			} catch {
+				flashCopyFeedback(button, 'error');
+			}
+		});
+	}
+
+	wireCopyButton(massCopyBtn, massInput);
+	wireCopyButton(molesCopyBtn, molesInput);
 
 	// Mode toggle listeners — re-parent the fields first, then apply roles/recalculate
 	toggleGtoMolBtn?.addEventListener('click', () => {

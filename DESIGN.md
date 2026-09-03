@@ -727,6 +727,19 @@ Interactive controls follow **one** state system. A control belongs to one of th
 - The hover fill and the focus ring are independent: hover on click, ring on keyboard focus — a control needs both.
 - On click, copies the current result value (plain number, no unit label) to the clipboard. Disabled/non-interactive in the empty state, since there is nothing to copy.
 
+**Copy feedback — success and failure both signal, via the icon only.** The write is `await navigator.clipboard.writeText(...)` in a `try/catch`, preceded by an explicit `navigator.clipboard` presence check so an insecure (plain-HTTP) context is a *handled failure*, not an uncaught `TypeError`. Every outcome changes the button's glyph for **~1.5s** (a plain hold, not a documented timing convention — the app has no other transient-confirmation precedent), then reverts to the clipboard glyph and the button's normal `ink-muted`.
+
+| Outcome | Glyph | Colour |
+|---|---|---|
+| Success | checkmark (`M4.5 12.75l6 6 9-13.5`, same stroke set as the copy glyph) | **none** — `currentColor` stays `ink-muted`. Deliberately no colour change: there is no success colour token and this doesn't add one (`{colors.primary}` is scarce / reserved). |
+| Failure (API absent, permission denied, document not focused) | circle-exclamation (`M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z`) — the **same** glyph the inline validation messages use | `{colors.error}` on the icon for the window, then back to `ink-muted` |
+
+- Both outcomes also set `#copy-status`, a single visually-hidden (`sr-only`) `aria-live="polite" aria-atomic="true"` region — `"Copied to clipboard"` / `"Copy failed"`, cleared on revert — so the confirmation is not vision-only.
+- **No toast, no badge, no shadow.** The feedback is entirely icon + (failure-only) icon colour on the existing button; nothing new is positioned, floated, or elevated.
+- **No platform branch.** A tap and a click run the identical handler and give the identical feedback.
+- The resting glyph is captured from the DOM at wire time, not hardcoded in the handler, so a markup change to the icon can't silently desync the revert.
+- Out of scope of this behaviour and untouched: the enabled/disabled logic (`setCopyButtonState`), the hover fill, and the focus ring.
+
 ### Cards & Panels
 
 **`card-calculator`** — The outer card. Everything lives inside it.
@@ -990,7 +1003,7 @@ All interactive controls hold a minimum 44×44px tap target on touch viewports. 
 
 - Dark mode is not defined. The product ships light-only for now.
 - State-change transitions are **150ms** with Tailwind's default ease; the hand-written wrapper ring uses `0.15s` CSS-default `ease`. See States & Interaction for the per-property choice (`transition-all` / `-colors` / `-shadow`). Larger motion (entrances, layout) is still unspecified; 150–200ms ease remains the default there.
-- A **success** semantic state is not defined — the calculator has no success confirmation. Add one only if a real use case appears.
+- A **success semantic *colour*** is still not defined, and deliberately stays that way. The one success confirmation in the app — the copy-to-clipboard button — signals success with an **icon swap only** (clipboard → checkmark, ~1.5s), no fill or colour change, because `{colors.primary}` is scarce / reserved and a dedicated success token has not earned its place. The paired failure state reuses the existing `{colors.error}` token. Add a success colour token only if a second, genuinely colour-dependent success case appears. (This resolves the earlier "no success confirmation exists" gap — see `button-copy` → Copy feedback.)
 - A **warning** semantic state (`{colors.warning}` / `{colors.warning-soft}`) is now defined, for non-error advisory copy in the explainer/theory section (common-mistake callouts). It is deliberately not an input/validation state — see Semantic under Colors.
 - The explainer/theory section below the calculator has no component definitions yet — that section's design is deliberately deferred.
 - `{colors.surface-3}` and `{colors.surface-4}` both have consumers and are no longer listed as unused headroom: `surface-3` fills `molar-mass-mode-trigger` (the left half of the fused Molar Mass control, one step up from the input beside it) **and** the element tile's symbol chip (one step below the #FAF9F5 tile — a shallow inset); `surface-4` fills only the element tile's stepper hover circle now (the symbol chip stepped off it when the Build custom panel was re-grounded — panel #ffffff, tile `{colors.canvas}`, chip `{colors.surface-3}`).

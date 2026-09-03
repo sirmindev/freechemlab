@@ -1844,3 +1844,117 @@ test.describe('Molar Mass mode panels – dismissal', () => {
     expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('compounds');
   });
 });
+
+// ─── 14. Copy to clipboard ───────────────────────────────────────────────────
+// The Mass / Moles result copy buttons. Every path gives visible feedback: a
+// checkmark on success, the error glyph in {colors.error} on failure, plus a
+// visually-hidden aria-live announcement, all reverting after ~1.5s. A failed
+// copy (insecure context, permission denied) must not look like a successful
+// one and must not throw.
+
+test.describe('Copy to clipboard', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+  const COPY_GLYPH = 'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z';
+  const CHECK_GLYPH = 'M4.5 12.75l6 6 9-13.5';
+  const ALERT_GLYPH = 'M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+
+  const iconD = (page: Page, btnId: string) =>
+    page.locator(`#${btnId} svg path`).getAttribute('d');
+
+  /** Default g→mol direction: 18.015 g / 18.015 g/mol → 1.000000 mol result. */
+  async function makeMolesResult(page: Page) {
+    await goto(page);
+    await setMolarMass(page, '18.015');
+    await setMass(page, '18.015');
+    await expect(page.locator('#moles-copy-btn')).toBeEnabled();
+  }
+
+  test('success: writes the value, swaps to a checkmark, announces, then reverts', async ({ page }) => {
+    await makeMolesResult(page);
+    expect(await iconD(page, 'moles-copy-btn')).toBe(COPY_GLYPH);
+
+    await page.locator('#moles-copy-btn').click();
+
+    // The plain result number reached the clipboard
+    const shown = await page.locator('#moles-input').inputValue();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(shown);
+
+    // Icon-only confirmation — checkmark, no error colour
+    await expect.poll(() => iconD(page, 'moles-copy-btn')).toBe(CHECK_GLYPH);
+    await expect(page.locator('#moles-copy-btn')).not.toHaveClass(/text-brand-error/);
+    await expect(page.locator('#copy-status')).toHaveText('Copied to clipboard');
+
+    // Reverts on its own
+    await expect.poll(() => iconD(page, 'moles-copy-btn'), { timeout: 3000 }).toBe(COPY_GLYPH);
+    await expect(page.locator('#copy-status')).toHaveText('');
+    await expect(page.locator('#moles-copy-btn')).toHaveClass(/text-ink-muted/);
+  });
+
+  test('failure (writeText rejects): swaps to the error glyph in the error colour, announces, reverts', async ({ page }) => {
+    await makeMolesResult(page);
+    await page.evaluate(() => {
+      navigator.clipboard.writeText = () => Promise.reject(new DOMException('denied', 'NotAllowedError'));
+    });
+
+    await page.locator('#moles-copy-btn').click();
+
+    await expect.poll(() => iconD(page, 'moles-copy-btn')).toBe(ALERT_GLYPH);
+    await expect(page.locator('#moles-copy-btn')).toHaveClass(/text-brand-error/);
+    await expect(page.locator('#copy-status')).toHaveText('Copy failed');
+
+    await expect.poll(() => iconD(page, 'moles-copy-btn'), { timeout: 3000 }).toBe(COPY_GLYPH);
+    await expect(page.locator('#moles-copy-btn')).not.toHaveClass(/text-brand-error/);
+    await expect(page.locator('#moles-copy-btn')).toHaveClass(/text-ink-muted/);
+    await expect(page.locator('#copy-status')).toHaveText('');
+  });
+
+  test('failure (insecure context: navigator.clipboard absent): handled, no uncaught error', async ({ page }) => {
+    const pageErrors: string[] = [];
+    page.on('pageerror', (e) => pageErrors.push(String(e)));
+
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'clipboard', { configurable: true, get: () => undefined });
+    });
+    await makeMolesResult(page);
+
+    await page.locator('#moles-copy-btn').click();
+
+    await expect(page.locator('#copy-status')).toHaveText('Copy failed');
+    await expect.poll(() => iconD(page, 'moles-copy-btn')).toBe(ALERT_GLYPH);
+    await expect(page.locator('#moles-copy-btn')).toHaveClass(/text-brand-error/);
+    expect(pageErrors).toEqual([]);
+  });
+
+  test('the Mass copy button behaves identically in the mol→g direction', async ({ page }) => {
+    await goto(page);
+    await page.click('#toggle-mol-to-g');
+    await setMolarMass(page, '18.015');
+    await setMoles(page, '1');
+    await expect(page.locator('#mass-copy-btn')).toBeEnabled();
+
+    await page.locator('#mass-copy-btn').click();
+
+    const shown = await page.locator('#mass-input').inputValue();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(shown);
+    await expect.poll(() => iconD(page, 'mass-copy-btn')).toBe(CHECK_GLYPH);
+    await expect(page.locator('#copy-status')).toHaveText('Copied to clipboard');
+    await expect.poll(() => iconD(page, 'mass-copy-btn'), { timeout: 3000 }).toBe(COPY_GLYPH);
+  });
+
+  test.describe('on a touch viewport', () => {
+    test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
+
+    test('tap gives the same success feedback as a click', async ({ page }) => {
+      await makeMolesResult(page);
+
+      await page.locator('#moles-copy-btn').tap();
+
+      expect(await page.evaluate(() => navigator.clipboard.readText()))
+        .toBe(await page.locator('#moles-input').inputValue());
+      await expect.poll(() => iconD(page, 'moles-copy-btn')).toBe(CHECK_GLYPH);
+      await expect(page.locator('#copy-status')).toHaveText('Copied to clipboard');
+      await expect.poll(() => iconD(page, 'moles-copy-btn'), { timeout: 3000 }).toBe(COPY_GLYPH);
+    });
+  });
+});
