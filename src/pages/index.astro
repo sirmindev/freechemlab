@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Logo from '../assets/freechemlab_logo.svg';
 ---
 
 <Layout title="Mole & Grams-to-Moles Calculator | FreeChemLab">
@@ -7,9 +8,8 @@ import Layout from '../layouts/Layout.astro';
 	<header class="w-full bg-canvas border-b border-hairline-soft">
 		<div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
 			<!-- Logo / Wordmark -->
-			<a href="/" class="text-base font-semibold text-ink tracking-tight flex items-center gap-1">
-				<span class="text-brand-green font-bold text-lg leading-none">&bull;</span>
-				<span>FreeChemLab</span>
+			<a href="/" class="flex items-center" aria-label="FreeChemLab">
+				<Logo class="h-4 w-auto" aria-hidden="true" />
 			</a>
 
 			<!-- Navigation Item (Active) -->

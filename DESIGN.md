@@ -525,7 +525,7 @@ Do not introduce a third family. JetBrains Mono, Inter, and Anonymous Pro were e
 - Input padding: 8px vertical · 12px horizontal
 - Element search input (`#molar-mass-element-search`, Build custom panel): 12px left / 12px right — symmetric, matching every other text input on the page. It briefly carried an asymmetric `pr-3.5` (14px) to clear the native browser search-cancel button; see "Suppressing native browser chrome" below for why that's no longer necessary.
 - Caption-above-value labels (e.g. "Molar Mass", "Mass", "Moles", "Common Compounds", the formula bar's "Formula"/"Molar Mass"): `{spacing.xs}` 8px between the caption and the value/control below it, at every breakpoint. Applies regardless of the container's own scale — the formula bar uses this same 8px even though its value text is smaller than a full field's, rather than a compressed value tuned to that one spot.
-- Nav bar logo (dot mark → "FreeChemLab" wordmark): `{spacing.xxs}` 4px gap. Chosen over 8px after a visual A/B at nav-bar scale — 8px visibly separated the dot from the wordmark into two elements instead of reading as one tight logotype; 4px kept the grouping closest to the prior (off-grid) 6px.
+- Nav bar logo: a single SVG asset (`src/assets/freechemlab_logo.svg`), imported as an Astro component and inlined. It is the complete "freechemlab." logotype — "free" in near-black (#14140F), "chemlab" plus the trailing period in brand green (#0B7A4F) — so there is no separate dot mark, no adjacent wordmark text, and no internal gap to tune. Rendered at `h-4` (16px tall, ~122px wide) inside the `href="/"` link, vertically centred in the fixed 56px nav row. (Historic note: the old mark was a green "•" bullet + separate "FreeChemLab" text with a `{spacing.xxs}` 4px gap between them, chosen over 8px after a visual A/B.)
 
 ### Suppressing Native Browser Chrome
 Some inputs render browser-native UI (spinners, clear buttons, dropdown arrows) that this design replaces with its own controls, or that would otherwise sit inside a padding zone meant for something else. The convention, established by the number-input spinner suppression and extended to the search-cancel button:
@@ -888,12 +888,13 @@ The particle-count row is the one place in the result block with a visible divid
 
 ### Navigation & Chrome
 
-**`top-nav`** — Wordmark left, minimal. No CTA button.
+**`top-nav`** — Logo left, minimal. No CTA button.
 - Background `{colors.canvas}`, height 56px, type `{typography.body-sm}`.
+- Logo: the `freechemlab.` SVG logotype (see "Nav bar logo" under Spacing System), wrapped in the `href="/"` home link with `aria-label="FreeChemLab"` since the link has no text node. `h-4`, vertically centred.
 
 **`breadcrumb-bar`** — Sits above the calculator card.
 - Transparent, text `{colors.ink-subtle}`, current page in `{colors.ink}`, type `{typography.breadcrumb}`.
-- Breadcrumb links darken to `{colors.ink}` on hover (`transition-colors`, 150ms). All text links (nav, breadcrumb, wordmark) keep the browser's **native focus outline** for keyboard nav — the `focus-visible` inset ring is for controls, not links. The "current page" nav pill has no hover/pressed of its own and carries no `transition-*` (it is a static marker, not an action).
+- Breadcrumb links darken to `{colors.ink}` on hover (`transition-colors`, 150ms). All text links (nav, breadcrumb, logo home link) keep the browser's **native focus outline** for keyboard nav — the `focus-visible` inset ring is for controls, not links. The "current page" nav pill has no hover/pressed of its own and carries no `transition-*` (it is a static marker, not an action).
 
 **`footer`** — Single line, copyright only. No cross-links until the product has more than one module.
 - Background `{colors.canvas}`, text `{colors.ink-subtle}`, type `{typography.body-sm}`.
