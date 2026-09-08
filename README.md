@@ -16,9 +16,7 @@ Inside of your Astro project, you'll see the following folders and files:
 │   └── favicon.svg
 ├── src
 │   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
+│   │   └── freechemlab_logo.svg
 │   ├── layouts
 │   │   └── Layout.astro
 │   └── pages
