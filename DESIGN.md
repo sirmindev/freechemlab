@@ -888,13 +888,15 @@ The particle-count row is the one place in the result block with a visible divid
 
 ### Navigation & Chrome
 
-**`top-nav`** — Logo left, minimal. No CTA button.
+**`top-nav`** — Logo centered, minimal. No CTA button.
 - Background `{colors.canvas}`, height 56px, type `{typography.body-sm}`.
 - Logo: the `freechemlab.` SVG logotype (see "Nav bar logo" under Spacing System), wrapped in the `href="/"` home link with `aria-label="FreeChemLab"` since the link has no text node. `h-4`, vertically centred.
+- **Current intentional state (not a placeholder):** the row is `justify-center` with the logo as its only child. The "Calculator" nav pill (`href="/calculators"`) is hidden — that route has no index page yet, so the link would be dead — via a `SHOW_CALCULATORS_INDEX` boolean in `src/pages/index.astro`'s frontmatter, gating both the pill's markup and the row's own `justify-between` ↔ `justify-center` split. **When a second calculator module ships and `/calculators` gets a real index page:** flip `SHOW_CALCULATORS_INDEX` to `true`. The row reverts to `justify-between` (logo left, pill right) automatically — the two are driven by the same flag, not independently toggled.
 
-**`breadcrumb-bar`** — Sits above the calculator card.
+**`breadcrumb-bar`** — Sits above the calculator card, when shown.
 - Transparent, text `{colors.ink-subtle}`, current page in `{colors.ink}`, type `{typography.breadcrumb}`.
 - Breadcrumb links darken to `{colors.ink}` on hover (`transition-colors`, 150ms). All text links (nav, breadcrumb, logo home link) keep the browser's **native focus outline** for keyboard nav — the `focus-visible` inset ring is for controls, not links. The "current page" nav pill has no hover/pressed of its own and carries no `transition-*` (it is a static marker, not an action).
+- **Currently hidden**, gated behind the same `SHOW_CALCULATORS_INDEX` flag as the nav pill above — its own "Calculators" segment (`href="/calculators"`) is the same dead link, and hiding one without the other would leave a breadcrumb trail pointing at a page that doesn't exist. The whole `<nav>` is omitted from the DOM (not CSS-hidden), so there is no leftover margin or gap where it used to sit — `main`'s own `py-4 md:py-6` top padding is what now sits above the calculator card. Flip the flag back to restore it alongside the pill.
 
 **`footer`** — Single line, copyright only. No cross-links until the product has more than one module.
 - Background `{colors.canvas}`, text `{colors.ink-subtle}`, type `{typography.body-sm}`.
