@@ -3,9 +3,13 @@ import '../styles/global.css';
 
 interface Props {
 	title?: string;
+	description?: string;
 }
 
-const { title = 'Mole & Grams-to-Moles Calculator | FreeChemLab' } = Astro.props;
+const {
+	title = 'Grams to Moles Calculator | Moles to Grams | FreeChemLab',
+	description = 'Convert grams to moles or moles to grams instantly, with step-by-step work shown for every calculation.'
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -20,6 +24,7 @@ const { title = 'Mole & Grams-to-Moles Calculator | FreeChemLab' } = Astro.props
 		<link rel="manifest" href="/site.webmanifest" />
 		<meta name="theme-color" content="#02613E" />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
