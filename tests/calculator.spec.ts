@@ -1305,10 +1305,10 @@ test.describe('Molar Mass Compounds panel', () => {
     await pickMode(page, 'Compounds');
     await option(page, /^Glucose/).click();
 
-    await expect(page.locator('#molar-mass')).toHaveValue('180.16');
+    await expect(page.locator('#molar-mass')).toHaveValue('180.156');
     await expect(page.locator('#molar-mass')).toHaveJSProperty('readOnly', true);
     expect(await getCompounds(page)).toEqual({
-      name: 'Glucose', formula: 'C₆H₁₂O₆', molarMass: 180.16,
+      name: 'Glucose', formula: 'C₆H₁₂O₆', molarMass: 180.156,
     });
     // Single click, no confirm step — and the panel stays open: picking a
     // compound and dismissing the list are different actions. See section 13
@@ -1340,9 +1340,9 @@ test.describe('Molar Mass Compounds panel', () => {
     await expect(page.locator(PANEL)).toHaveAttribute('aria-activedescendant', 'molar-mass-compound-option-2');
     await page.keyboard.press('Enter');
 
-    await expect(page.locator('#molar-mass')).toHaveValue('44.01');
+    await expect(page.locator('#molar-mass')).toHaveValue('44.009');
     expect(await getCompounds(page)).toEqual({
-      name: 'Carbon Dioxide', formula: 'CO₂', molarMass: 44.01,
+      name: 'Carbon Dioxide', formula: 'CO₂', molarMass: 44.009,
     });
   });
 
@@ -1362,7 +1362,7 @@ test.describe('Molar Mass Compounds panel', () => {
     // the keyboard-select test above, pre-existing and unrelated to auto-close.
     await page.mouse.move(5, 5);
     await expect(option(page, /^Ethanol/)).toHaveAttribute('aria-selected', 'true');
-    await expect(page.locator('#molar-mass')).toHaveValue('46.07');
+    await expect(page.locator('#molar-mass')).toHaveValue('46.069');
     // The highlight lands on the restored selection, not back at option 0
     await expect(page.locator(PANEL)).toHaveAttribute('aria-activedescendant', 'molar-mass-compound-option-4');
   });
@@ -1765,8 +1765,8 @@ test.describe('Molar Mass mode panels – dismissal', () => {
     await option(page, /^Ethanol/).click();
 
     await expect(page.locator(COMPOUNDS_PANEL)).toBeVisible();
-    await expect(page.locator('#molar-mass')).toHaveValue('46.07');
-    expect(await getCompounds(page)).toEqual({ name: 'Ethanol', formula: 'C₂H₅OH', molarMass: 46.07 });
+    await expect(page.locator('#molar-mass')).toHaveValue('46.069');
+    expect(await getCompounds(page)).toEqual({ name: 'Ethanol', formula: 'C₂H₅OH', molarMass: 46.069 });
     await expect(option(page, /^Ethanol/)).toHaveAttribute('aria-selected', 'true');
     await expect(option(page, /^Water/)).toHaveAttribute('aria-selected', 'false');
   });
@@ -1782,11 +1782,11 @@ test.describe('Molar Mass mode panels – dismissal', () => {
     // Closing must not re-point the field — same rule as Build custom.
     await expect(page.locator('#molar-mass-mode-label')).toHaveText('Compounds');
     expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('compounds');
-    await expect(page.locator('#molar-mass')).toHaveValue('46.07');
+    await expect(page.locator('#molar-mass')).toHaveValue('46.069');
 
     await pickMode(page, 'Compounds'); // toggle-click again: closed -> reopens
     await expect(page.locator(COMPOUNDS_PANEL)).toBeVisible();
-    await expect(page.locator('#molar-mass')).toHaveValue('46.07');
+    await expect(page.locator('#molar-mass')).toHaveValue('46.069');
     await expect(option(page, /^Ethanol/)).toHaveAttribute('aria-selected', 'true');
   });
 
@@ -1800,14 +1800,14 @@ test.describe('Molar Mass mode panels – dismissal', () => {
     await expect(page.locator(COMPOUNDS_PANEL)).toBeHidden();
     await expect(page.locator('#molar-mass-mode-label')).toHaveText('Compounds');
     expect(await page.evaluate(() => (window as any).molarMassMode.getActiveMode())).toBe('compounds');
-    await expect(page.locator('#molar-mass')).toHaveValue('46.07');
+    await expect(page.locator('#molar-mass')).toHaveValue('46.069');
 
     // Mode never left 'compounds' (click-outside doesn't switch it), so the
     // only way back is toggle-click, same as after any other Compounds close.
     await pickMode(page, 'Compounds');
     await expect(page.locator(COMPOUNDS_PANEL)).toBeVisible();
     await expect(option(page, /^Ethanol/)).toHaveAttribute('aria-selected', 'true');
-    await expect(page.locator('#molar-mass')).toHaveValue('46.07');
+    await expect(page.locator('#molar-mass')).toHaveValue('46.069');
   });
 
   test('Escape does NOT close the Compounds panel', async ({ page }) => {

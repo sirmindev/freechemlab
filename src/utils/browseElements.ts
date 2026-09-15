@@ -19,10 +19,10 @@ export interface Element {
 export const PRESETS: Preset[] = [
   // ── Original 5 (unchanged) ──────────────────────────────────────────────
   { name: 'Water',            formula: 'H₂O',       molarMass: 18.015 , group: 'Common' },
-  { name: 'Table Salt',       formula: 'NaCl',       molarMass: 58.44  , group: 'Common' },
-  { name: 'Carbon Dioxide',   formula: 'CO₂',        molarMass: 44.01  , group: 'Common' },
-  { name: 'Glucose',          formula: 'C₆H₁₂O₆',   molarMass: 180.16 , group: 'Common' },
-  { name: 'Ethanol',          formula: 'C₂H₅OH',     molarMass: 46.07  , group: 'Common' },
+  { name: 'Table Salt',       formula: 'NaCl',       molarMass: 58.440 , group: 'Common' },
+  { name: 'Carbon Dioxide',   formula: 'CO₂',        molarMass: 44.009 , group: 'Common' },
+  { name: 'Glucose',          formula: 'C₆H₁₂O₆',   molarMass: 180.156, group: 'Common' },
+  { name: 'Ethanol',          formula: 'C₂H₅OH',     molarMass: 46.069 , group: 'Common' },
   // ── 15 additions ────────────────────────────────────────────────────────
   { name: 'Ammonia',                   formula: 'NH₃',       molarMass: 17.031 , group: 'Common' },
   { name: 'Methane',                   formula: 'CH₄',       molarMass: 16.043 , group: 'Common' },
