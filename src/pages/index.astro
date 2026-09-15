@@ -615,14 +615,14 @@ const SHOW_CALCULATORS_INDEX = false;
 		     so the section's content edge lines up with the card's interior content
 		     (the h1), not the card's outer edge. -->
 		<section class="mt-12 px-4 mobile:px-6" aria-labelledby="understanding-moles-heading">
-			<h2 id="understanding-moles-heading" class="text-xl font-semibold text-ink">
+			<h2 id="understanding-moles-heading" class="text-[1.4rem] font-extrabold text-ink">
 				Understanding Moles
 			</h2>
 
 			<div class="mt-6 flex flex-col">
 				<!-- 1 · Definition + formula -->
-				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">
+				<div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">
 						What is a mole?
 					</h3>
 					<p class="text-base text-ink-muted">
@@ -635,11 +635,11 @@ const SHOW_CALCULATORS_INDEX = false;
 				</div>
 
 				<!-- 2 · The formula as a visual + scale anchor -->
-				<div class="flex flex-col gap-4 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">
+				<div class="flex flex-col gap-4 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">
 						The formula as a triangle
 					</h3>
-					<div class="bg-surface-soft inset-ring-1 inset-ring-hairline rounded-[12px] p-5 flex flex-col gap-5">
+					<div class="bg-surface-3 rounded-[12px] p-5 flex flex-col gap-5">
 						<div class="flex flex-col mobile:flex-row mobile:items-center gap-4">
 							<svg class="shrink-0" width="116" height="100" viewBox="0 0 116 100" fill="none" aria-hidden="true">
 								<path d="M58 6 L110 94 L6 94 Z" stroke="var(--color-hairline-tertiary)" stroke-width="1.5" stroke-linejoin="round" />
@@ -659,15 +659,15 @@ const SHOW_CALCULATORS_INDEX = false;
 				</div>
 
 				<!-- 3 · Live worked example. Reads the calculator's current state. -->
-				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">
+				<div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">
 						A worked example, live
 					</h3>
 					<p class="text-base text-ink-muted">
 						This uses the values in the calculator above. Change the mass or the
 						molar mass and it updates.
 					</p>
-					<div class="rounded-[8px] bg-surface inset-ring-1 inset-ring-hairline p-4 font-mono text-ink overflow-x-auto">
+					<div class="rounded-[8px] bg-surface-3 p-4 font-mono text-ink overflow-x-auto">
 						<div id="xp1-formula" class="text-[18px] font-medium leading-snug whitespace-nowrap text-ink-tertiary">n = m / M</div>
 					</div>
 					<p id="xp1-note" class="text-sm text-ink-subtle">
@@ -676,8 +676,8 @@ const SHOW_CALCULATORS_INDEX = false;
 				</div>
 
 				<!-- 4 · Common mistakes -->
-				<div class="flex flex-col gap-4 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">
+				<div class="flex flex-col gap-4 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">
 						Common mistakes
 					</h3>
 					<p class="text-base text-ink-muted">
@@ -710,7 +710,7 @@ const SHOW_CALCULATORS_INDEX = false;
 
 		<!-- FAQ section. Static content, no accordion — reuses the explainer section's
 		     section/heading/spacing pattern verbatim (mt-12 section gap, h2 title, mt-6
-		     column, border-t divider between items). Questions use a sentence-case h3
+		     column, py-8 spacing between items, no divider). Questions use a sentence-case h3
 		     (text-base font-semibold) rather than the explainer's uppercase eyebrow h3,
 		     since that treatment is sized for short 2-4 word labels and reads poorly at
 		     full-sentence question length. Worked-example calculations reuse the live
@@ -719,14 +719,14 @@ const SHOW_CALCULATORS_INDEX = false;
 		     color since these are filled, static answers, not an unpopulated result.
 		     No FAQPage JSON-LD yet — deferred to a later pass. -->
 		<section class="mt-12 px-4 mobile:px-6" aria-labelledby="faq-heading">
-			<h2 id="faq-heading" class="text-xl font-semibold text-ink">
+			<h2 id="faq-heading" class="text-[1.4rem] font-extrabold text-ink">
 				FAQs
 			</h2>
 
 			<div class="mt-6 flex flex-col">
 				<!-- 1 · Grams to moles -->
-				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">How do I convert grams to moles?</h3>
+				<div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">How do I convert grams to moles?</h3>
 					<ol class="list-decimal pl-5 text-base text-ink-muted space-y-1">
 						<li>Measure the mass in grams.</li>
 						<li>Find the molar mass.</li>
@@ -736,14 +736,14 @@ const SHOW_CALCULATORS_INDEX = false;
 						For example, <span class="font-mono text-ink">36</span> grams of water divided by
 						its molar mass, <span class="font-mono text-ink">18.015 g/mol</span>, gives about <span class="font-mono text-ink">2</span> moles (<span class="font-mono text-ink">1.998</span>, rounded):
 					</p>
-					<div class="rounded-[8px] bg-surface inset-ring-1 inset-ring-hairline p-4 font-mono text-ink overflow-x-auto">
+					<div class="rounded-[8px] bg-surface-3 p-4 font-mono text-ink overflow-x-auto">
 						<div class="text-[18px] font-medium leading-snug whitespace-nowrap">36 g &divide; 18.015 g/mol = 2 mol</div>
 					</div>
 				</div>
 
 				<!-- 2 · Moles to grams -->
-				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">How do I convert moles to grams?</h3>
+				<div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">How do I convert moles to grams?</h3>
 					<ol class="list-decimal pl-5 text-base text-ink-muted space-y-1">
 						<li>Find the number of moles.</li>
 						<li>Find the molar mass.</li>
@@ -754,14 +754,14 @@ const SHOW_CALCULATORS_INDEX = false;
 						multiplied by its molar mass, <span class="font-mono text-ink">58.44 g/mol</span>,
 						gives <span class="font-mono text-ink">175.32</span> grams:
 					</p>
-					<div class="rounded-[8px] bg-surface inset-ring-1 inset-ring-hairline p-4 font-mono text-ink overflow-x-auto">
+					<div class="rounded-[8px] bg-surface-3 p-4 font-mono text-ink overflow-x-auto">
 						<div class="text-[18px] font-medium leading-snug whitespace-nowrap">3 mol &times; 58.44 g/mol = 175.32 g</div>
 					</div>
 				</div>
 
 				<!-- 3 · What is molar mass -->
-				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">What is molar mass?</h3>
+				<div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">What is molar mass?</h3>
 					<p class="text-base text-ink-muted">
 						Molar mass is the mass of one mole of a substance, measured in grams per mole. It
 						tells you how much <span class="font-mono text-ink">6.022 &times; 10<sup>23</sup></span> particles of that substance weigh together. It varies a lot across the periodic
@@ -771,8 +771,8 @@ const SHOW_CALCULATORS_INDEX = false;
 				</div>
 
 				<!-- 4 · Molar mass of a compound -->
-				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">How do I find the molar mass of a compound?</h3>
+				<div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">How do I find the molar mass of a compound?</h3>
 					<p class="text-base text-ink-muted">
 						Add up the atomic mass of every atom in the compound. For carbon dioxide
 						(<span class="font-mono text-ink">CO<sub>2</sub></span>): one carbon atom
@@ -782,8 +782,8 @@ const SHOW_CALCULATORS_INDEX = false;
 				</div>
 
 				<!-- 5 · Determining molar mass in a lab -->
-				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
-					<h3 class="text-base font-semibold text-ink">How is molar mass determined in a lab?</h3>
+				<div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
+					<h3 class="text-[1.3rem] font-semibold text-ink">How is molar mass determined in a lab?</h3>
 					<ul class="list-disc pl-5 text-base text-ink-muted space-y-1">
 						<li>For an unknown solid, chemists use the colligative properties of a solution.</li>
 						<li>For a gas, equal volumes of any gas contain the same number of moles at the same temperature and pressure.</li>
