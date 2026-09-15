@@ -707,6 +707,91 @@ const SHOW_CALCULATORS_INDEX = false;
 				</div>
 			</div>
 		</section>
+
+		<!-- FAQ section. Static content, no accordion — reuses the explainer section's
+		     section/heading/spacing pattern verbatim (mt-12 section gap, h2 title, mt-6
+		     column, border-t divider between items). Questions use a sentence-case h3
+		     (text-base font-semibold) rather than the explainer's uppercase eyebrow h3,
+		     since that treatment is sized for short 2-4 word labels and reads poorly at
+		     full-sentence question length. Worked-example calculations reuse the live
+		     worked-example box (rounded-[8px] bg-surface ring p-4 font-mono) from the
+		     "A worked example, live" block above, minus its ink-tertiary empty-state
+		     color since these are filled, static answers, not an unpopulated result.
+		     No FAQPage JSON-LD yet — deferred to a later pass. -->
+		<section class="mt-12 px-4 mobile:px-6" aria-labelledby="faq-heading">
+			<h2 id="faq-heading" class="text-xl font-semibold text-ink">
+				FAQs
+			</h2>
+
+			<div class="mt-6 flex flex-col">
+				<!-- 1 · Grams to moles -->
+				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-base font-semibold text-ink">How do I convert grams to moles?</h3>
+					<ol class="list-decimal pl-5 text-base text-ink-muted space-y-1">
+						<li>Measure the mass in grams.</li>
+						<li>Find the molar mass.</li>
+						<li>Divide the mass by the molar mass.</li>
+					</ol>
+					<p class="text-base text-ink-muted">
+						For example, <span class="font-mono text-ink">36</span> grams of water divided by
+						its molar mass, <span class="font-mono text-ink">18.015 g/mol</span>, gives <span class="font-mono text-ink">2</span> moles:
+					</p>
+					<div class="rounded-[8px] bg-surface inset-ring-1 inset-ring-hairline p-4 font-mono text-ink overflow-x-auto">
+						<div class="text-[18px] font-medium leading-snug whitespace-nowrap">36 g &divide; 18.015 g/mol = 2 mol</div>
+					</div>
+				</div>
+
+				<!-- 2 · Moles to grams -->
+				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-base font-semibold text-ink">How do I convert moles to grams?</h3>
+					<ol class="list-decimal pl-5 text-base text-ink-muted space-y-1">
+						<li>Find the number of moles.</li>
+						<li>Find the molar mass.</li>
+						<li>Multiply the moles by the molar mass.</li>
+					</ol>
+					<p class="text-base text-ink-muted">
+						For example, <span class="font-mono text-ink">3</span> moles of sodium chloride
+						multiplied by its molar mass, <span class="font-mono text-ink">58.44 g/mol</span>,
+						gives <span class="font-mono text-ink">175.32</span> grams:
+					</p>
+					<div class="rounded-[8px] bg-surface inset-ring-1 inset-ring-hairline p-4 font-mono text-ink overflow-x-auto">
+						<div class="text-[18px] font-medium leading-snug whitespace-nowrap">3 mol &times; 58.44 g/mol = 175.32 g</div>
+					</div>
+				</div>
+
+				<!-- 3 · What is molar mass -->
+				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-base font-semibold text-ink">What is molar mass?</h3>
+					<p class="text-base text-ink-muted">
+						Molar mass is the mass of one mole of a substance, measured in grams per mole. It
+						tells you how much <span class="font-mono text-ink">6.022 &times; 10<sup>23</sup></span> particles of that substance weigh together. It varies a lot across the periodic
+						table &mdash; a mole of hydrogen weighs about <span class="font-mono text-ink">1.008</span> grams, while a mole of uranium weighs
+						about <span class="font-mono text-ink">238.03</span> grams.
+					</p>
+				</div>
+
+				<!-- 4 · Molar mass of a compound -->
+				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-base font-semibold text-ink">How do I find the molar mass of a compound?</h3>
+					<p class="text-base text-ink-muted">
+						Add up the atomic mass of every atom in the compound. For carbon dioxide
+						(<span class="font-mono text-ink">CO<sub>2</sub></span>): one carbon atom
+						(<span class="font-mono text-ink">12.01 g/mol</span>) plus two oxygen atoms
+						(<span class="font-mono text-ink">16.00 g/mol</span> each) equals <span class="font-mono text-ink">44.01 g/mol</span> total.
+					</p>
+				</div>
+
+				<!-- 5 · Determining molar mass in a lab -->
+				<div class="flex flex-col gap-3 py-6 border-t border-hairline first:border-t-0 first:pt-0 last:pb-0">
+					<h3 class="text-base font-semibold text-ink">How is molar mass determined in a lab?</h3>
+					<ul class="list-disc pl-5 text-base text-ink-muted space-y-1">
+						<li>For an unknown solid, chemists use the colligative properties of a solution.</li>
+						<li>For a gas, equal volumes of any gas contain the same number of moles at the same temperature and pressure.</li>
+						<li>For a known compound, calculate it directly by summing atomic masses.</li>
+					</ul>
+				</div>
+			</div>
+		</section>
 	</main>
 
 	<!-- Footer -->
